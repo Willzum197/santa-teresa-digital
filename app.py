@@ -26,10 +26,9 @@ def init_supabase():
 supabase = init_supabase()
 
 # ============================================
-# FUNCIÓN PARA DÓLAR - MANUAL (CORREGIDA)
+# FUNCIÓN PARA DÓLAR - MANUAL
 # ============================================
 def get_dolar():
-    """Obtiene el valor del dólar desde la base de datos"""
     try:
         response = supabase.table("configuracion").select("dolar").eq("id", 1).execute()
         if response.data and response.data[0].get("dolar"):
@@ -39,7 +38,6 @@ def get_dolar():
         return 55.0
 
 def actualizar_dolar_manual(nuevo_valor):
-    """Actualiza el valor del dólar en la base de datos"""
     try:
         supabase.table("configuracion").update({"dolar": nuevo_valor}).eq("id", 1).execute()
         return True
@@ -51,7 +49,6 @@ def actualizar_dolar_manual(nuevo_valor):
 # FUNCIÓN DE OPTIMIZACIÓN DE IMÁGENES
 # ============================================
 def optimizar_imagen(file, max_width=1024, quality=75):
-    """Optimiza una imagen antes de subirla"""
     try:
         if file is None:
             return None
@@ -82,14 +79,12 @@ def optimizar_imagen(file, max_width=1024, quality=75):
         
         return OptimizedFile(buffer, file.name)
     except Exception as e:
-        st.warning(f"No se pudo optimizar la imagen: {e}")
         return file
 
 # ============================================
 # FUNCIONES DE SUBIDA A STORAGE
 # ============================================
 def subir_imagen_storage(file, carpeta="imagenes"):
-    """Sube imagen optimizada a Supabase Storage"""
     try:
         if file is None:
             return None
@@ -107,12 +102,6 @@ def subir_imagen_storage(file, carpeta="imagenes"):
         )
         
         url = supabase.storage.from_("imagenes").get_public_url(nombre_archivo)
-        
-        if hasattr(file, 'size') and hasattr(archivo_optimizado, 'size'):
-            original = file.size / 1024
-            optimizada = archivo_optimizado.size / 1024
-            st.success(f"📸 Imagen: {original:.0f} KB → {optimizada:.0f} KB")
-        
         return url
     except Exception as e:
         st.error(f"Error al subir imagen: {e}")
@@ -209,8 +198,7 @@ def add_noticia(titulo, categoria, contenido, imagen):
         }
         supabase.table("noticias").insert(data).execute()
         return True
-    except Exception as e:
-        st.error(f"Error: {e}")
+    except Exception:
         return False
 
 def get_noticias(categoria=None):
@@ -475,7 +463,7 @@ def delete_opinion(id_):
     except Exception:
         return False
 
-# --- PERSONAJES (CON MODIFICAR Y ELIMINAR) ---
+# --- PERSONAJES ---
 def add_personaje(nombre, descripcion, imagen, fecha):
     try:
         img_url = subir_imagen_storage(imagen, "personajes") if imagen else None
@@ -486,25 +474,21 @@ def add_personaje(nombre, descripcion, imagen, fecha):
             "fecha": fecha,
             "activo": True
         }
-        # Desactivar personajes anteriores de la misma fecha
         existing = supabase.table("personajes").select("*").eq("fecha", fecha).eq("activo", True).execute()
         if existing.data:
             for p in existing.data:
                 supabase.table("personajes").update({"activo": False}).eq("id", p["id"]).execute()
         supabase.table("personajes").insert(data).execute()
         return True
-    except Exception as e:
-        st.error(f"Error: {e}")
+    except Exception:
         return False
 
 def update_personaje(id_, nombre, descripcion, imagen, fecha):
-    """Actualiza un personaje existente"""
     try:
         img_url = None
         if imagen:
             img_url = subir_imagen_storage(imagen, "personajes")
         else:
-            # Mantener la imagen actual
             existing = supabase.table("personajes").select("imagen_url").eq("id", id_).execute()
             if existing.data:
                 img_url = existing.data[0].get("imagen_url")
@@ -518,8 +502,7 @@ def update_personaje(id_, nombre, descripcion, imagen, fecha):
         }
         supabase.table("personajes").update(data).eq("id", id_).execute()
         return True
-    except Exception as e:
-        st.error(f"Error al actualizar: {e}")
+    except Exception:
         return False
 
 def get_personaje_dia(fecha):
@@ -1050,7 +1033,7 @@ with menu_tabs[8]:
     if personaje:
         col1, col2 = st.columns([1, 2])
         with col1:
-            if personaje.get('imagen_url'):
+            if personaje.get('imagen_url') and personaje['imagen_url']:
                 st.image(personaje['imagen_url'], use_container_width=True)
             else:
                 st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Flag_of_Venezuela_%28state%29.svg/1200px-Flag_of_Venezuela_%28state%29.svg.png", use_container_width=True)
@@ -1066,8 +1049,10 @@ with menu_tabs[8]:
         if not personajes_historicos.empty:
             for _, p in personajes_historicos.head(10).iterrows():
                 with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
-                    if p.get('imagen_url'):
+                    if p.get('imagen_url') and p['imagen_url']:
                         st.image(p['imagen_url'], width=150)
+                    else:
+                        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Flag_of_Venezuela_%28state%29.svg/1200px-Flag_of_Venezuela_%28state%29.svg.png", width=150)
                     st.write(p['descripcion'])
         else:
             st.info("No hay personajes registrados")
@@ -1292,13 +1277,12 @@ if st.session_state.get('es_admin', False):
     elif "👥 Personajes" in admin_opt:
         st.subheader("👥 Gestionar Personajes")
         
-        # --- FORMULARIO PARA CREAR NUEVO PERSONAJE ---
         st.markdown("### ➕ Crear nuevo personaje")
         with st.form("fpersonaje"):
             nombre = st.text_input("Nombre del personaje")
             fecha_personaje = st.date_input("Fecha a mostrar", value=datetime.now().date())
             descripcion = st.text_area("Biografía")
-            imagen = st.file_uploader("Imagen (desde tu laptop)", type=["jpg", "png", "jpeg"])
+            imagen = st.file_uploader("Imagen", type=["jpg", "png", "jpeg"])
             
             if st.form_submit_button("💾 Guardar Personaje"):
                 if nombre and descripcion:
@@ -1310,13 +1294,15 @@ if st.session_state.get('es_admin', False):
         st.markdown("---")
         st.markdown("### 📋 Personajes Registrados")
         
-        # --- LISTA DE PERSONAJES CON BOTONES MODIFICAR Y ELIMINAR ---
         personajes = get_personajes_historicos()
         if not personajes.empty:
             for _, p in personajes.iterrows():
                 with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
-                    if p.get('imagen_url'):
+                    if p.get('imagen_url') and p['imagen_url']:
                         st.image(p['imagen_url'], width=150)
+                    else:
+                        st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Flag_of_Venezuela_%28state%29.svg/1200px-Flag_of_Venezuela_%28state%29.svg.png", width=150)
+                    
                     st.write(p['descripcion'])
                     
                     col1, col2, col3 = st.columns(3)
@@ -1331,14 +1317,12 @@ if st.session_state.get('es_admin', False):
                             st.rerun()
                     with col3:
                         if st.button(f"⭐ Destacar hoy", key=f"destacar_{p['id']}"):
-                            # Actualizar fecha a hoy
                             update_personaje(p['id'], p['nombre'], p['descripcion'], None, datetime.now().strftime("%d/%m/%Y"))
                             st.success(f"✅ {p['nombre']} será el personaje del día")
                             st.rerun()
         else:
             st.info("No hay personajes registrados")
         
-        # --- FORMULARIO PARA MODIFICAR PERSONAJE (aparece si se clickea Modificar) ---
         if 'edit_personaje' in st.session_state and st.session_state.edit_personaje:
             p = st.session_state.edit_personaje
             st.markdown("---")
@@ -1348,7 +1332,7 @@ if st.session_state.get('es_admin', False):
                 nuevo_nombre = st.text_input("Nombre", value=p['nombre'])
                 nueva_fecha = st.date_input("Fecha", value=datetime.strptime(p['fecha'], "%d/%m/%Y").date())
                 nueva_descripcion = st.text_area("Biografía", value=p['descripcion'])
-                nueva_imagen = st.file_uploader("Nueva imagen (opcional, dejar vacío para mantener la actual)", type=["jpg", "png", "jpeg"])
+                nueva_imagen = st.file_uploader("Nueva imagen (opcional)", type=["jpg", "png", "jpeg"])
                 
                 col1, col2 = st.columns(2)
                 with col1:
