@@ -102,9 +102,17 @@ def subir_imagen_storage(file, carpeta="imagenes"):
         
         url = supabase.storage.from_("imagenes").get_public_url(nombre_archivo)
         return url
-    except Exception as e:
-        st.error(f"Error al subir imagen: {e}")
+    except Exception:
         return None
+
+def subir_multiples_imagenes(files, carpeta):
+    urls = []
+    if files:
+        for file in files:
+            url = subir_imagen_storage(file, carpeta)
+            if url:
+                urls.append(url)
+    return urls
 
 def subir_audio_storage(file, carpeta="musica"):
     try:
@@ -121,8 +129,7 @@ def subir_audio_storage(file, carpeta="musica"):
         
         url = supabase.storage.from_("musica").get_public_url(nombre_archivo)
         return url
-    except Exception as e:
-        st.error(f"Error al subir audio: {e}")
+    except Exception:
         return None
 
 def extraer_video_id(url_youtube):
@@ -251,8 +258,7 @@ def get_noticias(categoria=None):
         else:
             response = supabase.table("noticias").select("*").order("id", desc=True).execute()
         return pd.DataFrame(response.data)
-    except Exception as e:
-        st.error(f"Error al cargar noticias: {e}")
+    except Exception:
         return pd.DataFrame()
 
 def delete_noticia(id_):
@@ -260,21 +266,14 @@ def delete_noticia(id_):
         supabase.table("noticias").delete().eq("id", id_).execute()
         st.success("✅ Noticia eliminada")
         return True
-    except Exception as e:
-        st.error(f"Error al eliminar: {e}")
+    except Exception:
         return False
 
 # --- NEGOCIOS ---
 def add_negocio(nombre, resena, imagenes, google_maps_url):
     try:
         ahora = get_fecha_hora_venezuela()
-        imagenes_urls = []
-        if imagenes:
-            for img in imagenes:
-                url = subir_imagen_storage(img, "negocios")
-                if url:
-                    imagenes_urls.append(url)
-        
+        imagenes_urls = subir_multiples_imagenes(imagenes, "negocios") if imagenes else []
         data = {
             "nombre": nombre,
             "resena": resena,
@@ -293,11 +292,7 @@ def update_negocio(id_, nombre, resena, imagenes, google_maps_url):
     try:
         imagenes_urls = None
         if imagenes:
-            imagenes_urls = []
-            for img in imagenes:
-                url = subir_imagen_storage(img, "negocios")
-                if url:
-                    imagenes_urls.append(url)
+            imagenes_urls = subir_multiples_imagenes(imagenes, "negocios")
         else:
             existing = supabase.table("negocios").select("imagenes_url").eq("id", id_).execute()
             if existing.data:
@@ -426,13 +421,7 @@ def delete_reflexion(id_):
 def add_cronica(titulo, contenido, lugar, estado, imagenes):
     try:
         ahora = get_fecha_hora_venezuela()
-        imagenes_urls = []
-        if imagenes:
-            for img in imagenes:
-                url = subir_imagen_storage(img, "cronicas")
-                if url:
-                    imagenes_urls.append(url)
-        
+        imagenes_urls = subir_multiples_imagenes(imagenes, "cronicas") if imagenes else []
         data = {
             "titulo": titulo,
             "contenido": contenido,
@@ -453,11 +442,7 @@ def update_cronica(id_, titulo, contenido, lugar, estado, imagenes):
     try:
         imagenes_urls = None
         if imagenes:
-            imagenes_urls = []
-            for img in imagenes:
-                url = subir_imagen_storage(img, "cronicas")
-                if url:
-                    imagenes_urls.append(url)
+            imagenes_urls = subir_multiples_imagenes(imagenes, "cronicas")
         else:
             existing = supabase.table("cronicas").select("imagenes_url").eq("id", id_).execute()
             if existing.data:
@@ -953,7 +938,7 @@ with st.sidebar:
         st.session_state.es_admin = False
 
 # ============================================
-# MENU PRINCIPAL (TABS)
+# MENU PRINCIPAL (TABS) - CON VALIDACIONES DE IMÁGENES
 # ============================================
 menu_tabs = st.tabs(["🏠 Portada", "📰 Noticias", "📍 Donde ir - Donde comprar", "💭 Reflexiones", "📜 Crónicas", "🎬 Multimedia", "⚠️ Denuncias", "💬 Opiniones", "👥 Personajes que hicieron historia", "📅 Efemérides Médicas"])
 
