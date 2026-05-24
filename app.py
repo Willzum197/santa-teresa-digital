@@ -265,15 +265,19 @@ def delete_noticia(id_):
         return False
 
 # --- NEGOCIOS ---
-def add_negocio(nombre, resena, imagenes, google_maps_url):
+def add_negocio(nombre, categoria, resena, direccion, telefono, horario, google_maps_url, imagenes):
     try:
         ahora = get_fecha_hora_venezuela()
         imagenes_urls = subir_multiples_imagenes(imagenes, "negocios") if imagenes else []
         data = {
             "nombre": nombre,
+            "categoria": categoria,
             "resena": resena,
-            "imagenes_url": imagenes_urls,
+            "direccion": direccion,
+            "telefono": telefono,
+            "horario": horario,
             "google_maps_url": google_maps_url,
+            "imagenes_url": imagenes_urls,
             "fecha": ahora.strftime("%d/%m/%Y")
         }
         supabase.table("negocios").insert(data).execute()
@@ -281,7 +285,7 @@ def add_negocio(nombre, resena, imagenes, google_maps_url):
     except Exception:
         return False
 
-def update_negocio(id_, nombre, resena, imagenes, google_maps_url):
+def update_negocio(id_, nombre, categoria, resena, direccion, telefono, horario, google_maps_url, imagenes):
     try:
         imagenes_urls = None
         if imagenes:
@@ -293,9 +297,13 @@ def update_negocio(id_, nombre, resena, imagenes, google_maps_url):
         
         data = {
             "nombre": nombre,
+            "categoria": categoria,
             "resena": resena,
-            "imagenes_url": imagenes_urls,
-            "google_maps_url": google_maps_url
+            "direccion": direccion,
+            "telefono": telefono,
+            "horario": horario,
+            "google_maps_url": google_maps_url,
+            "imagenes_url": imagenes_urls
         }
         supabase.table("negocios").update(data).eq("id", id_).execute()
         return True
@@ -305,7 +313,9 @@ def update_negocio(id_, nombre, resena, imagenes, google_maps_url):
 def get_negocios():
     try:
         response = supabase.table("negocios").select("*").order("id", desc=True).execute()
-        return pd.DataFrame(response.data)
+        if response.data:
+            return pd.DataFrame(response.data)
+        return pd.DataFrame()
     except Exception:
         return pd.DataFrame()
 
@@ -742,60 +752,95 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS
+# ESTILOS - CON PESTAÑAS VISIBLES
 # ============================================
 st.markdown("""
 <style>
+/* Fondo tricolor venezolano */
 .stApp {
     background: linear-gradient(180deg, #FFD700 0%, #00247D 50%, #CF142B 100%);
 }
+
+/* Contenido principal con fondo oscuro */
 .block-container {
     background-color: rgba(0, 0, 0, 0.85) !important;
     border-radius: 20px !important;
     padding: 20px !important;
 }
+
+/* TODO EL TEXTO EN BLANCO */
 .main, .main p, .main span, .main div, .main label, .stMarkdown {
     color: #FFFFFF !important;
 }
+
+/* Títulos en dorado */
 .main h1, .main h2, .main h3, .main h4 {
     color: #FFD700 !important;
+    font-weight: bold !important;
 }
+
+/* ============================================ */
+/* PESTAÑAS (TABS) - CORREGIDO */
+/* ============================================ */
 .stTabs [data-baseweb="tab-list"] {
     gap: 8px !important;
     background-color: #1a1a1a !important;
     border-radius: 15px !important;
     padding: 8px !important;
 }
+
 .stTabs [data-baseweb="tab"] {
     background-color: #2a2a2a !important;
     border-radius: 12px !important;
-    color: #FFD700 !important;
+    color: #FFFFFF !important;
     font-weight: bold !important;
+    font-size: 16px !important;
     padding: 10px 20px !important;
 }
+
+.stTabs [data-baseweb="tab"]:hover {
+    background-color: #3a3a3a !important;
+    color: #FFD700 !important;
+}
+
 .stTabs [aria-selected="true"] {
     background: linear-gradient(135deg, #FFD700, #CF142B) !important;
-    color: white !important;
+    color: #FFFFFF !important;
 }
+
+/* Expanders */
 .streamlit-expanderHeader {
     background-color: #1a1a1a !important;
     border-radius: 10px !important;
     border-left: 4px solid #FFD700 !important;
     color: #FFD700 !important;
 }
+
+.streamlit-expanderContent {
+    background-color: #1a1a1a !important;
+    border-radius: 10px !important;
+    padding: 15px !important;
+}
+
+/* Sidebar azul claro */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important;
     border-right: 3px solid #FFD700 !important;
 }
+
 [data-testid="stSidebar"] * {
     color: #1a1a2e !important;
 }
+
+/* Inputs */
 input, textarea, .stSelectbox > div > div {
     background-color: #f0f0f0 !important;
     color: #000000 !important;
     border-radius: 12px !important;
     border: 2px solid #FFD700 !important;
 }
+
+/* Botones */
 .stButton > button {
     background: linear-gradient(135deg, #FFD700, #CF142B) !important;
     color: white !important;
@@ -803,6 +848,18 @@ input, textarea, .stSelectbox > div > div {
     font-weight: bold !important;
     border-radius: 25px !important;
 }
+
+/* Panel de estadísticas */
+.stats-panel {
+    background: rgba(0,0,0,0.8) !important;
+    padding: 15px !important;
+    border-radius: 20px !important;
+    border: 2px solid #FFD700 !important;
+    text-align: center !important;
+    margin-bottom: 20px !important;
+}
+
+/* Footer */
 .bronze-footer {
     background: linear-gradient(145deg, #8c6a31, #5d431a) !important;
     border: 5px solid #d4af37 !important;
@@ -811,8 +868,21 @@ input, textarea, .stSelectbox > div > div {
     text-align: center !important;
     margin-top: 50px !important;
 }
+
 .bronze-footer p {
     color: #ffd700 !important;
+}
+
+/* Mensajes de información */
+.stInfo, .stSuccess, .stWarning, .stError {
+    background-color: rgba(0,0,0,0.8) !important;
+    color: white !important;
+}
+
+/* Reproductor de audio */
+audio {
+    width: 100%;
+    border-radius: 30px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -850,12 +920,47 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL
+# PANEL SUPERIOR CON DÓLAR
 # ============================================
 ahora = get_fecha_hora_venezuela()
 dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
 meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 visitas = get_visitas()
+dolar = get_dolar()
+
+col1, col2, col3 = st.columns([2, 1, 1])
+with col1:
+    st.markdown(f"""
+    <div style="background: rgba(0,0,0,0.8); padding: 15px; border-radius: 20px; border: 2px solid #FFD700; text-align: center;">
+        <span style="color:#FFD700;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</span><br>
+        <span style="color:white; font-size:1.5em;">{ahora.strftime("%I:%M %p")}</span><br>
+        <span style="color:#FFD700;">👥 Visitantes: {visitas:,}</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown(f"""
+    <div style="background: rgba(0,0,0,0.8); padding: 15px; border-radius: 20px; border: 2px solid #FFD700; text-align: center;">
+        <span style="color:#FFD700;">💵 Dólar BCV</span><br>
+        <span style="color:white; font-size:1.5em;">{dolar:.2f} Bs</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    with st.expander("✏️ Cambiar Dólar"):
+        nuevo_dolar = st.number_input("Nuevo valor:", value=float(dolar), step=0.01, format="%.2f", key="dolar_rapido")
+        if st.button("💾 Actualizar", key="btn_dolar_rapido"):
+            if actualizar_dolar_manual(nuevo_dolar):
+                st.success("✅ Dólar actualizado")
+                st.rerun()
+            else:
+                st.error("❌ Error")
+
+st.markdown("---")
+
+# ============================================
+# ENCABEZADO PRINCIPAL
+# ============================================
 portada_url = get_portada_url()
 
 st.markdown(f"""
@@ -865,15 +970,10 @@ st.markdown(f"""
                 background-size: cover;
                 background-position: center;
                 border-radius: 20px;
-                padding: 50px 20px 40px 20px;
+                padding: 60px 20px;
                 border: 3px solid #FFD700;">
         <h1 style="color: #FFD700; text-shadow: 3px 3px 8px black; font-size: 2.5em;">Santa Teresa al Dia</h1>
         <p style="color: #FFFFFF; text-shadow: 2px 2px 5px black; font-size: 1.3em;">Informacion, Cultura y Fe de nuestro pueblo</p>
-        <div style="margin-top: 25px; padding-top: 10px; border-top: 1px solid rgba(255, 215, 0, 0.5);">
-            <p style="color: #FFD700; font-size: 0.9em; margin: 0;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</p>
-            <p style="color: white; font-size: 1em; margin: 5px 0;">{ahora.strftime("%I:%M %p")}</p>
-            <p style="color: #FFD700; font-size: 0.9em; margin: 0;">👥 Visitantes: {visitas:,}</p>
-        </div>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -892,8 +992,6 @@ with st.sidebar:
     if clave == "Juan*316*" or clave == "1966":
         es_admin = True
         st.success("✅ Acceso concedido")
-        dolar = get_dolar()
-        st.caption(f"💵 Dólar BCV actual: {dolar:.2f} Bs")
     elif clave:
         st.error("❌ Clave incorrecta")
     
@@ -914,7 +1012,6 @@ with st.sidebar:
 # FUNCIÓN SEGURA PARA MOSTRAR IMÁGENES
 # ============================================
 def mostrar_imagen_segura(url, width=300, use_container_width=False):
-    """Muestra una imagen solo si la URL es válida"""
     if url and isinstance(url, str) and url.startswith(('http://', 'https://', 'data:image')):
         if use_container_width:
             st.image(url, use_container_width=True)
@@ -924,7 +1021,7 @@ def mostrar_imagen_segura(url, width=300, use_container_width=False):
     return False
 
 # ============================================
-# MENU PRINCIPAL (TABS) - CON FUNCIÓN SEGURA
+# MENU PRINCIPAL (TABS)
 # ============================================
 menu_tabs = st.tabs(["🏠 Portada", "📰 Noticias", "📍 Donde ir - Donde comprar", "💭 Reflexiones", "📜 Crónicas", "🎬 Multimedia", "⚠️ Denuncias", "💬 Opiniones", "👥 Personajes que hicieron historia", "📅 Efemérides Médicas"])
 
@@ -1016,7 +1113,7 @@ with menu_tabs[2]:
     negocios = get_negocios()
     if not negocios.empty:
         for _, n in negocios.iterrows():
-            with st.expander(f"🏪 {n['nombre']}"):
+            with st.expander(f"🏪 {n['nombre']} - {n['categoria']}"):
                 if n.get('imagenes_url') and n['imagenes_url']:
                     if isinstance(n['imagenes_url'], list):
                         for img_url in n['imagenes_url'][:2]:
@@ -1025,7 +1122,12 @@ with menu_tabs[2]:
                         mostrar_imagen_segura(n['imagenes_url'], 200)
                 
                 st.write(f"**Reseña:** {n['resena']}")
-                
+                if n.get('direccion') and n['direccion']:
+                    st.write(f"📍 **Dirección:** {n['direccion']}")
+                if n.get('telefono') and n['telefono']:
+                    st.write(f"📞 **Teléfono:** {n['telefono']}")
+                if n.get('horario') and n['horario']:
+                    st.write(f"⏰ **Horario:** {n['horario']}")
                 if n.get('google_maps_url') and n['google_maps_url']:
                     st.markdown(f"📍 [Ver en Google Maps]({n['google_maps_url']})")
                 
@@ -1271,7 +1373,7 @@ with menu_tabs[9]:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN - CONTENIDO (se mantiene igual)
+# PANEL ADMIN - CONTENIDO
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
@@ -1347,19 +1449,22 @@ if st.session_state.get('es_admin', False):
         with st.expander("➕ CREAR nuevo negocio", expanded=True):
             with st.form("fneg"):
                 nombre = st.text_input("Nombre del negocio *")
+                categoria = st.text_input("Categoría *")
                 resena = st.text_area("Reseña *")
-                google_maps_url = st.text_input("Enlace Google Maps (opcional)", placeholder="https://maps.google.com/...")
-                imagenes = st.file_uploader("Fotos (máximo 2)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
+                direccion = st.text_input("Dirección")
+                telefono = st.text_input("Teléfono")
+                horario = st.text_input("Horario")
+                google_maps_url = st.text_input("Enlace Google Maps", placeholder="https://maps.google.com/...")
+                imagenes = st.file_uploader("Fotos (máximo 3)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
                 
-                if len(imagenes) > 2:
-                    st.error("Máximo 2 fotos por negocio")
+                if len(imagenes) > 3:
+                    st.error("Máximo 3 fotos por negocio")
                 elif st.form_submit_button("➕ Agregar Negocio"):
-                    if nombre and resena:
-                        add_negocio(nombre, resena, imagenes, google_maps_url)
-                        st.success("✅ Negocio agregado")
-                        st.rerun()
+                    if nombre and categoria and resena:
+                        if add_negocio(nombre, categoria, resena, direccion, telefono, horario, google_maps_url, imagenes):
+                            st.rerun()
                     else:
-                        st.error("❌ Nombre y reseña son obligatorios")
+                        st.error("❌ Nombre, categoría y reseña son obligatorios")
         
         st.markdown("---")
         st.markdown("### 📋 Negocios existentes")
@@ -1367,7 +1472,7 @@ if st.session_state.get('es_admin', False):
         negocios = get_negocios()
         if not negocios.empty:
             for _, n in negocios.iterrows():
-                with st.expander(f"🏪 {n['nombre']}"):
+                with st.expander(f"🏪 {n['nombre']} - {n['categoria']}"):
                     if n.get('imagenes_url') and n['imagenes_url']:
                         if isinstance(n['imagenes_url'], list):
                             for img_url in n['imagenes_url']:
@@ -1376,6 +1481,12 @@ if st.session_state.get('es_admin', False):
                             mostrar_imagen_segura(n['imagenes_url'], 200)
                     
                     st.write(f"**Reseña:** {n['resena']}")
+                    if n.get('direccion') and n['direccion']:
+                        st.write(f"📍 **Dirección:** {n['direccion']}")
+                    if n.get('telefono') and n['telefono']:
+                        st.write(f"📞 **Teléfono:** {n['telefono']}")
+                    if n.get('horario') and n['horario']:
+                        st.write(f"⏰ **Horario:** {n['horario']}")
                     if n.get('google_maps_url') and n['google_maps_url']:
                         st.markdown(f"📍 [Ver en Google Maps]({n['google_maps_url']})")
                     
@@ -1415,14 +1526,18 @@ if st.session_state.get('es_admin', False):
             st.subheader(f"✏️ Modificando: {n['nombre']}")
             with st.form("edit_negocio_form"):
                 nuevo_nombre = st.text_input("Nombre", value=n['nombre'])
+                nueva_categoria = st.text_input("Categoría", value=n['categoria'])
                 nueva_resena = st.text_area("Reseña", value=n['resena'])
+                nueva_direccion = st.text_input("Dirección", value=n.get('direccion', ''))
+                nuevo_telefono = st.text_input("Teléfono", value=n.get('telefono', ''))
+                nuevo_horario = st.text_input("Horario", value=n.get('horario', ''))
                 nuevo_google_maps = st.text_input("Enlace Google Maps", value=n.get('google_maps_url', ''))
-                nuevas_imagenes = st.file_uploader("Nuevas fotos (opcional, máximo 2)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
+                nuevas_imagenes = st.file_uploader("Nuevas fotos (opcional, máximo 3)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
                 
-                if len(nuevas_imagenes) > 2:
-                    st.error("Máximo 2 fotos")
+                if len(nuevas_imagenes) > 3:
+                    st.error("Máximo 3 fotos")
                 elif st.form_submit_button("💾 Guardar cambios"):
-                    if update_negocio(n['id'], nuevo_nombre, nueva_resena, nuevas_imagenes, nuevo_google_maps):
+                    if update_negocio(n['id'], nuevo_nombre, nueva_categoria, nueva_resena, nueva_direccion, nuevo_telefono, nuevo_horario, nuevo_google_maps, nuevas_imagenes):
                         st.success("✅ Negocio actualizado")
                         del st.session_state.edit_negocio
                         st.rerun()
