@@ -120,17 +120,21 @@ def subir_audio_storage(file, carpeta="musica"):
         if file is None:
             return None
         
+        # Generar nombre único para el archivo
         nombre_archivo = f"{carpeta}/{uuid.uuid4()}.mp3"
         
+        # Subir el archivo a Supabase Storage
         supabase.storage.from_("musica").upload(
             nombre_archivo,
             file.getvalue(),
-            {"content-type": file.type}
+            {"content-type": "audio/mpeg"}
         )
         
+        # Obtener la URL pública
         url = supabase.storage.from_("musica").get_public_url(nombre_archivo)
         return url
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al subir audio: {str(e)}")
         return None
 
 def extraer_video_id(url_youtube):
@@ -162,7 +166,6 @@ def mostrar_video_youtube(url_youtube, width_percent=25):
     """Muestra video de YouTube con ancho personalizado"""
     video_id = extraer_video_id(url_youtube)
     if video_id:
-        # Usar HTML/CSS para controlar el ancho al 25%
         html = f"""
         <div style="width: {width_percent}%; margin: 0 auto;">
             <iframe 
@@ -180,12 +183,17 @@ def mostrar_video_youtube(url_youtube, width_percent=25):
         st.error("URL de YouTube no válida")
 
 def mostrar_musica(url_audio):
-    html = f"""
-    <audio controls style="width: 100%;">
-        <source src="{url_audio}" type="audio/mpeg">
-    </audio>
-    """
-    st.markdown(html, unsafe_allow_html=True)
+    """Muestra reproductor de audio"""
+    if url_audio:
+        html = f"""
+        <audio controls style="width: 100%; border-radius: 30px;">
+            <source src="{url_audio}" type="audio/mpeg">
+            Tu navegador no soporta el elemento de audio.
+        </audio>
+        """
+        st.markdown(html, unsafe_allow_html=True)
+    else:
+        st.warning("No hay URL de audio disponible")
 
 # ============================================
 # DETECTAR DISPOSITIVO MOVIL
@@ -517,7 +525,7 @@ def delete_cronica(id_):
     except Exception:
         return False
 
-# --- VIDEOS (CORREGIDO) ---
+# --- VIDEOS ---
 def add_video(titulo, url_youtube):
     try:
         if not url_youtube or url_youtube.strip() == "":
@@ -593,28 +601,68 @@ def delete_video(id_):
         st.error(f"Error al eliminar video: {str(e)}")
         return False
 
-# --- MUSICA ---
+# --- MUSICA (CORREGIDO) ---
 def add_musica(titulo, audio_file):
     try:
+        if not titulo or titulo.strip() == "":
+            st.error("❌ El título es obligatorio")
+            return False
+        
+        if not audio_file:
+            st.error("❌ Debes seleccionar un archivo de audio")
+            return False
+        
+        # Verificar que sea un archivo MP3
+        if not audio_file.name.lower().endswith('.mp3'):
+            st.error("❌ Solo se permiten archivos MP3")
+            return False
+        
         ahora = get_fecha_hora_venezuela()
-        audio_url = subir_audio_storage(audio_file, "musica") if audio_file else None
+        
+        # Subir el audio a Supabase Storage
+        audio_url = subir_audio_storage(audio_file, "musica")
+        
+        if not audio_url:
+            st.error("❌ Error al subir el archivo de audio")
+            return False
+        
         data = {
             "titulo": titulo,
             "audio_url": audio_url,
             "formato": "mp3",
             "fecha": ahora.strftime("%d/%m/%Y")
         }
-        supabase.table("musicas").insert(data).execute()
-        return True
-    except Exception:
+        
+        result = supabase.table("musicas").insert(data).execute()
+        
+        if result.data:
+            st.success("✅ Música agregada correctamente")
+            return True
+        else:
+            st.error("❌ Error al guardar en la base de datos")
+            return False
+            
+    except Exception as e:
+        st.error(f"❌ Error al agregar música: {str(e)}")
         return False
 
 def update_musica(id_, titulo, audio_file):
     try:
+        if not titulo or titulo.strip() == "":
+            st.error("❌ El título es obligatorio")
+            return False
+        
         audio_url = None
         if audio_file:
+            if not audio_file.name.lower().endswith('.mp3'):
+                st.error("❌ Solo se permiten archivos MP3")
+                return False
             audio_url = subir_audio_storage(audio_file, "musica")
+            if not audio_url:
+                st.error("❌ Error al subir el archivo de audio")
+                return False
         else:
+            # Mantener la URL existente
             existing = supabase.table("musicas").select("audio_url").eq("id", id_).execute()
             if existing.data:
                 audio_url = existing.data[0].get("audio_url")
@@ -625,21 +673,26 @@ def update_musica(id_, titulo, audio_file):
         }
         supabase.table("musicas").update(data).eq("id", id_).execute()
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al actualizar música: {str(e)}")
         return False
 
 def get_musicas():
     try:
         response = supabase.table("musicas").select("*").order("id", desc=True).execute()
-        return pd.DataFrame(response.data)
-    except Exception:
+        if response.data:
+            return pd.DataFrame(response.data)
+        return pd.DataFrame()
+    except Exception as e:
+        st.error(f"Error al obtener música: {str(e)}")
         return pd.DataFrame()
 
 def delete_musica(id_):
     try:
         supabase.table("musicas").delete().eq("id", id_).execute()
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al eliminar música: {str(e)}")
         return False
 
 # --- DENUNCIAS ---
@@ -1255,7 +1308,6 @@ with menu_tabs[5]:
         if not videos.empty:
             for _, v in videos.iterrows():
                 with st.expander(f"🎬 {v['titulo']}"):
-                    # Mostrar video al 25% del ancho
                     mostrar_video_youtube(v['video_url'], width_percent=25)
                     st.caption(f"📅 {v['fecha']}")
                     st.caption(f"🔗 {v['video_url']}")
@@ -1263,17 +1315,24 @@ with menu_tabs[5]:
             st.info("No hay videos disponibles")
     
     with tab_mus:
+        st.markdown("### 🎵 Lista de Música")
         musicas = get_musicas()
         if not musicas.empty:
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
-                    mostrar_musica(m['audio_url'])
-                    st.caption(f"📅 {m['fecha']}")
+                    if m.get('audio_url'):
+                        mostrar_musica(m['audio_url'])
+                        st.caption(f"📅 {m['fecha']}")
+                    else:
+                        st.warning("No hay URL de audio disponible")
         else:
             st.info("No hay música disponible")
     
     with tab_rad:
-        st.markdown("### 🎵 Love Songs Radio")
+        st.markdown("### 📻 Emisoras de Radio")
+        
+        # Radio 1: Love Songs Radio
+        st.markdown("#### 🎵 Love Songs Radio")
         radio_iframe = """
         <iframe src="https://hearme.fm/embed/love-songs" 
                 width="100%" 
@@ -1284,6 +1343,13 @@ with menu_tabs[5]:
         </iframe>
         """
         st.markdown(radio_iframe, unsafe_allow_html=True)
+        st.caption("Música romántica las 24 horas")
+        
+        st.markdown("---")
+        
+        # Radio 2: Opción adicional (puedes agregar más)
+        st.markdown("#### 📻 Radio Santa Teresa (Próximamente)")
+        st.info("🚀 Pronto tendremos nuestra propia radio online")
 
 # --- TAB 6: DENUNCIAS ---
 with menu_tabs[6]:
@@ -1736,7 +1802,6 @@ if st.session_state.get('es_admin', False):
     elif "🎬 Videos" in admin_opt:
         st.subheader("🎬 Gestionar Videos")
         st.info("📌 Sube tu video a YouTube y pega la URL aquí")
-        st.info("Ejemplos de URLs válidas:\n- https://www.youtube.com/watch?v=dQw4w9WgXcQ\n- https://youtu.be/dQw4w9WgXcQ")
         
         with st.expander("➕ CREAR nuevo video", expanded=True):
             with st.form("fvid"):
@@ -1806,7 +1871,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_video
                         st.rerun()
     
-    # --- MUSICA ---
+    # --- MUSICA (CORREGIDO) ---
     elif "🎵 Música" in admin_opt:
         st.subheader("🎵 Gestionar Música")
         st.info("📌 Sube tu música desde tu laptop (formato MP3)")
@@ -1815,13 +1880,13 @@ if st.session_state.get('es_admin', False):
             with st.form("fmus"):
                 titulo = st.text_input("Título de la canción *")
                 audio_file = st.file_uploader("Archivo de audio (MP3) *", type=["mp3"])
+                
                 if st.form_submit_button("📤 Agregar Música"):
                     if titulo and audio_file:
                         if add_musica(titulo, audio_file):
-                            st.success("✅ Música agregada")
                             st.rerun()
                         else:
-                            st.error("❌ Error al agregar")
+                            st.error("❌ Error al agregar música")
                     else:
                         st.error("❌ Título y archivo de audio son obligatorios")
         
@@ -1832,8 +1897,12 @@ if st.session_state.get('es_admin', False):
         if not musicas.empty:
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
-                    mostrar_musica(m['audio_url'])
-                    st.caption(f"📅 {m['fecha']}")
+                    if m.get('audio_url'):
+                        mostrar_musica(m['audio_url'])
+                        st.caption(f"📅 {m['fecha']}")
+                        st.caption(f"🔗 URL del audio disponible")
+                    else:
+                        st.warning("No hay URL de audio disponible")
                     
                     col1, col2 = st.columns(2)
                     with col1:
