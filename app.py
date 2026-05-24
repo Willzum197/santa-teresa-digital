@@ -265,7 +265,7 @@ def delete_noticia(id_):
     except Exception:
         return False
 
-# --- NEGOCIOS (CORREGIDO) ---
+# --- NEGOCIOS ---
 def add_negocio(nombre, resena, google_maps_url, imagenes):
     try:
         ahora = get_fecha_hora_venezuela()
@@ -352,22 +352,30 @@ def delete_opinion_negocio(id_):
     except Exception:
         return False
 
-# --- REFLEXIONES ---
+# --- REFLEXIONES (CORREGIDO) ---
 def add_reflexion(titulo, contenido, versiculo):
     try:
         ahora = get_fecha_hora_venezuela()
-        supabase.table("reflexiones").update({"activo": False}).execute()
+        
+        # Desactivar todas las reflexiones actuales
+        try:
+            supabase.table("reflexiones").update({"activo": False}).execute()
+        except:
+            pass
+        
         data = {
             "titulo": titulo,
             "contenido": contenido,
-            "versiculo": versiculo,
+            "versiculo": versiculo if versiculo else None,
             "autor": "Admin",
             "fecha": ahora.strftime("%d/%m/%Y"),
             "activo": True
         }
-        supabase.table("reflexiones").insert(data).execute()
-        return True
-    except Exception:
+        
+        result = supabase.table("reflexiones").insert(data).execute()
+        return True if result.data else False
+    except Exception as e:
+        st.error(f"Error al guardar reflexión: {str(e)}")
         return False
 
 def update_reflexion(id_, titulo, contenido, versiculo):
@@ -375,11 +383,12 @@ def update_reflexion(id_, titulo, contenido, versiculo):
         data = {
             "titulo": titulo,
             "contenido": contenido,
-            "versiculo": versiculo
+            "versiculo": versiculo if versiculo else None
         }
         supabase.table("reflexiones").update(data).eq("id", id_).execute()
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al actualizar reflexión: {str(e)}")
         return False
 
 def get_reflexion_activa():
@@ -387,25 +396,34 @@ def get_reflexion_activa():
         response = supabase.table("reflexiones").select("*").eq("activo", True).limit(1).execute()
         if response.data:
             return response.data[0]
+        
         response = supabase.table("reflexiones").select("*").order("id", desc=True).limit(1).execute()
         if response.data:
             return response.data[0]
         return None
     except Exception:
+        try:
+            response = supabase.table("reflexiones").select("*").order("id", desc=True).limit(1).execute()
+            if response.data:
+                return response.data[0]
+        except:
+            pass
         return None
 
 def get_reflexiones():
     try:
         response = supabase.table("reflexiones").select("*").order("id", desc=True).execute()
         return pd.DataFrame(response.data)
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al obtener reflexiones: {str(e)}")
         return pd.DataFrame()
 
 def delete_reflexion(id_):
     try:
         supabase.table("reflexiones").delete().eq("id", id_).execute()
         return True
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al eliminar reflexión: {str(e)}")
         return False
 
 # --- CRONICAS ---
@@ -747,7 +765,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON PESTAÑAS VISIBLES
+# ESTILOS
 # ============================================
 st.markdown("""
 <style>
@@ -756,25 +774,25 @@ st.markdown("""
     background: linear-gradient(180deg, #FFD700 0%, #00247D 50%, #CF142B 100%);
 }
 
-/* Contenido principal con fondo oscuro */
+/* Contenido principal */
 .block-container {
     background-color: rgba(0, 0, 0, 0.85) !important;
     border-radius: 20px !important;
     padding: 20px !important;
 }
 
-/* TODO EL TEXTO EN BLANCO */
+/* Texto en blanco */
 .main, .main p, .main span, .main div, .main label, .stMarkdown {
     color: #FFFFFF !important;
 }
 
-/* Títulos en dorado */
+/* Títulos dorados */
 .main h1, .main h2, .main h3, .main h4 {
     color: #FFD700 !important;
     font-weight: bold !important;
 }
 
-/* PESTAÑAS (TABS) */
+/* Pestañas */
 div[data-testid="stTabs"] button {
     background-color: #2a2a2a !important;
     border-radius: 12px !important;
@@ -858,7 +876,7 @@ input, textarea, .stSelectbox > div > div {
     color: white !important;
 }
 
-/* Reproductor de audio */
+/* Audio */
 audio {
     width: 100%;
     border-radius: 30px;
@@ -1058,7 +1076,7 @@ with menu_tabs[1]:
         else:
             st.info("No hay noticias de Farándula")
 
-# --- TAB 2: DONDE IR - DONDE COMPRAR (NEGOCIOS) ---
+# --- TAB 2: NEGOCIOS ---
 with menu_tabs[2]:
     st.title("📍 Donde ir - Donde comprar")
     
@@ -1328,7 +1346,7 @@ with menu_tabs[9]:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN - CONTENIDO
+# PANEL ADMIN
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
