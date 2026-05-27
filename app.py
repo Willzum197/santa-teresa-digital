@@ -1034,10 +1034,10 @@ div[data-testid="stTabs"] button {
     border-radius: 12px !important;
     color: #FFFFFF !important;
     font-weight: bold !important;
-    font-size: 16px !important;
-    padding: 12px 24px !important;
-    margin: 0 6px !important;
-    border: 2px solid #FFD700 !important;
+    font-size: 14px !important;
+    padding: 8px 16px !important;
+    margin: 0 4px !important;
+    border: 1px solid #FFD700 !important;
     cursor: pointer !important;
     transition: all 0.3s ease !important;
 }
@@ -1134,12 +1134,18 @@ audio {
 [data-testid="stMetricValue"] {
     color: #FFD700 !important;
     font-weight: bold !important;
-    font-size: 2rem !important;
+    font-size: 1.5rem !important;
 }
 
 [data-testid="stMetricLabel"] {
     color: #FFFFFF !important;
     font-weight: bold !important;
+}
+
+/* Inputs pequeños para like */
+.stTextInput > div > div > input {
+    padding: 4px 8px !important;
+    font-size: 12px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1234,6 +1240,12 @@ with st.sidebar:
         ])
         st.session_state.admin_opt = admin_opt
         st.session_state.es_admin = True
+        
+        # Mostrar estadísticas rápidas en sidebar (solo admin)
+        st.markdown("---")
+        st.markdown("### 📊 Estadísticas Rápidas")
+        total_likes_sidebar = obtener_total_likes()
+        st.metric("👍 Me gusta", total_likes_sidebar)
     else:
         st.session_state.es_admin = False
 
@@ -1263,44 +1275,27 @@ with menu_tabs[0]:
         session_id = str(time.time()) + str(st.session_state.get('admin_pass', ''))
         st.session_state.usuario_id = hashlib.md5(session_id.encode()).hexdigest()
     
-    # Mostrar total de Me gusta
-    total_likes = obtener_total_likes()
+    # Botón de Me gusta - HORIZONTAL Y MÁS PEQUEÑO
+    st.markdown("### 👍 Apoya nuestra página")
     
-    # Botón de Me gusta
-    col_like1, col_like2, col_like3 = st.columns([1, 2, 1])
-    with col_like2:
-        st.markdown("---")
-        st.markdown("### 👍 Apoya nuestra página")
+    with st.form("form_like"):
+        # Tres columnas para nombre, teléfono y botón
+        col_nom, col_tel, col_btn = st.columns([2, 2, 1])
         
-        with st.form("form_like"):
-            nombre_like = st.text_input("Tu nombre (para aparecer en la lista)", placeholder="Ej: María González")
-            telefono_like = st.text_input("WhatsApp (opcional)", placeholder="0412 1234567")
-            
-            col_btn1, col_btn2 = st.columns(2)
-            with col_btn1:
-                if st.form_submit_button("👍 Me gusta", use_container_width=True):
-                    if agregar_like(st.session_state.usuario_id, nombre_like if nombre_like else "Anónimo", telefono_like):
-                        st.success(f"✅ Gracias por tu like! Total: {total_likes + 1}")
-                        st.balloons()
-                        st.rerun()
+        with col_nom:
+            nombre_like = st.text_input("Tu nombre", placeholder="Ej: María González", key="like_nombre", label_visibility="collapsed")
         
-        # Mostrar total
-        st.markdown(f"### ❤️ Total de Me gusta: **{total_likes}**")
+        with col_tel:
+            telefono_like = st.text_input("WhatsApp", placeholder="0412 1234567", key="like_tel", label_visibility="collapsed")
         
-        # Mostrar últimos likes
-        with st.expander("👥 Ver últimos Me gusta"):
-            likes_df = obtener_lista_likes()
-            if not likes_df.empty:
-                for _, l in likes_df.head(10).iterrows():
-                    try:
-                        fecha_like = datetime.fromisoformat(l['fecha']).strftime("%d/%m/%Y %H:%M")
-                    except:
-                        fecha_like = l['fecha'][:16] if len(l['fecha']) > 16 else l['fecha']
-                    st.markdown(f"👍 **{l['usuario_nombre']}** - {fecha_like}")
-            else:
-                st.info("Sé el primero en dar Me gusta")
-        
-        st.markdown("---")
+        with col_btn:
+            if st.form_submit_button("👍 Me gusta", use_container_width=True):
+                if agregar_like(st.session_state.usuario_id, nombre_like if nombre_like else "Anónimo", telefono_like):
+                    st.success("✅ Gracias por tu like!")
+                    st.balloons()
+                    st.rerun()
+    
+    st.markdown("---")
     
     col1, col2 = st.columns(2)
     with col1:
@@ -2309,6 +2304,45 @@ if st.session_state.get('es_admin', False):
     elif "⚙️ Configuración" in admin_opt:
         st.subheader("⚙️ Configuración del Sistema")
         
+        # Mostrar estadísticas de Me gusta (SOLO ADMIN)
+        st.markdown("### ❤️ Estadísticas de Me gusta")
+        col_est1, col_est2, col_est3 = st.columns(3)
+        
+        total_likes_admin = obtener_total_likes()
+        likes_df_admin = obtener_lista_likes()
+        
+        with col_est1:
+            st.metric("👍 Total Me gusta", total_likes_admin)
+        
+        with col_est2:
+            likes_hoy = 0
+            hoy_str = datetime.now().strftime("%Y-%m-%d")
+            if not likes_df_admin.empty:
+                for _, l in likes_df_admin.iterrows():
+                    try:
+                        fecha_like = datetime.fromisoformat(l['fecha']).strftime("%Y-%m-%d")
+                        if fecha_like == hoy_str:
+                            likes_hoy += 1
+                    except:
+                        pass
+            st.metric("📅 Me gusta hoy", likes_hoy)
+        
+        with col_est3:
+            st.metric("👥 Personas que apoyan", len(likes_df_admin))
+        
+        # Mostrar lista completa de Me gusta (solo admin)
+        with st.expander("📋 Lista completa de Me gusta"):
+            if not likes_df_admin.empty:
+                for _, l in likes_df_admin.iterrows():
+                    try:
+                        fecha_like = datetime.fromisoformat(l['fecha']).strftime("%d/%m/%Y %H:%M")
+                    except:
+                        fecha_like = l['fecha'][:16] if len(l['fecha']) > 16 else l['fecha']
+                    st.markdown(f"👍 **{l['usuario_nombre']}** - Tel: {l['usuario_telefono'] if l['usuario_telefono'] else 'No registrado'} - {fecha_like}")
+            else:
+                st.info("No hay Me gusta registrados")
+        
+        st.markdown("---")
         st.markdown("### 💵 Tipo de Cambio Dólar BCV")
         dolar_actual = get_dolar()
         st.metric("Valor actual", f"{dolar_actual:.2f} Bs")
