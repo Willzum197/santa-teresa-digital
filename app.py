@@ -47,28 +47,23 @@ def actualizar_dolar_manual(nuevo_valor):
         return False
 
 # ============================================
-# FUNCIONES DE ME GUSTA
+# FUNCIONES DE ME GUSTA (SIMPLIFICADO)
 # ============================================
-def agregar_like(usuario_id, usuario_nombre, usuario_telefono):
+def agregar_like(usuario_id):
     try:
         existing = supabase.table("likes").select("*").eq("usuario_id", usuario_id).execute()
         
         if existing.data:
-            supabase.table("likes").update({
-                "activo": True,
-                "fecha": datetime.now(pytz.UTC).isoformat()
-            }).eq("usuario_id", usuario_id).execute()
-            return True
+            return True  # Ya había dado like antes
         else:
             data = {
                 "usuario_id": usuario_id,
-                "usuario_nombre": usuario_nombre if usuario_nombre else "Anónimo",
-                "usuario_telefono": usuario_telefono if usuario_telefono else None,
                 "fecha": datetime.now(pytz.UTC).isoformat(),
                 "activo": True
             }
-            supabase.table("likes").insert(data).execute()
-            return True
+            result = supabase.table("likes").insert(data).execute()
+            return True if result.data else False
+            
     except Exception as e:
         st.error(f"Error al agregar like: {str(e)}")
         return False
@@ -80,12 +75,12 @@ def obtener_total_likes():
     except Exception:
         return 0
 
-def obtener_lista_likes():
+def ya_dio_like(usuario_id):
     try:
-        response = supabase.table("likes").select("*").eq("activo", True).order("fecha", desc=True).execute()
-        return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+        response = supabase.table("likes").select("*").eq("usuario_id", usuario_id).execute()
+        return len(response.data) > 0
     except Exception:
-        return pd.DataFrame()
+        return False
 
 # ============================================
 # FUNCIÓN DE OPTIMIZACIÓN DE IMÁGENES
@@ -221,9 +216,10 @@ def mostrar_video_youtube(url_youtube, width_percent=25):
         st.error("URL de YouTube no válida")
 
 def mostrar_musica(url_audio):
+    """Reproductor de música SIN opción de descarga"""
     if url_audio:
         html = f"""
-        <audio controls style="width: 100%; border-radius: 30px;">
+        <audio controls controlsList="nodownload" style="width: 100%; border-radius: 30px;">
             <source src="{url_audio}" type="audio/mpeg">
             Tu navegador no soporta el elemento de audio.
         </audio>
@@ -984,51 +980,35 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - TODAS LAS LETRAS EN BLANCO NEGRITA
+# ESTILOS
 # ============================================
 st.markdown("""
 <style>
-/* Fondo tricolor venezolano */
 .stApp {
     background: linear-gradient(180deg, #FFD700 0%, #00247D 50%, #CF142B 100%);
 }
-
-/* Contenido principal con fondo oscuro */
 .block-container {
     background-color: rgba(0, 0, 0, 0.85) !important;
     border-radius: 20px !important;
     padding: 20px !important;
 }
-
-/* TODAS LAS LETRAS EN BLANCO NEGRITA */
 * {
     color: #FFFFFF !important;
     font-weight: bold !important;
 }
-
 .main, .main p, .main span, .main div, .main label, .stMarkdown {
     color: #FFFFFF !important;
     font-weight: bold !important;
 }
-
-/* Títulos en dorado (ligeramente más claro) */
 .main h1, .main h2, .main h3, .main h4 {
     color: #FFD700 !important;
     font-weight: bold !important;
 }
-
-/* Enlaces */
 a {
     color: #FFD700 !important;
     font-weight: bold !important;
     text-decoration: underline !important;
 }
-
-/* Pestañas (TABS) */
-div[data-testid="stTabs"] {
-    background-color: transparent !important;
-}
-
 div[data-testid="stTabs"] button {
     background-color: #1a1a1a !important;
     border-radius: 12px !important;
@@ -1038,48 +1018,30 @@ div[data-testid="stTabs"] button {
     padding: 8px 16px !important;
     margin: 0 4px !important;
     border: 1px solid #FFD700 !important;
-    cursor: pointer !important;
-    transition: all 0.3s ease !important;
 }
-
 div[data-testid="stTabs"] button:hover {
     background-color: #FFD700 !important;
     color: #000000 !important;
-    border-color: #FFFFFF !important;
 }
-
-div[data-testid="stTabs"] button p {
-    color: inherit !important;
-    font-weight: bold !important;
-}
-
-/* Expanders */
 .streamlit-expanderHeader {
     background-color: #1a1a1a !important;
     border-radius: 10px !important;
     border-left: 4px solid #FFD700 !important;
     color: #FFD700 !important;
-    font-weight: bold !important;
 }
-
 .streamlit-expanderContent {
     background-color: #1a1a1a !important;
     border-radius: 10px !important;
     padding: 15px !important;
 }
-
-/* Sidebar */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important;
     border-right: 3px solid #FFD700 !important;
 }
-
 [data-testid="stSidebar"] * {
     color: #1a1a2e !important;
     font-weight: bold !important;
 }
-
-/* Inputs */
 input, textarea, .stSelectbox > div > div {
     background-color: #f0f0f0 !important;
     color: #000000 !important;
@@ -1087,13 +1049,6 @@ input, textarea, .stSelectbox > div > div {
     border-radius: 12px !important;
     border: 2px solid #FFD700 !important;
 }
-
-input::placeholder, textarea::placeholder {
-    color: #666666 !important;
-    font-weight: normal !important;
-}
-
-/* Botones */
 .stButton > button {
     background: linear-gradient(135deg, #FFD700, #CF142B) !important;
     color: white !important;
@@ -1101,8 +1056,6 @@ input::placeholder, textarea::placeholder {
     font-weight: bold !important;
     border-radius: 25px !important;
 }
-
-/* Footer */
 .bronze-footer {
     background: linear-gradient(145deg, #8c6a31, #5d431a) !important;
     border: 5px solid #d4af37 !important;
@@ -1111,41 +1064,27 @@ input::placeholder, textarea::placeholder {
     text-align: center !important;
     margin-top: 50px !important;
 }
-
 .bronze-footer p {
     color: #ffd700 !important;
     font-weight: bold !important;
 }
-
-/* Mensajes */
 .stInfo, .stSuccess, .stWarning, .stError {
     background-color: rgba(0,0,0,0.8) !important;
     color: white !important;
     font-weight: bold !important;
 }
-
-/* Reproductor de audio */
 audio {
     width: 100%;
     border-radius: 30px;
 }
-
-/* Métricas */
 [data-testid="stMetricValue"] {
     color: #FFD700 !important;
     font-weight: bold !important;
     font-size: 1.5rem !important;
 }
-
 [data-testid="stMetricLabel"] {
     color: #FFFFFF !important;
     font-weight: bold !important;
-}
-
-/* Inputs pequeños para like */
-.stTextInput > div > div > input {
-    padding: 4px 8px !important;
-    font-size: 12px !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -1241,7 +1180,6 @@ with st.sidebar:
         st.session_state.admin_opt = admin_opt
         st.session_state.es_admin = True
         
-        # Mostrar estadísticas rápidas en sidebar (solo admin)
         st.markdown("---")
         st.markdown("### 📊 Estadísticas Rápidas")
         total_likes_sidebar = obtener_total_likes()
@@ -1275,25 +1213,24 @@ with menu_tabs[0]:
         session_id = str(time.time()) + str(st.session_state.get('admin_pass', ''))
         st.session_state.usuario_id = hashlib.md5(session_id.encode()).hexdigest()
     
-    # Botón de Me gusta - HORIZONTAL Y MÁS PEQUEÑO
+    total_likes = obtener_total_likes()
+    ya_like = ya_dio_like(st.session_state.usuario_id)
+    
+    # Botón de Me gusta
     st.markdown("### 👍 Apoya nuestra página")
     
-    with st.form("form_like"):
-        # Tres columnas para nombre, teléfono y botón
-        col_nom, col_tel, col_btn = st.columns([2, 2, 1])
-        
-        with col_nom:
-            nombre_like = st.text_input("Tu nombre", placeholder="Ej: María González", key="like_nombre", label_visibility="collapsed")
-        
-        with col_tel:
-            telefono_like = st.text_input("WhatsApp", placeholder="0412 1234567", key="like_tel", label_visibility="collapsed")
-        
-        with col_btn:
-            if st.form_submit_button("👍 Me gusta", use_container_width=True):
-                if agregar_like(st.session_state.usuario_id, nombre_like if nombre_like else "Anónimo", telefono_like):
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
+    with col_btn2:
+        if not ya_like:
+            if st.button("👍 Me gusta", use_container_width=True):
+                if agregar_like(st.session_state.usuario_id):
                     st.success("✅ Gracias por tu like!")
                     st.balloons()
                     st.rerun()
+                else:
+                    st.error("❌ Error al registrar like")
+        else:
+            st.success(f"❤️ Ya has dado like! Total: {total_likes}")
     
     st.markdown("---")
     
@@ -1529,18 +1466,42 @@ with menu_tabs[5]:
             st.info("No hay música disponible")
     
     with tab_rad:
-        st.markdown("### 📻 Love Songs Radio")
-        radio_iframe = """
-        <iframe src="https://hearme.fm/embed/love-songs" 
+        st.markdown("### 📻 Radio Online")
+        
+        radio_opcion = st.selectbox(
+            "Selecciona una emisora:",
+            ["Love Songs Radio", "Radio Romántica", "Radio Latina FM", "Radio Instrumental"]
+        )
+        
+        if radio_opcion == "Love Songs Radio":
+            st.markdown("#### 🎵 Love Songs Radio")
+            radio_iframe = """
+            <iframe 
+                src="https://hearme.fm/embed/love-songs" 
                 width="100%" 
                 height="200" 
                 frameborder="0" 
                 allowtransparency 
                 allow="autoplay">
-        </iframe>
-        """
-        st.markdown(radio_iframe, unsafe_allow_html=True)
-        st.caption("🎶 Música romántica las 24 horas")
+            </iframe>
+            """
+            st.markdown(radio_iframe, unsafe_allow_html=True)
+            st.caption("🎶 Música romántica las 24 horas")
+        
+        elif radio_opcion == "Radio Romántica":
+            st.markdown("#### 🎵 Radio Romántica")
+            st.audio("https://streamingecuador.com:8000/romantica.mp3", format="audio/mp3")
+            st.caption("🎶 Los mejores éxitos románticos")
+        
+        elif radio_opcion == "Radio Latina FM":
+            st.markdown("#### 🎵 Radio Latina FM")
+            st.audio("https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KQ_FMAAC.aac", format="audio/aac")
+            st.caption("🎶 Música latina actual")
+        
+        elif radio_opcion == "Radio Instrumental":
+            st.markdown("#### 🎵 Radio Instrumental")
+            st.audio("http://streaming.radionomy.com/InstrumentalSongs", format="audio/mp3")
+            st.caption("🎶 Música instrumental para relajarse")
 
 # --- TAB 6: DENUNCIAS ---
 with menu_tabs[6]:
@@ -2309,38 +2270,15 @@ if st.session_state.get('es_admin', False):
         col_est1, col_est2, col_est3 = st.columns(3)
         
         total_likes_admin = obtener_total_likes()
-        likes_df_admin = obtener_lista_likes()
         
         with col_est1:
             st.metric("👍 Total Me gusta", total_likes_admin)
         
         with col_est2:
-            likes_hoy = 0
-            hoy_str = datetime.now().strftime("%Y-%m-%d")
-            if not likes_df_admin.empty:
-                for _, l in likes_df_admin.iterrows():
-                    try:
-                        fecha_like = datetime.fromisoformat(l['fecha']).strftime("%Y-%m-%d")
-                        if fecha_like == hoy_str:
-                            likes_hoy += 1
-                    except:
-                        pass
-            st.metric("📅 Me gusta hoy", likes_hoy)
+            st.metric("📅 Usuarios únicos", total_likes_admin)
         
         with col_est3:
-            st.metric("👥 Personas que apoyan", len(likes_df_admin))
-        
-        # Mostrar lista completa de Me gusta (solo admin)
-        with st.expander("📋 Lista completa de Me gusta"):
-            if not likes_df_admin.empty:
-                for _, l in likes_df_admin.iterrows():
-                    try:
-                        fecha_like = datetime.fromisoformat(l['fecha']).strftime("%d/%m/%Y %H:%M")
-                    except:
-                        fecha_like = l['fecha'][:16] if len(l['fecha']) > 16 else l['fecha']
-                    st.markdown(f"👍 **{l['usuario_nombre']}** - Tel: {l['usuario_telefono'] if l['usuario_telefono'] else 'No registrado'} - {fecha_like}")
-            else:
-                st.info("No hay Me gusta registrados")
+            st.metric("👥 Apoyan la página", total_likes_admin)
         
         st.markdown("---")
         st.markdown("### 💵 Tipo de Cambio Dólar BCV")
