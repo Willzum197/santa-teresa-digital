@@ -1264,20 +1264,19 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL
+# ENCABEZADO PRINCIPAL - CORREGIDO (SIN FONDO BLANCO)
 # ============================================
 ahora = get_fecha_hora_venezuela()
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 visitas = get_visitas()
 dolar = get_dolar()
-portada_url = get_portada_url()
-
+total_likes = obtener_total_likes()
 hora_str = ahora.strftime("%I:%M %p").lstrip("0")
 
-# ENCABEZADO COMPLETO EN UNA SOLA LÍNEA HORIZONTAL
+# Encabezado sin imagen de fondo (solo color para evitar fondo blanco)
 st.markdown(f"""
-<div style="background: linear-gradient(rgba(0,0,0,0.7), rgba(0,0,0,0.7)), url('{portada_url}'); background-size: cover; background-position: center; border-radius: 20px; padding: 25px 20px; border: 2px solid #FFD700; margin-bottom: 20px;">
+<div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border-radius: 20px; padding: 20px 25px; border: 2px solid #FFD700; margin-bottom: 20px;">
     <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;">
         <!-- Columna 1: Título y subtítulo -->
         <div style="flex: 2; min-width: 200px;">
@@ -1286,17 +1285,17 @@ st.markdown(f"""
         </div>
         
         <!-- Columna 2: Me gusta -->
-        <div style="flex: 1; min-width: 200px; text-align: center; background: rgba(0,0,0,0.5); border-radius: 15px; padding: 10px;">
-            <div style="font-size: 0.9em; color: #FFD700;">❤️ Apoya nuestra página</div>
-            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
-                <span style="font-size: 2em;">👍</span>
-                <span style="font-size: 1.8em; font-weight: bold; color: #FFD700;">{obtener_total_likes():,}</span>
-                <span style="font-size: 0.8em;">Personas apoyan</span>
+        <div style="flex: 1; min-width: 180px; text-align: center; background: rgba(0,0,0,0.4); border-radius: 15px; padding: 10px;">
+            <div style="font-size: 0.85em; color: #FFD700;">❤️ Apoya nuestra página</div>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span style="font-size: 1.8em;">👍</span>
+                <span style="font-size: 1.5em; font-weight: bold; color: #FFD700;">{total_likes:,}</span>
+                <span style="font-size: 0.7em;">Personas apoyan</span>
             </div>
         </div>
         
         <!-- Columna 3: Fecha, hora y visitantes -->
-        <div style="flex: 1.5; min-width: 200px; text-align: right;">
+        <div style="flex: 1.5; min-width: 220px; text-align: right;">
             <div style="font-size: 0.85em; color: #FFD700;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</div>
             <div style="font-size: 1em; color: #FFFFFF;">🕐 {hora_str}</div>
             <div style="font-size: 0.85em; color: #FFD700;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</div>
@@ -1304,6 +1303,28 @@ st.markdown(f"""
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# Botón "Dar Me gusta" separado debajo del encabezado
+if 'usuario_id' not in st.session_state:
+    session_id = str(time.time()) + str(st.session_state.get('admin_pass', ''))
+    st.session_state.usuario_id = hashlib.md5(session_id.encode()).hexdigest()
+
+ya_like = ya_dio_like(st.session_state.usuario_id)
+
+if not ya_like:
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
+        if st.button("👍 Dar Me gusta", use_container_width=True, key="btn_like_global"):
+            if agregar_like(st.session_state.usuario_id):
+                st.success("✅ Gracias por tu like!")
+                st.balloons()
+                st.rerun()
+            else:
+                st.error("❌ Error al registrar like")
+else:
+    st.info("❤️ ¡Gracias por apoyar nuestra página!")
+
+st.markdown("---")
 
 # ============================================
 # SIDEBAR ADMIN
@@ -1336,8 +1357,7 @@ with st.sidebar:
         
         st.markdown("---")
         st.markdown("### 📊 Estadísticas")
-        total_likes_sidebar = obtener_total_likes()
-        st.metric("👍 Me gusta", f"{total_likes_sidebar:,}")
+        st.metric("👍 Me gusta", f"{total_likes:,}")
     else:
         st.session_state.es_admin = False
 
@@ -1390,7 +1410,7 @@ with col_linea3[2]:
     if st.button("📅 Efemérides Médicas", use_container_width=True):
         st.session_state.selected_tab = 10
 with col_linea3[3]:
-    st.markdown(" ")  # Espacio vacío para equilibrio
+    st.markdown(" ")
 
 st.markdown("---")
 
@@ -1401,29 +1421,6 @@ if 'selected_tab' not in st.session_state:
 # Mostrar contenido según la pestaña seleccionada
 if st.session_state.selected_tab == 0:
     # --- PORTADA ---
-    if 'usuario_id' not in st.session_state:
-        session_id = str(time.time()) + str(st.session_state.get('admin_pass', ''))
-        st.session_state.usuario_id = hashlib.md5(session_id.encode()).hexdigest()
-    
-    ya_like = ya_dio_like(st.session_state.usuario_id)
-    total_likes = obtener_total_likes()
-    
-    # Botón de Me gusta
-    col_like1, col_like2, col_like3 = st.columns([1, 1, 1])
-    with col_like2:
-        if not ya_like:
-            if st.button("👍 Dar Me gusta", use_container_width=True, key="btn_like_portada"):
-                if agregar_like(st.session_state.usuario_id):
-                    st.success("✅ Gracias por tu like!")
-                    st.balloons()
-                    st.rerun()
-                else:
-                    st.error("❌ Error al registrar like")
-        else:
-            st.info("❤️ ¡Gracias por apoyar nuestra página!")
-    
-    st.markdown("---")
-    
     col1, col2 = st.columns(2)
     with col1:
         st.markdown("### 📰 Últimas Noticias")
