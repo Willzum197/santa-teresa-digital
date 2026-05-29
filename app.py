@@ -272,6 +272,33 @@ def mostrar_tiktok(url_tiktok, width_percent=25):
         st.markdown(f"📱 [Ver video en TikTok]({url_tiktok})")
 
 # ============================================
+# FUNCIÓN PARA MOSTRAR IMÁGENES EN FILA (una al lado de la otra)
+# ============================================
+def mostrar_imagenes_en_fila(urls, max_imagenes=3):
+    """Muestra las imágenes una al lado de la otra horizontalmente"""
+    if not urls:
+        return
+    
+    # Limitar número de imágenes a mostrar
+    urls_mostrar = urls[:max_imagenes]
+    
+    # Crear columnas dinámicamente
+    cols = st.columns(len(urls_mostrar))
+    
+    for i, url in enumerate(urls_mostrar):
+        with cols[i]:
+            st.image(url, use_container_width=True)
+
+def mostrar_imagen_segura(url, width=300, use_container_width=False):
+    if url and isinstance(url, str) and url.startswith(('http://', 'https://', 'data:image')):
+        if use_container_width:
+            st.image(url, use_container_width=True)
+        else:
+            st.image(url, width=width)
+        return True
+    return False
+
+# ============================================
 # DETECTAR DISPOSITIVO MOVIL
 # ============================================
 def is_mobile():
@@ -1174,14 +1201,16 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL
+# ENCABEZADO PRINCIPAL CON FECHA Y HORA
 # ============================================
 ahora = get_fecha_hora_venezuela()
-dias = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
 meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 visitas = get_visitas()
 dolar = get_dolar()
 portada_url = get_portada_url()
+
+hora_str = ahora.strftime("%I:%M %p").lstrip("0")
 
 st.markdown(f"""
 <div style="text-align: center; margin-bottom: 20px;">
@@ -1196,7 +1225,7 @@ st.markdown(f"""
         <p style="color: #FFFFFF; text-shadow: 2px 2px 5px black; font-size: 1.3em; font-weight: bold;">Informacion, Cultura y Fe de nuestro pueblo</p>
         <div style="margin-top: 25px; padding-top: 10px; border-top: 1px solid rgba(255, 215, 0, 0.5);">
             <p style="color: #FFD700; font-size: 0.9em; margin: 0; font-weight: bold;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</p>
-            <p style="color: white; font-size: 1em; margin: 5px 0; font-weight: bold;">{ahora.strftime("%I:%M %p")}</p>
+            <p style="color: white; font-size: 1.2em; margin: 5px 0; font-weight: bold;">🕐 {hora_str}</p>
             <p style="color: #FFD700; font-size: 0.9em; margin: 0; font-weight: bold;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</p>
         </div>
     </div>
@@ -1240,18 +1269,6 @@ with st.sidebar:
         st.session_state.es_admin = False
 
 # ============================================
-# FUNCIÓN SEGURA PARA MOSTRAR IMÁGENES
-# ============================================
-def mostrar_imagen_segura(url, width=300, use_container_width=False):
-    if url and isinstance(url, str) and url.startswith(('http://', 'https://', 'data:image')):
-        if use_container_width:
-            st.image(url, use_container_width=True)
-        else:
-            st.image(url, width=width)
-        return True
-    return False
-
-# ============================================
 # MENU PRINCIPAL (TABS)
 # ============================================
 menu_tabs = st.tabs(["🏠 Portada", "📰 Noticias", "📍 Donde ir - Donde comprar", "💭 Reflexiones", "📜 Crónicas", "🎬 Multimedia", "⚠️ Denuncias", "💬 Opiniones", "👥 Personajes que hicieron historia", "⚖️ El Crimen No Paga", "📅 Efemérides Médicas"])
@@ -1265,13 +1282,22 @@ with menu_tabs[0]:
         st.session_state.usuario_id = hashlib.md5(session_id.encode()).hexdigest()
     
     ya_like = ya_dio_like(st.session_state.usuario_id)
+    total_likes = obtener_total_likes()
     
-    st.markdown("### 👍 Apoya nuestra página")
+    st.markdown("### ❤️ Apoya nuestra página")
     
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 1, 1])
-    with col_btn2:
+    col_like1, col_like2, col_like3 = st.columns([1, 2, 1])
+    with col_like2:
+        st.markdown(f"""
+        <div style="text-align: center; padding: 20px;">
+            <div style="font-size: 48px; color: #FFD700;">👍</div>
+            <div style="font-size: 36px; font-weight: bold; color: #FFD700;">{total_likes:,}</div>
+            <div style="font-size: 18px;">Personas apoyan esta página</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         if not ya_like:
-            if st.button("👍 Me gusta", use_container_width=True):
+            if st.button("👍 Dar Me gusta", use_container_width=True):
                 if agregar_like(st.session_state.usuario_id):
                     st.success("✅ Gracias por tu like!")
                     st.balloons()
@@ -1381,7 +1407,7 @@ with menu_tabs[1]:
         else:
             st.info("No hay Reportajes disponibles")
 
-# --- TAB 2: NEGOCIOS ---
+# --- TAB 2: NEGOCIOS (CON IMÁGENES EN FILA) ---
 with menu_tabs[2]:
     st.title("📍 Donde ir - Donde comprar")
     
@@ -1390,12 +1416,12 @@ with menu_tabs[2]:
     if not negocios.empty:
         for _, n in negocios.iterrows():
             with st.expander(f"🏪 {n['nombre']}"):
+                # Mostrar imágenes en fila (una al lado de la otra)
                 if n.get('imagenes_url') and n['imagenes_url']:
-                    if isinstance(n['imagenes_url'], list):
-                        for img_url in n['imagenes_url'][:2]:
-                            mostrar_imagen_segura(img_url, 200)
+                    if isinstance(n['imagenes_url'], list) and len(n['imagenes_url']) > 0:
+                        mostrar_imagenes_en_fila(n['imagenes_url'], max_imagenes=3)
                     elif isinstance(n['imagenes_url'], str):
-                        mostrar_imagen_segura(n['imagenes_url'], 200)
+                        mostrar_imagen_segura(n['imagenes_url'], 300)
                 else:
                     st.caption("📷 Sin imágenes")
                 
@@ -1460,7 +1486,7 @@ with menu_tabs[3]:
     else:
         st.info("No hay reflexiones anteriores")
 
-# --- TAB 4: CRONICAS ---
+# --- TAB 4: CRONICAS (CON IMÁGENES EN FILA) ---
 with menu_tabs[4]:
     st.title("📜 Crónicas")
     estados = ["Todos", "Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"]
@@ -1470,9 +1496,8 @@ with menu_tabs[4]:
         for _, c in cronicas.iterrows():
             with st.expander(f"📖 {c['titulo']} - {c['lugar']}, {c['estado']}"):
                 if c.get('imagenes_url') and c['imagenes_url']:
-                    if isinstance(c['imagenes_url'], list):
-                        for img_url in c['imagenes_url']:
-                            mostrar_imagen_segura(img_url, 200)
+                    if isinstance(c['imagenes_url'], list) and len(c['imagenes_url']) > 0:
+                        mostrar_imagenes_en_fila(c['imagenes_url'], max_imagenes=3)
                     elif isinstance(c['imagenes_url'], str):
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(c['contenido'])
@@ -1653,7 +1678,7 @@ with menu_tabs[8]:
     else:
         st.info("No hay personajes registrados")
 
-# --- TAB 9: EL CRIMEN NO PAGA ---
+# --- TAB 9: EL CRIMEN NO PAGA (CON IMÁGENES EN FILA) ---
 with menu_tabs[9]:
     st.title("⚖️ El Crimen No Paga")
     st.markdown("### Casos y noticias sobre justicia")
@@ -1664,9 +1689,8 @@ with menu_tabs[9]:
         for _, c in crimenes.iterrows():
             with st.expander(f"⚖️ {c['titulo']} - {c['fecha']}"):
                 if c.get('imagenes_url') and c['imagenes_url']:
-                    if isinstance(c['imagenes_url'], list):
-                        for img_url in c['imagenes_url']:
-                            mostrar_imagen_segura(img_url, 200)
+                    if isinstance(c['imagenes_url'], list) and len(c['imagenes_url']) > 0:
+                        mostrar_imagenes_en_fila(c['imagenes_url'], max_imagenes=3)
                     elif isinstance(c['imagenes_url'], str):
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(f"**Descripción:** {c['descripcion']}")
@@ -1726,7 +1750,7 @@ with menu_tabs[10]:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN
+# PANEL ADMIN (COMPLETO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
