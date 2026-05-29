@@ -83,6 +83,73 @@ def ya_dio_like(usuario_id):
         return False
 
 # ============================================
+# FUNCIONES DE COMENTARIOS
+# ============================================
+def agregar_comentario(seccion, item_id, usuario, comentario):
+    try:
+        ahora = get_fecha_hora_venezuela()
+        data = {
+            "seccion": seccion,
+            "item_id": item_id,
+            "usuario": usuario if usuario else "Anónimo",
+            "comentario": comentario,
+            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+            "aprobado": True
+        }
+        result = supabase.table("comentarios").insert(data).execute()
+        return True if result.data else False
+    except Exception as e:
+        st.error(f"Error al agregar comentario: {str(e)}")
+        return False
+
+def obtener_comentarios(seccion, item_id):
+    try:
+        response = supabase.table("comentarios").select("*").eq("seccion", seccion).eq("item_id", item_id).eq("aprobado", True).order("id", desc=True).execute()
+        return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    except Exception:
+        return pd.DataFrame()
+
+def eliminar_comentario(id_):
+    try:
+        supabase.table("comentarios").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
+def mostrar_seccion_comentarios(seccion, item_id, titulo_item):
+    st.markdown("---")
+    st.markdown("### 💬 Comentarios y Opiniones")
+    
+    with st.form(key=f"comentario_form_{seccion}_{item_id}"):
+        col_nom, col_com = st.columns([1, 3])
+        with col_nom:
+            nombre_com = st.text_input("Tu nombre", placeholder="Anónimo", key=f"nombre_{seccion}_{item_id}")
+        with col_com:
+            comentario_text = st.text_area("Escribe tu comentario u opinión", placeholder="Comparte tu opinión sobre este contenido...", key=f"comentario_{seccion}_{item_id}")
+        
+        if st.form_submit_button("📝 Enviar comentario"):
+            if comentario_text and comentario_text.strip():
+                if agregar_comentario(seccion, item_id, nombre_com if nombre_com else "Anónimo", comentario_text):
+                    st.success("✅ ¡Comentario enviado correctamente!")
+                    st.rerun()
+                else:
+                    st.error("❌ Error al enviar comentario")
+            else:
+                st.error("❌ Escribe un comentario antes de enviar")
+    
+    comentarios = obtener_comentarios(seccion, item_id)
+    
+    if not comentarios.empty:
+        st.markdown(f"#### 📌 {len(comentarios)} comentarios")
+        for _, com in comentarios.iterrows():
+            with st.container():
+                st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
+                st.markdown(f"💬 {com['comentario']}")
+                st.divider()
+    else:
+        st.info("💬 No hay comentarios aún. ¡Sé el primero en opinar!")
+
+# ============================================
 # FUNCIÓN DE OPTIMIZACIÓN DE IMÁGENES
 # ============================================
 def optimizar_imagen(file, max_width=1024, quality=75):
@@ -272,17 +339,13 @@ def mostrar_tiktok(url_tiktok, width_percent=25):
         st.markdown(f"📱 [Ver video en TikTok]({url_tiktok})")
 
 # ============================================
-# FUNCIÓN PARA MOSTRAR IMÁGENES EN FILA (una al lado de la otra)
+# FUNCIÓN PARA MOSTRAR IMÁGENES EN FILA
 # ============================================
 def mostrar_imagenes_en_fila(urls, max_imagenes=3):
-    """Muestra las imágenes una al lado de la otra horizontalmente"""
     if not urls:
         return
     
-    # Limitar número de imágenes a mostrar
     urls_mostrar = urls[:max_imagenes]
-    
-    # Crear columnas dinámicamente
     cols = st.columns(len(urls_mostrar))
     
     for i, url in enumerate(urls_mostrar):
@@ -1088,19 +1151,30 @@ a {
     font-weight: bold !important;
     text-decoration: underline !important;
 }
+div[data-testid="stTabs"] {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+}
 div[data-testid="stTabs"] button {
     background-color: #1a1a1a !important;
     border-radius: 12px !important;
     color: #FFFFFF !important;
     font-weight: bold !important;
-    font-size: 14px !important;
-    padding: 8px 16px !important;
-    margin: 0 4px !important;
+    font-size: 13px !important;
+    padding: 8px 14px !important;
+    margin: 0 !important;
     border: 1px solid #FFD700 !important;
+    white-space: nowrap !important;
 }
 div[data-testid="stTabs"] button:hover {
     background-color: #FFD700 !important;
     color: #000000 !important;
+}
+div[data-testid="stTabs"] button[aria-selected="true"] {
+    background: linear-gradient(135deg, #FFD700, #CF142B) !important;
+    color: #FFFFFF !important;
 }
 .streamlit-expanderHeader {
     background-color: #1a1a1a !important;
@@ -1201,7 +1275,7 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL CON FECHA Y HORA
+# ENCABEZADO PRINCIPAL
 # ============================================
 ahora = get_fecha_hora_venezuela()
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -1219,14 +1293,14 @@ st.markdown(f"""
                 background-size: cover;
                 background-position: center;
                 border-radius: 20px;
-                padding: 60px 20px 40px 20px;
+                padding: 40px 20px 30px 20px;
                 border: 3px solid #FFD700;">
-        <h1 style="color: #FFD700; text-shadow: 3px 3px 8px black; font-size: 2.5em; font-weight: bold;">Santa Teresa al Dia</h1>
-        <p style="color: #FFFFFF; text-shadow: 2px 2px 5px black; font-size: 1.3em; font-weight: bold;">Informacion, Cultura y Fe de nuestro pueblo</p>
-        <div style="margin-top: 25px; padding-top: 10px; border-top: 1px solid rgba(255, 215, 0, 0.5);">
-            <p style="color: #FFD700; font-size: 0.9em; margin: 0; font-weight: bold;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</p>
-            <p style="color: white; font-size: 1.2em; margin: 5px 0; font-weight: bold;">🕐 {hora_str}</p>
-            <p style="color: #FFD700; font-size: 0.9em; margin: 0; font-weight: bold;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</p>
+        <h1 style="color: #FFD700; text-shadow: 3px 3px 8px black; font-size: 2em; font-weight: bold;">Santa Teresa al Dia</h1>
+        <p style="color: #FFFFFF; text-shadow: 2px 2px 5px black; font-size: 1.1em; font-weight: bold;">Informacion, Cultura y Fe de nuestro pueblo</p>
+        <div style="margin-top: 20px; padding-top: 8px; border-top: 1px solid rgba(255, 215, 0, 0.5);">
+            <p style="color: #FFD700; font-size: 0.8em; margin: 0; font-weight: bold;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</p>
+            <p style="color: white; font-size: 1em; margin: 5px 0; font-weight: bold;">🕐 {hora_str}</p>
+            <p style="color: #FFD700; font-size: 0.8em; margin: 0; font-weight: bold;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</p>
         </div>
     </div>
 </div>
@@ -1269,13 +1343,71 @@ with st.sidebar:
         st.session_state.es_admin = False
 
 # ============================================
-# MENU PRINCIPAL (TABS)
+# MENU PRINCIPAL (TABS) - ORGANIZADO EN TRES LÍNEAS
 # ============================================
-menu_tabs = st.tabs(["🏠 Portada", "📰 Noticias", "📍 Donde ir - Donde comprar", "💭 Reflexiones", "📜 Crónicas", "🎬 Multimedia", "⚠️ Denuncias", "💬 Opiniones", "👥 Personajes que hicieron historia", "⚖️ El Crimen No Paga", "📅 Efemérides Médicas"])
 
-# --- TAB 0: PORTADA ---
-with menu_tabs[0]:
-    st.title("Santa Teresa al Dia")
+# Línea 1: Secciones principales
+st.markdown("### 📌 Secciones Principales")
+col_linea1 = st.columns(4)
+with col_linea1[0]:
+    if st.button("🏠 Portada", use_container_width=True):
+        st.session_state.selected_tab = 0
+with col_linea1[1]:
+    if st.button("📰 Noticias", use_container_width=True):
+        st.session_state.selected_tab = 1
+with col_linea1[2]:
+    if st.button("📍 Donde ir - Donde comprar", use_container_width=True):
+        st.session_state.selected_tab = 2
+with col_linea1[3]:
+    if st.button("💭 Reflexiones", use_container_width=True):
+        st.session_state.selected_tab = 3
+
+# Línea 2: Contenido multimedia
+st.markdown("### 🎬 Contenido Multimedia")
+col_linea2 = st.columns(4)
+with col_linea2[0]:
+    if st.button("📜 Crónicas", use_container_width=True):
+        st.session_state.selected_tab = 4
+with col_linea2[1]:
+    if st.button("🎬 Multimedia", use_container_width=True):
+        st.session_state.selected_tab = 5
+with col_linea2[2]:
+    if st.button("⚠️ Denuncias", use_container_width=True):
+        st.session_state.selected_tab = 6
+with col_linea2[3]:
+    if st.button("💬 Opiniones", use_container_width=True):
+        st.session_state.selected_tab = 7
+
+# Línea 3: Otras secciones
+st.markdown("### 📖 Otras Secciones")
+col_linea3 = st.columns(4)
+with col_linea3[0]:
+    if st.button("👥 Personajes", use_container_width=True):
+        st.session_state.selected_tab = 8
+with col_linea3[1]:
+    if st.button("⚖️ El Crimen No Paga", use_container_width=True):
+        st.session_state.selected_tab = 9
+with col_linea3[2]:
+    if st.button("📅 Efemérides Médicas", use_container_width=True):
+        st.session_state.selected_tab = 10
+with col_linea3[3]:
+    st.markdown(" ")  # Espacio vacío para equilibrio
+
+st.markdown("---")
+
+# Inicializar sesión para la pestaña seleccionada
+if 'selected_tab' not in st.session_state:
+    st.session_state.selected_tab = 0
+
+# Mostrar contenido según la pestaña seleccionada
+if st.session_state.selected_tab == 0:
+    # --- PORTADA ---
+    # Título más pequeño
+    st.markdown("""
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #FFD700; font-weight: bold; font-size: 1.8em;">Santa Teresa al Dia</h2>
+    </div>
+    """, unsafe_allow_html=True)
     
     if 'usuario_id' not in st.session_state:
         session_id = str(time.time()) + str(st.session_state.get('admin_pass', ''))
@@ -1284,20 +1416,42 @@ with menu_tabs[0]:
     ya_like = ya_dio_like(st.session_state.usuario_id)
     total_likes = obtener_total_likes()
     
-    st.markdown("### ❤️ Apoya nuestra página")
+    st.markdown("""
+    <div style="text-align: center; margin: 10px 0;">
+        <h3 style="color: #FFD700; font-size: 1.2em; margin-bottom: 10px;">❤️ Apoya nuestra página</h3>
+    </div>
+    """, unsafe_allow_html=True)
     
     col_like1, col_like2, col_like3 = st.columns([1, 2, 1])
+    
     with col_like2:
-        st.markdown(f"""
-        <div style="text-align: center; padding: 20px;">
-            <div style="font-size: 48px; color: #FFD700;">👍</div>
-            <div style="font-size: 36px; font-weight: bold; color: #FFD700;">{total_likes:,}</div>
-            <div style="font-size: 18px;">Personas apoyan esta página</div>
-        </div>
-        """, unsafe_allow_html=True)
+        col_icon, col_number, col_text = st.columns([1, 1, 2])
+        
+        with col_icon:
+            st.markdown("""
+            <div style="text-align: center;">
+                <div style="font-size: 28px; color: #FFD700;">👍</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col_number:
+            st.markdown(f"""
+            <div style="text-align: center;">
+                <div style="font-size: 24px; font-weight: bold; color: #FFD700;">{total_likes:,}</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        with col_text:
+            st.markdown("""
+            <div style="text-align: left;">
+                <div style="font-size: 12px;">Personas apoyan esta página</div>
+            </div>
+            """, unsafe_allow_html=True)
+        
+        st.markdown("<div style='margin-top: 5px;'></div>", unsafe_allow_html=True)
         
         if not ya_like:
-            if st.button("👍 Dar Me gusta", use_container_width=True):
+            if st.button("👍 Dar Me gusta", use_container_width=True, key="btn_like_portada"):
                 if agregar_like(st.session_state.usuario_id):
                     st.success("✅ Gracias por tu like!")
                     st.balloons()
@@ -1318,6 +1472,7 @@ with menu_tabs[0]:
                 with st.expander(f"📰 {n['titulo']} - {n['categoria']} ({n['fecha']})"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
         else:
             st.info("No hay noticias disponibles")
         
@@ -1328,6 +1483,7 @@ with menu_tabs[0]:
                 with st.expander(f"📽️ {r['titulo']} - {r['fecha']}"):
                     mostrar_imagen_segura(r.get('imagen_url'), 300)
                     st.write(r['contenido'])
+                    mostrar_seccion_comentarios("reportaje", r['id'], r['titulo'])
         else:
             st.info("No hay reportajes disponibles")
     
@@ -1339,11 +1495,12 @@ with menu_tabs[0]:
                 st.write(ref['contenido'])
                 if ref.get('versiculo'):
                     st.caption(f"📖 {ref['versiculo']}")
+                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
         else:
             st.info("No hay reflexión activa")
 
-# --- TAB 1: NOTICIAS ---
-with menu_tabs[1]:
+elif st.session_state.selected_tab == 1:
+    # --- NOTICIAS ---
     st.title("📰 Noticias")
     tab_nac, tab_inter, tab_dep, tab_suc, tab_far, tab_rep = st.tabs(["🇻🇪 Nacionales", "🌎 Internacionales", "⚽ Deportes", "🚨 Sucesos", "🎭 Farándula", "📽️ Reportajes"])
     
@@ -1354,6 +1511,7 @@ with menu_tabs[1]:
                 with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
         else:
             st.info("No hay noticias Nacionales")
     
@@ -1364,6 +1522,7 @@ with menu_tabs[1]:
                 with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
         else:
             st.info("No hay noticias Internacionales")
     
@@ -1374,6 +1533,7 @@ with menu_tabs[1]:
                 with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
         else:
             st.info("No hay noticias de Deportes")
     
@@ -1384,6 +1544,7 @@ with menu_tabs[1]:
                 with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
         else:
             st.info("No hay noticias de Sucesos")
     
@@ -1394,6 +1555,7 @@ with menu_tabs[1]:
                 with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
         else:
             st.info("No hay noticias de Farándula")
     
@@ -1404,11 +1566,12 @@ with menu_tabs[1]:
                 with st.expander(f"📽️ {n['titulo']} - {n['fecha']}"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
+                    mostrar_seccion_comentarios("reportaje", n['id'], n['titulo'])
         else:
             st.info("No hay Reportajes disponibles")
 
-# --- TAB 2: NEGOCIOS (CON IMÁGENES EN FILA) ---
-with menu_tabs[2]:
+elif st.session_state.selected_tab == 2:
+    # --- NEGOCIOS ---
     st.title("📍 Donde ir - Donde comprar")
     
     negocios = get_negocios()
@@ -1416,7 +1579,6 @@ with menu_tabs[2]:
     if not negocios.empty:
         for _, n in negocios.iterrows():
             with st.expander(f"🏪 {n['nombre']}"):
-                # Mostrar imágenes en fila (una al lado de la otra)
                 if n.get('imagenes_url') and n['imagenes_url']:
                     if isinstance(n['imagenes_url'], list) and len(n['imagenes_url']) > 0:
                         mostrar_imagenes_en_fila(n['imagenes_url'], max_imagenes=3)
@@ -1460,8 +1622,8 @@ with menu_tabs[2]:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- TAB 3: REFLEXIONES ---
-with menu_tabs[3]:
+elif st.session_state.selected_tab == 3:
+    # --- REFLEXIONES ---
     st.title("💭 Reflexiones")
     ref = get_reflexion_activa()
     if ref:
@@ -1470,6 +1632,7 @@ with menu_tabs[3]:
             if ref.get('versiculo'):
                 st.caption(f"📖 {ref['versiculo']}")
             st.caption(f"📅 {ref['fecha']}")
+            mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
     else:
         st.info("No hay reflexión activa")
     
@@ -1483,11 +1646,12 @@ with menu_tabs[3]:
                     st.write(r['contenido'])
                     if r.get('versiculo'):
                         st.caption(f"📖 {r['versiculo']}")
+                    mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'])
     else:
         st.info("No hay reflexiones anteriores")
 
-# --- TAB 4: CRONICAS (CON IMÁGENES EN FILA) ---
-with menu_tabs[4]:
+elif st.session_state.selected_tab == 4:
+    # --- CRONICAS ---
     st.title("📜 Crónicas")
     estados = ["Todos", "Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"]
     estado_filtro = st.selectbox("Filtrar por estado:", estados)
@@ -1502,11 +1666,12 @@ with menu_tabs[4]:
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(c['contenido'])
                 st.caption(f"📅 {c['fecha']}")
+                mostrar_seccion_comentarios("cronica", c['id'], c['titulo'])
     else:
         st.info("No hay crónicas disponibles")
 
-# --- TAB 5: MULTIMEDIA ---
-with menu_tabs[5]:
+elif st.session_state.selected_tab == 5:
+    # --- MULTIMEDIA ---
     st.title("🎬 Multimedia")
     tab_vid, tab_tik, tab_mus, tab_rad = st.tabs(["🎥 YouTube", "📱 TikTok", "🎵 Música", "📻 Radio"])
     
@@ -1518,6 +1683,7 @@ with menu_tabs[5]:
                 with st.expander(f"🎬 {v['titulo']}"):
                     mostrar_video_youtube(v['video_url'], width_percent=25)
                     st.caption(f"📅 {v['fecha']}")
+                    mostrar_seccion_comentarios("video", v['id'], v['titulo'])
         else:
             st.info("No hay videos disponibles")
     
@@ -1529,6 +1695,7 @@ with menu_tabs[5]:
                 with st.expander(f"📱 {t['titulo']}"):
                     mostrar_tiktok(t['tiktok_url'], width_percent=25)
                     st.caption(f"📅 {t['fecha']}")
+                    mostrar_seccion_comentarios("tiktok", t['id'], t['titulo'])
         else:
             st.info("No hay videos de TikTok disponibles")
         
@@ -1556,6 +1723,7 @@ with menu_tabs[5]:
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
+                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'])
         else:
             st.info("No hay música disponible")
     
@@ -1597,8 +1765,8 @@ with menu_tabs[5]:
             st.audio("http://streaming.radionomy.com/InstrumentalSongs", format="audio/mp3")
             st.caption("🎶 Música instrumental para relajarse")
 
-# --- TAB 6: DENUNCIAS ---
-with menu_tabs[6]:
+elif st.session_state.selected_tab == 6:
+    # --- DENUNCIAS ---
     st.title("⚠️ Denuncias Ciudadanas")
     tab_den, tab_ver = st.tabs(["📝 Hacer Denuncia", "👁️ Ver Denuncias"])
     
@@ -1627,12 +1795,13 @@ with menu_tabs[6]:
                 with st.expander("Ver detalles"):
                     st.write(d['descripcion'])
                     st.caption(f"📅 {d['fecha']}")
+                    mostrar_seccion_comentarios("denuncia", d['id'], d['titulo'])
                 st.divider()
         else:
             st.info("No hay denuncias registradas")
 
-# --- TAB 7: OPINIONES ---
-with menu_tabs[7]:
+elif st.session_state.selected_tab == 7:
+    # --- OPINIONES ---
     st.title("💬 Opiniones")
     tab_op, tab_ver_op = st.tabs(["✍️ Dar Opinión", "👁️ Ver Opiniones"])
     
@@ -1663,8 +1832,8 @@ with menu_tabs[7]:
         else:
             st.info("No hay opiniones aprobadas")
 
-# --- TAB 8: PERSONAJES ---
-with menu_tabs[8]:
+elif st.session_state.selected_tab == 8:
+    # --- PERSONAJES ---
     st.title("👥 Personajes que hicieron historia")
     
     st.markdown("### 📋 Personajes Registrados")
@@ -1675,11 +1844,12 @@ with menu_tabs[8]:
             with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
                 mostrar_imagen_segura(p.get('imagen_url'), 200)
                 st.write(f"**Biografía:** {p['descripcion']}")
+                mostrar_seccion_comentarios("personaje", p['id'], p['nombre'])
     else:
         st.info("No hay personajes registrados")
 
-# --- TAB 9: EL CRIMEN NO PAGA (CON IMÁGENES EN FILA) ---
-with menu_tabs[9]:
+elif st.session_state.selected_tab == 9:
+    # --- EL CRIMEN NO PAGA ---
     st.title("⚖️ El Crimen No Paga")
     st.markdown("### Casos y noticias sobre justicia")
     
@@ -1695,11 +1865,12 @@ with menu_tabs[9]:
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(f"**Descripción:** {c['descripcion']}")
                 st.caption(f"📅 Publicado: {c['fecha']}")
+                mostrar_seccion_comentarios("crimen", c['id'], c['titulo'])
     else:
         st.info("No hay casos registrados")
 
-# --- TAB 10: EFEMÉRIDES MÉDICAS ---
-with menu_tabs[10]:
+elif st.session_state.selected_tab == 10:
+    # --- EFEMÉRIDES MÉDICAS ---
     st.title("📅 Efemérides Médicas")
     fecha_actual_str = f"{ahora.day} de {meses[ahora.month-1]}"
     st.markdown(f"### 📌 {dias[ahora.weekday()]}, {fecha_actual_str} de {ahora.year}")
@@ -2467,6 +2638,16 @@ if st.session_state.get('es_admin', False):
         
         with col_est3:
             st.metric("👥 Apoyan la página", f"{total_likes_admin:,}")
+        
+        st.markdown("---")
+        
+        st.markdown("### 💬 Estadísticas de Comentarios")
+        try:
+            response = supabase.table("comentarios").select("*", count="exact").execute()
+            total_comentarios = response.count if response.count else 0
+            st.metric("📝 Total Comentarios", total_comentarios)
+        except:
+            st.info("No hay comentarios registrados")
         
         st.markdown("---")
         st.markdown("### 💵 Tipo de Cambio Dólar BCV")
