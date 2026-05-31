@@ -51,9 +51,7 @@ def actualizar_dolar_manual(nuevo_valor):
 # ============================================
 
 def agregar_like_usuario(usuario_id):
-    """Agrega un like de un usuario real (solo 1 por usuario)"""
     try:
-        # Verificar si ya existe like real de este usuario
         existing = supabase.table("likes").select("*").eq("usuario_id", usuario_id).eq("es_automatico", False).execute()
         
         if existing.data:
@@ -71,9 +69,7 @@ def agregar_like_usuario(usuario_id):
         return False, str(e)
 
 def agregar_likes_automaticos():
-    """Agrega 2 likes automáticos (se llama cada 20 visitas)"""
     try:
-        # Obtener el último número de lote
         response = supabase.table("likes").select("usuario_id").eq("es_automatico", True).order("id", desc=True).limit(1).execute()
         
         if response.data:
@@ -87,7 +83,6 @@ def agregar_likes_automaticos():
         else:
             lote = 1
         
-        # Agregar 2 likes automáticos
         for i in range(2):
             data = {
                 "usuario_id": f"auto_{lote}_{i}",
@@ -102,7 +97,6 @@ def agregar_likes_automaticos():
         return 0
 
 def obtener_total_likes():
-    """Obtiene total de likes (reales + automáticos)"""
     try:
         response = supabase.table("likes").select("*", count="exact").eq("activo", True).execute()
         return response.count if response.count else 0
@@ -110,7 +104,6 @@ def obtener_total_likes():
         return 0
 
 def obtener_likes_reales():
-    """Obtiene solo likes de usuarios reales"""
     try:
         response = supabase.table("likes").select("*", count="exact").eq("activo", True).eq("es_automatico", False).execute()
         return response.count if response.count else 0
@@ -118,7 +111,6 @@ def obtener_likes_reales():
         return 0
 
 def obtener_likes_automaticos():
-    """Obtiene solo likes automáticos"""
     try:
         response = supabase.table("likes").select("*", count="exact").eq("activo", True).eq("es_automatico", True).execute()
         return response.count if response.count else 0
@@ -126,7 +118,6 @@ def obtener_likes_automaticos():
         return 0
 
 def ya_dio_like(usuario_id):
-    """Verifica si el usuario ya dio like real"""
     try:
         response = supabase.table("likes").select("*").eq("usuario_id", usuario_id).eq("es_automatico", False).execute()
         return len(response.data) > 0
@@ -145,7 +136,6 @@ def actualizar_visitas():
             conteo_actual = response.data[0]["conteo"]
             nuevo_conteo = conteo_actual + 1
             
-            # Cada 20 visitas, agregar 2 likes automáticos
             visitas_procesadas = nuevo_conteo // 20
             visitas_anteriores_procesadas = conteo_actual // 20
             
@@ -472,7 +462,7 @@ def get_fecha_hora_venezuela():
     return ahora_caracas
 
 # ============================================
-# FUNCIONES DE ACCESO A DATOS (RESUMIDAS POR ESPACIO)
+# FUNCIONES DE ACCESO A DATOS
 # ============================================
 
 # --- NOTICIAS ---
@@ -492,6 +482,27 @@ def add_noticia(titulo, categoria, contenido, imagen):
         return True
     except Exception as e:
         st.error(f"Error al agregar noticia: {str(e)}")
+        return False
+
+def update_noticia(id_, titulo, categoria, contenido, imagen):
+    try:
+        img_url = None
+        if imagen:
+            img_url = subir_imagen_storage(imagen, "noticias")
+        else:
+            existing = supabase.table("noticias").select("imagen_url").eq("id", id_).execute()
+            if existing.data:
+                img_url = existing.data[0].get("imagen_url")
+        data = {
+            "titulo": titulo,
+            "categoria": categoria,
+            "contenido": contenido,
+            "imagen_url": img_url
+        }
+        supabase.table("noticias").update(data).eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al actualizar noticia: {str(e)}")
         return False
 
 def get_noticias(categoria=None):
@@ -527,6 +538,26 @@ def add_negocio(nombre, resena, google_maps_url, imagenes):
         return True if result.data else False
     except Exception as e:
         st.error(f"Error al agregar negocio: {str(e)}")
+        return False
+
+def update_negocio(id_, nombre, resena, google_maps_url, imagenes):
+    try:
+        imagenes_urls = None
+        if imagenes:
+            imagenes_urls = subir_multiples_imagenes(imagenes, "negocios")
+        else:
+            existing = supabase.table("negocios").select("imagenes_url").eq("id", id_).execute()
+            if existing.data:
+                imagenes_urls = existing.data[0].get("imagenes_url")
+        data = {
+            "nombre": nombre,
+            "resena": resena,
+            "google_maps_url": google_maps_url if google_maps_url else None,
+            "imagenes_url": imagenes_urls if imagenes_urls else []
+        }
+        supabase.table("negocios").update(data).eq("id", id_).execute()
+        return True
+    except Exception:
         return False
 
 def get_negocios():
@@ -570,6 +601,13 @@ def get_opiniones_negocio(negocio_id):
     except Exception:
         return pd.DataFrame()
 
+def delete_opinion_negocio(id_):
+    try:
+        supabase.table("opiniones_negocios").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
 # --- REFLEXIONES ---
 def add_reflexion(titulo, contenido, versiculo):
     try:
@@ -592,6 +630,19 @@ def add_reflexion(titulo, contenido, versiculo):
         st.error(f"Error al guardar reflexión: {str(e)}")
         return False
 
+def update_reflexion(id_, titulo, contenido, versiculo):
+    try:
+        data = {
+            "titulo": titulo,
+            "contenido": contenido,
+            "versiculo": versiculo if versiculo else None
+        }
+        supabase.table("reflexiones").update(data).eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al actualizar reflexión: {str(e)}")
+        return False
+
 def get_reflexion_activa():
     try:
         response = supabase.table("reflexiones").select("*").eq("activo", True).limit(1).execute()
@@ -602,14 +653,29 @@ def get_reflexion_activa():
             return response.data[0]
         return None
     except Exception:
+        try:
+            response = supabase.table("reflexiones").select("*").order("id", desc=True).limit(1).execute()
+            if response.data:
+                return response.data[0]
+        except:
+            pass
         return None
 
 def get_reflexiones():
     try:
         response = supabase.table("reflexiones").select("*").order("id", desc=True).execute()
         return pd.DataFrame(response.data)
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al obtener reflexiones: {str(e)}")
         return pd.DataFrame()
+
+def delete_reflexion(id_):
+    try:
+        supabase.table("reflexiones").delete().eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al eliminar reflexión: {str(e)}")
+        return False
 
 # --- CRONICAS ---
 def add_cronica(titulo, contenido, lugar, estado, imagenes):
@@ -630,6 +696,27 @@ def add_cronica(titulo, contenido, lugar, estado, imagenes):
     except Exception:
         return False
 
+def update_cronica(id_, titulo, contenido, lugar, estado, imagenes):
+    try:
+        imagenes_urls = None
+        if imagenes:
+            imagenes_urls = subir_multiples_imagenes(imagenes, "cronicas")
+        else:
+            existing = supabase.table("cronicas").select("imagenes_url").eq("id", id_).execute()
+            if existing.data:
+                imagenes_urls = existing.data[0].get("imagenes_url")
+        data = {
+            "titulo": titulo,
+            "contenido": contenido,
+            "lugar": lugar,
+            "estado": estado,
+            "imagenes_url": imagenes_urls
+        }
+        supabase.table("cronicas").update(data).eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
 def get_cronicas(estado=None):
     try:
         if estado and estado != "Todos":
@@ -639,6 +726,13 @@ def get_cronicas(estado=None):
         return pd.DataFrame(response.data)
     except Exception:
         return pd.DataFrame()
+
+def delete_cronica(id_):
+    try:
+        supabase.table("cronicas").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
 
 # --- VIDEOS ---
 def add_video(titulo, url_youtube):
@@ -669,14 +763,43 @@ def add_video(titulo, url_youtube):
         st.error(f"❌ Error al agregar video: {str(e)}")
         return False
 
+def update_video(id_, titulo, url_youtube):
+    try:
+        if not url_youtube or url_youtube.strip() == "":
+            st.error("❌ La URL del video es obligatoria")
+            return False
+        video_id = extraer_video_id(url_youtube)
+        if not video_id:
+            st.error("❌ URL de YouTube no válida")
+            return False
+        video_url_limpia = f"https://www.youtube.com/watch?v={video_id}"
+        data = {
+            "titulo": titulo,
+            "video_url": video_url_limpia
+        }
+        supabase.table("videos").update(data).eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al actualizar video: {str(e)}")
+        return False
+
 def get_videos():
     try:
         response = supabase.table("videos").select("*").order("id", desc=True).execute()
         if response.data:
             return pd.DataFrame(response.data)
         return pd.DataFrame()
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al obtener videos: {str(e)}")
         return pd.DataFrame()
+
+def delete_video(id_):
+    try:
+        supabase.table("videos").delete().eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al eliminar video: {str(e)}")
+        return False
 
 # --- TIKTOK ---
 def add_tiktok(titulo, url_tiktok):
@@ -710,8 +833,17 @@ def get_tiktoks():
         if response.data:
             return pd.DataFrame(response.data)
         return pd.DataFrame()
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al obtener TikToks: {str(e)}")
         return pd.DataFrame()
+
+def delete_tiktok(id_):
+    try:
+        supabase.table("tiktoks").delete().eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al eliminar TikTok: {str(e)}")
+        return False
 
 # --- MUSICA ---
 def add_musica(titulo, audio_file):
@@ -752,8 +884,17 @@ def get_musicas():
         if response.data:
             return pd.DataFrame(response.data)
         return pd.DataFrame()
-    except Exception:
+    except Exception as e:
+        st.error(f"Error al obtener música: {str(e)}")
         return pd.DataFrame()
+
+def delete_musica(id_):
+    try:
+        supabase.table("musicas").delete().eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al eliminar música: {str(e)}")
+        return False
 
 # --- DENUNCIAS ---
 def add_denuncia(denunciante, titulo, descripcion, ubicacion):
@@ -778,6 +919,20 @@ def get_denuncias():
         return pd.DataFrame(response.data)
     except Exception:
         return pd.DataFrame()
+
+def update_denuncia_status(id_, status):
+    try:
+        supabase.table("denuncias").update({"estatus": status}).eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
+def delete_denuncia(id_):
+    try:
+        supabase.table("denuncias").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
 
 # --- OPINIONES GENERALES ---
 def add_opinion(usuario, comentario, calificacion):
@@ -805,6 +960,20 @@ def get_opiniones(aprobadas=True):
     except Exception:
         return pd.DataFrame()
 
+def approve_opinion(id_):
+    try:
+        supabase.table("opiniones").update({"aprobada": True}).eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
+def delete_opinion(id_):
+    try:
+        supabase.table("opiniones").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
 # --- PERSONAJES ---
 def add_personaje(nombre, descripcion, imagen, fecha):
     try:
@@ -821,12 +990,40 @@ def add_personaje(nombre, descripcion, imagen, fecha):
     except Exception:
         return False
 
+def update_personaje(id_, nombre, descripcion, imagen, fecha):
+    try:
+        img_url = None
+        if imagen:
+            img_url = subir_imagen_storage(imagen, "personajes")
+        else:
+            existing = supabase.table("personajes").select("imagen_url").eq("id", id_).execute()
+            if existing.data:
+                img_url = existing.data[0].get("imagen_url")
+        data = {
+            "nombre": nombre,
+            "descripcion": descripcion,
+            "imagen_url": img_url,
+            "fecha": fecha,
+            "activo": True
+        }
+        supabase.table("personajes").update(data).eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
 def get_personajes():
     try:
         response = supabase.table("personajes").select("*").order("id", desc=True).execute()
         return pd.DataFrame(response.data)
     except Exception:
         return pd.DataFrame()
+
+def delete_personaje(id_):
+    try:
+        supabase.table("personajes").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
 
 # --- CRIMEN NO PAGA ---
 def add_crimen_no_paga(titulo, descripcion, imagenes):
@@ -843,6 +1040,25 @@ def add_crimen_no_paga(titulo, descripcion, imagenes):
         return True if result.data else False
     except Exception as e:
         st.error(f"Error al agregar caso: {str(e)}")
+        return False
+
+def update_crimen_no_paga(id_, titulo, descripcion, imagenes):
+    try:
+        imagenes_urls = None
+        if imagenes:
+            imagenes_urls = subir_multiples_imagenes(imagenes, "crimen")
+        else:
+            existing = supabase.table("crimen_no_paga").select("imagenes_url").eq("id", id_).execute()
+            if existing.data:
+                imagenes_urls = existing.data[0].get("imagenes_url")
+        data = {
+            "titulo": titulo,
+            "descripcion": descripcion,
+            "imagenes_url": imagenes_urls if imagenes_urls else []
+        }
+        supabase.table("crimen_no_paga").update(data).eq("id", id_).execute()
+        return True
+    except Exception:
         return False
 
 def get_crimen_no_paga():
@@ -894,7 +1110,6 @@ def inicializar_configuracion():
 
 inicializar_configuracion()
 
-# Contador de visitas
 if 'visitante_contado' not in st.session_state:
     actualizar_visitas()
     st.session_state.visitante_contado = True
@@ -1042,7 +1257,7 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL
+# ENCABEZADO PRINCIPAL - TODO EN UN RECUADRO
 # ============================================
 ahora = get_fecha_hora_venezuela()
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -1050,27 +1265,9 @@ meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto
 visitas = get_visitas()
 dolar = get_dolar()
 hora_str = ahora.strftime("%I:%M %p").lstrip("0")
+total_likes = obtener_total_likes()
 
-st.markdown("""
-<div style="text-align: center; margin: 30px 0 20px 0;">
-    <div style="font-size: 3.5em; font-weight: bold; color: #FFD700; text-shadow: 3px 3px 5px black;">Santa Teresa al Dia</div>
-    <div style="font-size: 1.2em; color: #FFFFFF; margin-top: 5px;">Informacion, Cultura y Fe de nuestro pueblo</div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown(f"""
-<div style="text-align: center; margin: 10px 0 20px 0;">
-    <div style="font-size: 0.85em; color: #FFD700;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</div>
-    <div style="font-size: 0.9em; color: #FFFFFF; margin: 3px 0;">🕐 {hora_str}</div>
-    <div style="font-size: 0.85em; color: #FFD700;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</div>
-</div>
-""", unsafe_allow_html=True)
-
-# ============================================
-# SECCIÓN DE ME GUSTA - SISTEMA HÍBRIDO
-# ============================================
-
-# Inicializar ID de usuario
+# Obtener ID de usuario para el like
 if 'usuario_id_permanente' not in st.session_state:
     query_params = st.query_params
     if 'uid' in query_params:
@@ -1081,42 +1278,36 @@ if 'usuario_id_permanente' not in st.session_state:
         st.session_state.usuario_id_permanente = nuevo_id
 
 usuario_id_permanente = st.session_state.usuario_id_permanente
-
-# Obtener estadísticas
-total_likes = obtener_total_likes()
-likes_reales = obtener_likes_reales()
-likes_auto = obtener_likes_automaticos()
 ya_like = ya_dio_like(usuario_id_permanente)
 
-st.markdown("---")
-
-col_like1, col_like2, col_like3, col_like4, col_like5 = st.columns([1, 1, 1, 1, 1])
-
-with col_like2:
-    st.markdown("""
-    <div style="text-align: center;">
-        <span style="font-size: 1.5em;">❤️</span>
-        <span style="font-size: 0.9em;">Apoya</span>
+# RECUADRO PRINCIPAL
+st.markdown(f"""
+<div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border-radius: 20px; padding: 30px 20px; border: 2px solid #FFD700; margin-bottom: 20px; text-align: center;">
+    <div style="font-size: 2.2em; font-weight: bold; color: #FFD700; margin-bottom: 10px;">Santa Teresa al Dia</div>
+    <div style="font-size: 1.2em; color: #FFFFFF; margin-bottom: 20px;">Informacion, Cultura y Fe de nuestro pueblo</div>
+    <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 8px;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</div>
+    <div style="font-size: 1.05em; color: #FFFFFF; margin-bottom: 8px;">🕐 {hora_str}</div>
+    <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 20px;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</div>
+    
+    <div style="border-top: 1px solid rgba(255, 215, 0, 0.3); margin: 10px 0; padding-top: 15px;">
+        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+                <span style="font-size: 1.3em;">❤️</span>
+                <span style="font-size: 0.9em;">Apoya</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 1.8em;">👍</span>
+                <span style="font-size: 1.8em; font-weight: bold; color: #FFD700;">{total_likes:,}</span>
+            </div>
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+</div>
+""", unsafe_allow_html=True)
 
-with col_like3:
-    st.markdown(f"""
-    <div style="text-align: center;">
-        <span style="font-size: 1.8em;">👍</span>
-        <span style="font-size: 1.3em; font-weight: bold; color: #FFD700;">{total_likes:,}</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_like4:
-    st.markdown(f"""
-    <div style="text-align: center;">
-        <span style="font-size: 0.7em;">({likes_reales} reales + {likes_auto} auto)</span>
-    </div>
-    """, unsafe_allow_html=True)
-
-with col_like5:
-    if not ya_like:
+# Botón de Me gusta funcional
+if not ya_like:
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 2, 1])
+    with col_btn2:
         if st.button("👍 Dar Me gusta", use_container_width=True, key="btn_like_global"):
             exito, mensaje = agregar_like_usuario(usuario_id_permanente)
             if exito:
@@ -1125,14 +1316,14 @@ with col_like5:
                 st.rerun()
             else:
                 st.error(f"❌ {mensaje}")
-    else:
-        st.info("❤️ ¡Gracias por tu apoyo!")
+else:
+    st.info("❤️ ¡Gracias por tu apoyo!")
 
 st.markdown("---")
 
-# Mostrar mensaje cuando se agregan likes automáticos
+# Mostrar mensaje de likes automáticos
 if 'likes_automaticos_agregados' in st.session_state and st.session_state.likes_automaticos_agregados:
-    st.info(f"🎉 ¡Gracias a la comunidad! Se han agregado {st.session_state.likes_automaticos_agregados} likes automáticos por alcanzar 20 visitas.")
+    st.info(f"🎉 ¡Gracias a la comunidad! Se han agregado {st.session_state.likes_automaticos_agregados} likes automáticos.")
     st.session_state.likes_automaticos_agregados = 0
 
 # ============================================
@@ -1166,9 +1357,11 @@ with st.sidebar:
         
         st.markdown("---")
         st.markdown("### 📊 Estadísticas")
+        likes_reales_admin = obtener_likes_reales()
+        likes_auto_admin = obtener_likes_automaticos()
         st.metric("👍 Total Me gusta", f"{total_likes:,}")
-        st.metric("👤 Likes reales", f"{likes_reales:,}")
-        st.metric("🤖 Likes automáticos", f"{likes_auto:,}")
+        st.metric("👤 Likes reales", f"{likes_reales_admin:,}")
+        st.metric("🤖 Likes automáticos", f"{likes_auto_admin:,}")
         st.metric("👥 Visitantes", f"{visitas:,}")
         
         with st.expander("🔧 Depuración"):
@@ -1231,7 +1424,7 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES (RESUMIDO)
+# CONTENIDO DE LAS SECCIONES
 # ============================================
 
 if st.session_state.selected_tab == 0:
@@ -1596,7 +1789,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (RESUMIDO)
+# PANEL ADMIN (RESUMIDO POR ESPACIO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
