@@ -28,6 +28,11 @@ def init_supabase():
 supabase = init_supabase()
 
 # ============================================
+# URL DE LA IMAGEN DE FONDO (CAMBIALA AQUÍ SI QUIERES)
+# ============================================
+FONDO_URL = "https://assets.change.org/photos/0/lt/kp/EelTkpfkXQbEiEQ-800x450-noPad.jpg?1528608279"
+
+# ============================================
 # FUNCIÓN PARA DÓLAR
 # ============================================
 def get_dolar():
@@ -1115,36 +1120,40 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS
+# ESTILOS - CON FONDO DE IMAGEN
 # ============================================
-st.markdown("""
+st.markdown(f"""
 <style>
-.stApp {
-    background: linear-gradient(180deg, #FFD700 0%, #00247D 50%, #CF142B 100%);
-}
-.block-container {
+/* Fondo de la aplicación con tu imagen */
+.stApp {{
+    background: linear-gradient(rgba(0, 0, 0, 0.75), rgba(0, 0, 0, 0.75)), url('{FONDO_URL}');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+}}
+.block-container {{
     background-color: rgba(0, 0, 0, 0.85) !important;
     border-radius: 20px !important;
     padding: 20px !important;
-}
-* {
+}}
+* {{
     color: #FFFFFF !important;
     font-weight: bold !important;
-}
-.main, .main p, .main span, .main div, .main label, .stMarkdown {
+}}
+.main, .main p, .main span, .main div, .main label, .stMarkdown {{
     color: #FFFFFF !important;
     font-weight: bold !important;
-}
-.main h1, .main h2, .main h3, .main h4 {
+}}
+.main h1, .main h2, .main h3, .main h4 {{
     color: #FFD700 !important;
     font-weight: bold !important;
-}
-a {
+}}
+a {{
     color: #FFD700 !important;
     font-weight: bold !important;
     text-decoration: underline !important;
-}
-div[data-testid="stTabs"] button {
+}}
+div[data-testid="stTabs"] button {{
     background-color: #1a1a1a !important;
     border-radius: 10px !important;
     color: #FFFFFF !important;
@@ -1153,74 +1162,74 @@ div[data-testid="stTabs"] button {
     padding: 6px 12px !important;
     margin: 0 3px !important;
     border: 1px solid #FFD700 !important;
-}
-div[data-testid="stTabs"] button:hover {
+}}
+div[data-testid="stTabs"] button:hover {{
     background-color: #FFD700 !important;
     color: #000000 !important;
-}
-.streamlit-expanderHeader {
+}}
+.streamlit-expanderHeader {{
     background-color: #1a1a1a !important;
     border-radius: 10px !important;
     border-left: 4px solid #FFD700 !important;
     color: #FFD700 !important;
-}
-.streamlit-expanderContent {
+}}
+.streamlit-expanderContent {{
     background-color: #1a1a1a !important;
     border-radius: 10px !important;
     padding: 15px !important;
-}
-[data-testid="stSidebar"] {
+}}
+[data-testid="stSidebar"] {{
     background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important;
     border-right: 3px solid #FFD700 !important;
-}
-[data-testid="stSidebar"] * {
+}}
+[data-testid="stSidebar"] * {{
     color: #1a1a2e !important;
     font-weight: bold !important;
-}
-input, textarea, .stSelectbox > div > div {
+}}
+input, textarea, .stSelectbox > div > div {{
     background-color: #f0f0f0 !important;
     color: #000000 !important;
     font-weight: normal !important;
     border-radius: 12px !important;
     border: 2px solid #FFD700 !important;
-}
-.stButton > button {
+}}
+.stButton > button {{
     background: linear-gradient(135deg, #FFD700, #CF142B) !important;
     color: white !important;
     border: none !important;
     font-weight: bold !important;
     border-radius: 25px !important;
-}
-.bronze-footer {
+}}
+.bronze-footer {{
     background: linear-gradient(145deg, #8c6a31, #5d431a) !important;
     border: 5px solid #d4af37 !important;
     padding: 35px 25px !important;
     border-radius: 20px !important;
     text-align: center !important;
     margin-top: 50px !important;
-}
-.bronze-footer p {
+}}
+.bronze-footer p {{
     color: #ffd700 !important;
     font-weight: bold !important;
-}
-.stInfo, .stSuccess, .stWarning, .stError {
+}}
+.stInfo, .stSuccess, .stWarning, .stError {{
     background-color: rgba(0,0,0,0.8) !important;
     color: white !important;
     font-weight: bold !important;
-}
-audio {
+}}
+audio {{
     width: 100%;
     border-radius: 30px;
-}
-[data-testid="stMetricValue"] {
+}}
+[data-testid="stMetricValue"] {{
     color: #FFD700 !important;
     font-weight: bold !important;
     font-size: 1.5rem !important;
-}
-[data-testid="stMetricLabel"] {
+}}
+[data-testid="stMetricLabel"] {{
     color: #FFFFFF !important;
     font-weight: bold !important;
-}
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1424,7 +1433,7 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES
+# CONTENIDO DE LAS SECCIONES (RESUMIDO)
 # ============================================
 
 if st.session_state.selected_tab == 0:
@@ -1789,7 +1798,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (RESUMIDO POR ESPACIO)
+# PANEL ADMIN (RESUMIDO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
