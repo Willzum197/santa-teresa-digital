@@ -28,7 +28,7 @@ def init_supabase():
 supabase = init_supabase()
 
 # ============================================
-# URL DE LA IMAGEN DE FONDO (CAMBIALA AQUÍ SI QUIERES)
+# URL DE LA IMAGEN DE FONDO
 # ============================================
 FONDO_URL = "https://assets.change.org/photos/0/lt/kp/EelTkpfkXQbEiEQ-800x450-noPad.jpg?1528608279"
 
@@ -305,6 +305,25 @@ def subir_audio_storage(file):
     except Exception as e:
         st.error(f"Error al subir audio: {str(e)}")
         return None
+
+def update_musica(id_, titulo, audio_file=None):
+    try:
+        audio_url = None
+        if audio_file:
+            audio_url = subir_audio_storage(audio_file)
+        else:
+            existing = supabase.table("musicas").select("audio_url").eq("id", id_).execute()
+            if existing.data:
+                audio_url = existing.data[0].get("audio_url")
+        data = {
+            "titulo": titulo,
+            "audio_url": audio_url
+        }
+        supabase.table("musicas").update(data).eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al actualizar música: {str(e)}")
+        return False
 
 def extraer_video_id(url_youtube):
     if not url_youtube:
@@ -1266,7 +1285,7 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL - TODO EN UN RECUADRO
+# ENCABEZADO PRINCIPAL CORREGIDO
 # ============================================
 ahora = get_fecha_hora_venezuela()
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -1289,7 +1308,7 @@ if 'usuario_id_permanente' not in st.session_state:
 usuario_id_permanente = st.session_state.usuario_id_permanente
 ya_like = ya_dio_like(usuario_id_permanente)
 
-# RECUADRO PRINCIPAL
+# RECUADRO PRINCIPAL CORREGIDO
 st.markdown(f"""
 <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border-radius: 20px; padding: 30px 20px; border: 2px solid #FFD700; margin-bottom: 20px; text-align: center;">
     <div style="font-size: 2.2em; font-weight: bold; color: #FFD700; margin-bottom: 10px;">Santa Teresa al Dia</div>
@@ -1297,7 +1316,6 @@ st.markdown(f"""
     <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 8px;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</div>
     <div style="font-size: 1.05em; color: #FFFFFF; margin-bottom: 8px;">🕐 {hora_str}</div>
     <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 20px;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</div>
-    
     <div style="border-top: 1px solid rgba(255, 215, 0, 0.3); margin: 10px 0; padding-top: 15px;">
         <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
             <div style="display: flex; align-items: center; gap: 5px;">
@@ -1433,7 +1451,7 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES (RESUMIDO)
+# CONTENIDO DE LAS SECCIONES
 # ============================================
 
 if st.session_state.selected_tab == 0:
@@ -1607,19 +1625,6 @@ elif st.session_state.selected_tab == 5:
                     mostrar_seccion_comentarios("tiktok", t['id'], t['titulo'])
         else:
             st.info("No hay videos de TikTok disponibles")
-        
-        if es_admin:
-            st.markdown("---")
-            st.markdown("#### ➕ Agregar nuevo TikTok")
-            with st.form("add_tiktok_form"):
-                titulo_tik = st.text_input("Título del video")
-                url_tik = st.text_input("URL de TikTok", placeholder="https://www.tiktok.com/@usuario/video/123456789")
-                if st.form_submit_button("📤 Agregar TikTok"):
-                    if titulo_tik and url_tik:
-                        if add_tiktok(titulo_tik, url_tik):
-                            st.rerun()
-                    else:
-                        st.error("❌ Título y URL son obligatorios")
     
     with tab_mus:
         st.markdown("### 🎵 Lista de Música")
@@ -1798,13 +1803,12 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (RESUMIDO)
+# PANEL ADMIN (COMPLETO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
     st.title("🔧 Panel de Administración")
     
-    # --- NOTICIAS ---
     if "📰 Noticias" in admin_opt:
         st.subheader("📰 Gestionar Noticias")
         
@@ -1866,7 +1870,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_noticia
                         st.rerun()
     
-    # --- NEGOCIOS ---
     elif "🏪 Negocios" in admin_opt:
         st.subheader("🏪 Gestionar Negocios")
         
@@ -1954,7 +1957,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_negocio
                         st.rerun()
     
-    # --- REFLEXIONES ---
     elif "💭 Reflexiones" in admin_opt:
         st.subheader("💭 Gestionar Reflexiones")
         
@@ -2015,7 +2017,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_reflexion
                         st.rerun()
     
-    # --- CRONICAS ---
     elif "📜 Crónicas" in admin_opt:
         st.subheader("📜 Gestionar Crónicas")
         
@@ -2087,7 +2088,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_cronica
                         st.rerun()
     
-    # --- VIDEOS ---
     elif "🎬 Videos" in admin_opt:
         st.subheader("🎬 Gestionar Videos")
         st.info("📌 Sube tu video a YouTube y pega la URL aquí")
@@ -2153,7 +2153,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_video
                         st.rerun()
     
-    # --- TIKTOK ---
     elif "📱 TikTok" in admin_opt:
         st.subheader("📱 Gestionar Videos de TikTok")
         
@@ -2172,24 +2171,23 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 TikToks existentes")
         tiktoks = get_tiktoks()
         if not tiktoks.empty:
-            for _, t in tiktoks.iterrows():
-                with st.expander(f"📱 {t['titulo']}"):
-                    mostrar_tiktok(t['tiktok_url'], width_percent=25)
-                    st.caption(f"📅 {t['fecha']}")
+            for _, tik in tiktoks.iterrows():
+                with st.expander(f"📱 {tik['titulo']}"):
+                    mostrar_tiktok(tik['tiktok_url'], width_percent=25)
+                    st.caption(f"📅 {tik['fecha']}")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_tik_{t['id']}"):
-                            st.session_state.edit_tiktok = t.to_dict()
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_tik_{tik['id']}"):
+                            st.session_state.edit_tiktok = tik.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_tik_{t['id']}"):
-                            if delete_tiktok(t['id']):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_tik_{tik['id']}"):
+                            if delete_tiktok(tik['id']):
                                 st.success("✅ TikTok eliminado")
                                 st.rerun()
         else:
             st.info("No hay TikToks registrados")
     
-    # --- MUSICA ---
     elif "🎵 Música" in admin_opt:
         st.subheader("🎵 Gestionar Música")
         st.info("📌 Sube tu música desde tu laptop (formato MP3)")
@@ -2250,7 +2248,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_musica
                         st.rerun()
     
-    # --- DENUNCIAS ---
     elif "⚠️ Denuncias" in admin_opt:
         st.subheader("⚠️ Gestionar Denuncias")
         
@@ -2278,7 +2275,6 @@ if st.session_state.get('es_admin', False):
         else:
             st.info("No hay denuncias registradas")
     
-    # --- OPINIONES GENERALES ---
     elif "💬 Opiniones" in admin_opt:
         st.subheader("💬 Gestionar Opiniones")
         
@@ -2316,7 +2312,6 @@ if st.session_state.get('es_admin', False):
         else:
             st.info("No hay opiniones aprobadas")
     
-    # --- PERSONAJES ---
     elif "👥 Personajes" in admin_opt:
         st.subheader("👥 Gestionar Personajes")
         
@@ -2387,7 +2382,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_personaje
                         st.rerun()
     
-    # --- EL CRIMEN NO PAGA ---
     elif "⚖️ El Crimen No Paga" in admin_opt:
         st.subheader("⚖️ Gestionar El Crimen No Paga")
         
@@ -2457,7 +2451,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_crimen
                         st.rerun()
     
-    # --- CONFIGURACION ---
     elif "⚙️ Configuración" in admin_opt:
         st.subheader("⚙️ Configuración del Sistema")
         
@@ -2503,6 +2496,7 @@ if st.session_state.get('es_admin', False):
         
         st.markdown("---")
         st.markdown("### 🖼️ Logo de la aplicación")
+        logo = get_logo()
         if logo:
             st.image(logo, width=150)
         nuevo_logo = st.file_uploader("Subir nuevo logo", type=["png", "jpg", "jpeg"])
