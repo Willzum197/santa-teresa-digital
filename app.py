@@ -160,18 +160,22 @@ def agregar_comentario(seccion, item_id, usuario, comentario):
     try:
         ahora = get_fecha_hora_venezuela()
         data = {
-            "seccion": seccion, "item_id": item_id,
-            "usuario": usuario or "Anónimo", "comentario": comentario,
-            "fecha": ahora.strftime("%d/%m/%Y %H:%M"), "aprobado": True
+            "seccion": seccion,
+            "item_id": str(item_id),
+            "usuario": usuario if usuario else "Anónimo",
+            "comentario": comentario,
+            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+            "aprobado": True
         }
-        supabase.table("comentarios").insert(data).execute()
-        return True
-    except Exception:
+        result = supabase.table("comentarios").insert(data).execute()
+        return True if result.data else False
+    except Exception as e:
+        st.error(f"Error al agregar comentario: {str(e)}")
         return False
 
 def obtener_comentarios(seccion, item_id):
     try:
-        response = supabase.table("comentarios").select("*").eq("seccion", seccion).eq("item_id", item_id).eq("aprobado", True).order("id", desc=True).execute()
+        response = supabase.table("comentarios").select("*").eq("seccion", seccion).eq("item_id", str(item_id)).eq("aprobado", True).order("id", desc=True).execute()
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
     except Exception:
         return pd.DataFrame()
@@ -179,20 +183,36 @@ def obtener_comentarios(seccion, item_id):
 def mostrar_seccion_comentarios(seccion, item_id, titulo_item):
     st.markdown("---")
     st.markdown("### 💬 Comentarios y Opiniones")
+    
+    # Formulario para agregar comentario
     with st.form(key=f"comentario_form_{seccion}_{item_id}"):
-        nombre_com = st.text_input("Tu nombre", placeholder="Anónimo", key=f"nombre_{seccion}_{item_id}")
-        comentario_text = st.text_area("Escribe tu comentario", key=f"comentario_{seccion}_{item_id}")
+        col_nom, col_com = st.columns([1, 3])
+        with col_nom:
+            nombre_com = st.text_input("Tu nombre", placeholder="Anónimo", key=f"nombre_{seccion}_{item_id}")
+        with col_com:
+            comentario_text = st.text_area("Escribe tu comentario u opinión", placeholder="Comparte tu opinión sobre este contenido...", key=f"comentario_{seccion}_{item_id}")
+        
         if st.form_submit_button("📝 Enviar comentario"):
             if comentario_text and comentario_text.strip():
-                if agregar_comentario(seccion, item_id, nombre_com, comentario_text):
-                    st.success("✅ ¡Comentario enviado!")
+                if agregar_comentario(seccion, item_id, nombre_com if nombre_com else "Anónimo", comentario_text):
+                    st.success("✅ ¡Comentario enviado correctamente!")
                     st.rerun()
+                else:
+                    st.error("❌ Error al enviar comentario")
+            else:
+                st.error("❌ Escribe un comentario antes de enviar")
+    
+    # Mostrar comentarios existentes
     comentarios = obtener_comentarios(seccion, item_id)
     if not comentarios.empty:
+        st.markdown(f"#### 📌 {len(comentarios)} comentarios")
         for _, com in comentarios.iterrows():
-            st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
-            st.markdown(f"💬 {com['comentario']}")
-            st.divider()
+            with st.container():
+                st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
+                st.markdown(f"💬 {com['comentario']}")
+                st.divider()
+    else:
+        st.info("💬 No hay comentarios aún. ¡Sé el primero en opinar!")
 
 # ============================================
 # FUNCIONES DE SUBIDA Y MULTIMEDIA
@@ -392,7 +412,7 @@ def delete_opinion_negocio(id_):
     except: return False
 
 # ============================================
-# FUNCIONES DE REFLEXIONES (MODIFICADAS)
+# FUNCIONES DE REFLEXIONES
 # ============================================
 def get_reflexiones_todas():
     """Obtiene todas las reflexiones ordenadas por fecha (más reciente primero)"""
@@ -989,7 +1009,7 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) - UNIFICADAS ---
+# --- REFLEXIONES (TAB 3) - UNIFICADAS CON COMENTARIOS ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
     
@@ -1005,7 +1025,7 @@ elif st.session_state.selected_tab == 3:
                 if ref.get('versiculo'):
                     st.caption(f"📖 {ref['versiculo']}")
                 st.caption(f"📅 {ref['fecha']}")
-                # DESPUÉS: Comentarios y opiniones
+                # DESPUÉS: Comentarios y opiniones (LLAMADA CORRECTA)
                 mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
     else:
         st.info("No hay reflexiones disponibles")
@@ -1228,7 +1248,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN COMPLETO
+# PANEL ADMIN COMPLETO (por brevedad se incluye solo la estructura)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
@@ -1383,7 +1403,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_negocio
                         st.rerun()
     
-    # --- REFLEXIONES (UNIFICADAS EN ADMIN) ---
+    # --- REFLEXIONES ---
     elif "💭 Reflexiones" in admin_opt:
         st.subheader("💭 Gestionar Reflexiones")
         
