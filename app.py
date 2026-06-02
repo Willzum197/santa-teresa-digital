@@ -391,36 +391,58 @@ def delete_opinion_negocio(id_):
     try: supabase.table("opiniones_negocios").delete().eq("id", id_).execute(); return True
     except: return False
 
-def get_reflexion_activa():
+# ============================================
+# FUNCIONES DE REFLEXIONES (MODIFICADAS)
+# ============================================
+def get_reflexiones_todas():
+    """Obtiene todas las reflexiones ordenadas por fecha (más reciente primero)"""
     try:
-        response = supabase.table("reflexiones").select("*").eq("activo", True).limit(1).execute()
-        if response.data: return response.data[0]
-        response = supabase.table("reflexiones").select("*").order("id", desc=True).limit(1).execute()
-        return response.data[0] if response.data else None
-    except: return None
-
-def get_reflexiones():
-    try:
-        response = supabase.table("reflexiones").select("*").order("id", desc=True).execute()
+        response = supabase.table("reflexiones").select("*").order("fecha", desc=True).execute()
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
-    except: return pd.DataFrame()
+    except Exception as e:
+        st.error(f"Error al obtener reflexiones: {str(e)}")
+        return pd.DataFrame()
 
 def add_reflexion(titulo, contenido, versiculo):
     try:
         ahora = get_fecha_hora_venezuela()
-        supabase.table("reflexiones").update({"activo": False}).execute()
-        supabase.table("reflexiones").insert({"titulo": titulo, "contenido": contenido, "versiculo": versiculo, "fecha": ahora.strftime("%d/%m/%Y"), "activo": True}).execute()
-        return True
-    except: return False
+        data = {
+            "titulo": titulo,
+            "contenido": contenido,
+            "versiculo": versiculo if versiculo else None,
+            "fecha": ahora.strftime("%d/%m/%Y"),
+            "activo": True
+        }
+        result = supabase.table("reflexiones").insert(data).execute()
+        return True if result.data else False
+    except Exception as e:
+        st.error(f"Error al guardar reflexión: {str(e)}")
+        return False
 
 def update_reflexion(id_, titulo, contenido, versiculo):
-    try: supabase.table("reflexiones").update({"titulo": titulo, "contenido": contenido, "versiculo": versiculo}).eq("id", id_).execute(); return True
-    except: return False
+    try:
+        data = {
+            "titulo": titulo,
+            "contenido": contenido,
+            "versiculo": versiculo if versiculo else None
+        }
+        supabase.table("reflexiones").update(data).eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al actualizar reflexión: {str(e)}")
+        return False
 
 def delete_reflexion(id_):
-    try: supabase.table("reflexiones").delete().eq("id", id_).execute(); return True
-    except: return False
+    try:
+        supabase.table("reflexiones").delete().eq("id", id_).execute()
+        return True
+    except Exception as e:
+        st.error(f"Error al eliminar reflexión: {str(e)}")
+        return False
 
+# ============================================
+# FUNCIONES CRUD (CONTINUACIÓN)
+# ============================================
 def get_cronicas(estado=None):
     try:
         if estado and estado != "Todos":
@@ -890,19 +912,18 @@ if st.session_state.selected_tab == 0:
             st.info("No hay reportajes disponibles")
     
     with col2:
-        st.markdown("### ✝️ Reflexión del Día")
-        ref = get_reflexion_activa()
-        if ref:
-            with st.expander(f"✨ {ref['titulo']}", expanded=True):
-                # PRIMERO: Contenido de la reflexión
-                st.write(ref['contenido'])
-                if ref.get('versiculo'):
-                    st.caption(f"📖 {ref['versiculo']}")
-                st.caption(f"📅 {ref['fecha']}")
-                # DESPUÉS: Comentarios
-                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
+        st.markdown("### ✝️ Reflexiones")
+        reflexiones = get_reflexiones_todas()
+        if not reflexiones.empty:
+            for _, ref in reflexiones.iterrows():
+                with st.expander(f"✨ {ref['titulo']} - {ref['fecha']}"):
+                    st.write(ref['contenido'])
+                    if ref.get('versiculo'):
+                        st.caption(f"📖 {ref['versiculo']}")
+                    st.caption(f"📅 {ref['fecha']}")
+                    mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
         else:
-            st.info("No hay reflexión activa")
+            st.info("No hay reflexiones disponibles")
 
 # --- NOTICIAS (TAB 1) ---
 elif st.session_state.selected_tab == 1:
@@ -968,37 +989,26 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) ---
+# --- REFLEXIONES (TAB 3) - UNIFICADAS ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
-    ref = get_reflexion_activa()
-    if ref:
-        # PRIMERO: La reflexión activa con su contenido
-        with st.expander(f"✨ ACTUAL: {ref['titulo']}", expanded=True):
-            st.write(ref['contenido'])
-            if ref.get('versiculo'):
-                st.caption(f"📖 {ref['versiculo']}")
-            st.caption(f"📅 {ref['fecha']}")
-            # DESPUÉS: Los comentarios
-            mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
-    else:
-        st.info("No hay reflexión activa")
     
-    st.markdown("---")
-    st.markdown("### 📜 Reflexiones Anteriores")
-    reflexiones = get_reflexiones()
+    # Obtener TODAS las reflexiones ordenadas por fecha (más reciente primero)
+    reflexiones = get_reflexiones_todas()
+    
     if not reflexiones.empty:
-        for _, r in reflexiones.iterrows():
-            if ref is None or r['id'] != ref['id']:
-                with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
-                    # PRIMERO: Contenido de la reflexión anterior
-                    st.write(r['contenido'])
-                    if r.get('versiculo'):
-                        st.caption(f"📖 {r['versiculo']}")
-                    # DESPUÉS: Comentarios
-                    mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'])
+        # Mostrar todas las reflexiones en orden de fecha
+        for _, ref in reflexiones.iterrows():
+            with st.expander(f"✨ {ref['titulo']} - {ref['fecha']}"):
+                # PRIMERO: Contenido de la reflexión
+                st.write(ref['contenido'])
+                if ref.get('versiculo'):
+                    st.caption(f"📖 {ref['versiculo']}")
+                st.caption(f"📅 {ref['fecha']}")
+                # DESPUÉS: Comentarios y opiniones
+                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
     else:
-        st.info("No hay reflexiones anteriores")
+        st.info("No hay reflexiones disponibles")
 
 # --- CRÓNICAS (TAB 4) ---
 elif st.session_state.selected_tab == 4:
@@ -1373,7 +1383,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_negocio
                         st.rerun()
     
-    # --- REFLEXIONES ---
+    # --- REFLEXIONES (UNIFICADAS EN ADMIN) ---
     elif "💭 Reflexiones" in admin_opt:
         st.subheader("💭 Gestionar Reflexiones")
         
@@ -1382,7 +1392,7 @@ if st.session_state.get('es_admin', False):
                 titulo = st.text_input("Título *")
                 versiculo = st.text_input("Versículo (opcional)")
                 contenido = st.text_area("Contenido *")
-                if st.form_submit_button("💾 Guardar como activa"):
+                if st.form_submit_button("💾 Guardar Reflexión"):
                     if titulo and contenido:
                         if add_reflexion(titulo, contenido, versiculo):
                             st.success("✅ Reflexión guardada")
@@ -1393,8 +1403,8 @@ if st.session_state.get('es_admin', False):
                         st.error("❌ Título y contenido son obligatorios")
         
         st.markdown("---")
-        st.markdown("### 📋 Reflexiones existentes")
-        reflexiones = get_reflexiones()
+        st.markdown("### 📋 Todas las Reflexiones")
+        reflexiones = get_reflexiones_todas()
         if not reflexiones.empty:
             for _, r in reflexiones.iterrows():
                 with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
