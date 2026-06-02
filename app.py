@@ -808,7 +808,7 @@ with st.sidebar:
         st.session_state.es_admin = False
 
 # ============================================
-# MENÚ PRINCIPAL (CORREGIDO - LAS PESTAÑAS AHORA ABREN)
+# MENÚ PRINCIPAL
 # ============================================
 st.markdown("### 📌 Secciones Principales")
 col_linea1 = st.columns(4)
@@ -860,7 +860,7 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE CADA SECCIÓN (TODAS FUNCIONAN)
+# CONTENIDO DE CADA SECCIÓN
 # ============================================
 
 # --- PORTADA (TAB 0) ---
@@ -894,9 +894,12 @@ if st.session_state.selected_tab == 0:
         ref = get_reflexion_activa()
         if ref:
             with st.expander(f"✨ {ref['titulo']}", expanded=True):
+                # PRIMERO: Contenido de la reflexión
                 st.write(ref['contenido'])
                 if ref.get('versiculo'):
                     st.caption(f"📖 {ref['versiculo']}")
+                st.caption(f"📅 {ref['fecha']}")
+                # DESPUÉS: Comentarios
                 mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
         else:
             st.info("No hay reflexión activa")
@@ -970,14 +973,17 @@ elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
     ref = get_reflexion_activa()
     if ref:
+        # PRIMERO: La reflexión activa con su contenido
         with st.expander(f"✨ ACTUAL: {ref['titulo']}", expanded=True):
             st.write(ref['contenido'])
             if ref.get('versiculo'):
                 st.caption(f"📖 {ref['versiculo']}")
             st.caption(f"📅 {ref['fecha']}")
+            # DESPUÉS: Los comentarios
             mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
     else:
         st.info("No hay reflexión activa")
+    
     st.markdown("---")
     st.markdown("### 📜 Reflexiones Anteriores")
     reflexiones = get_reflexiones()
@@ -985,9 +991,11 @@ elif st.session_state.selected_tab == 3:
         for _, r in reflexiones.iterrows():
             if ref is None or r['id'] != ref['id']:
                 with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
+                    # PRIMERO: Contenido de la reflexión anterior
                     st.write(r['contenido'])
                     if r.get('versiculo'):
                         st.caption(f"📖 {r['versiculo']}")
+                    # DESPUÉS: Comentarios
                     mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'])
     else:
         st.info("No hay reflexiones anteriores")
