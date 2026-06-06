@@ -28,7 +28,7 @@ def init_supabase():
 supabase = init_supabase()
 
 # ============================================
-# URL DE LA IMAGEN DE FONDO (CAMBIALA AQUÍ SI QUIERES)
+# URL DE LA IMAGEN DE FONDO
 # ============================================
 FONDO_URL = "https://assets.change.org/photos/0/lt/kp/EelTkpfkXQbEiEQ-800x450-noPad.jpg?1528608279"
 
@@ -1139,73 +1139,57 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# 🖼️ ESTILOS - CON FONDO DE IMAGEN (CORREGIDO - VISIBLE SIEMPRE)
+# 🖼️ ESTILOS - SIN RECUADRO BLANCO (CORREGIDO)
 # ============================================
 st.markdown(f"""
 <style>
-/* La imagen de fondo se aplica directamente sin gradiente que la opaque */
+/* La imagen de fondo es visible permanentemente */
 .stApp {{
     background: url('{FONDO_URL}') no-repeat center center fixed !important;
     background-size: cover !important;
 }}
 
-/* Contenedor principal con fondo semi-transparente para legibilidad */
+/* Elimina el fondo blanco del contenedor principal */
 .block-container {{
-    background-color: rgba(0, 0, 0, 0.75) !important;
+    background-color: transparent !important;
     border-radius: 20px !important;
     padding: 20px !important;
 }}
 
-* {{
+/* Todos los textos en blanco */
+*, .main, .main p, .main span, .main div, .main label, .stMarkdown {{
     color: #FFFFFF !important;
     font-weight: bold !important;
 }}
 
-.main, .main p, .main span, .main div, .main label, .stMarkdown {{
-    color: #FFFFFF !important;
-    font-weight: bold !important;
-}}
-
+/* Títulos en dorado */
 .main h1, .main h2, .main h3, .main h4 {{
     color: #FFD700 !important;
     font-weight: bold !important;
 }}
 
+/* Enlaces dorados */
 a {{
     color: #FFD700 !important;
     font-weight: bold !important;
     text-decoration: underline !important;
 }}
 
-div[data-testid="stTabs"] button {{
-    background-color: #1a1a1a !important;
-    border-radius: 10px !important;
-    color: #FFFFFF !important;
-    font-weight: bold !important;
-    font-size: 12px !important;
-    padding: 6px 12px !important;
-    margin: 0 3px !important;
-    border: 1px solid #FFD700 !important;
-}}
-
-div[data-testid="stTabs"] button:hover {{
-    background-color: #FFD700 !important;
-    color: #000000 !important;
-}}
-
+/* Fondo oscuro semitransparente SOLO para los expansores y tarjetas */
 .streamlit-expanderHeader {{
-    background-color: #1a1a1a !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
     border-radius: 10px !important;
     border-left: 4px solid #FFD700 !important;
     color: #FFD700 !important;
 }}
 
 .streamlit-expanderContent {{
-    background-color: #1a1a1a !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
     border-radius: 10px !important;
     padding: 15px !important;
 }}
 
+/* Sidebar con fondo de gradiente */
 [data-testid="stSidebar"] {{
     background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important;
     border-right: 3px solid #FFD700 !important;
@@ -1216,6 +1200,7 @@ div[data-testid="stTabs"] button:hover {{
     font-weight: bold !important;
 }}
 
+/* Inputs y textareas con fondo claro para legibilidad */
 input, textarea, .stSelectbox > div > div {{
     background-color: #f0f0f0 !important;
     color: #000000 !important;
@@ -1224,6 +1209,7 @@ input, textarea, .stSelectbox > div > div {{
     border: 2px solid #FFD700 !important;
 }}
 
+/* Botones */
 .stButton > button {{
     background: linear-gradient(135deg, #FFD700, #CF142B) !important;
     color: white !important;
@@ -1232,6 +1218,7 @@ input, textarea, .stSelectbox > div > div {{
     border-radius: 25px !important;
 }}
 
+/* Footer de bronce */
 .bronze-footer {{
     background: linear-gradient(145deg, #8c6a31, #5d431a) !important;
     border: 5px solid #d4af37 !important;
@@ -1246,6 +1233,7 @@ input, textarea, .stSelectbox > div > div {{
     font-weight: bold !important;
 }}
 
+/* Mensajes informativos */
 .stInfo, .stSuccess, .stWarning, .stError {{
     background-color: rgba(0,0,0,0.8) !important;
     color: white !important;
@@ -1266,6 +1254,23 @@ audio {{
 [data-testid="stMetricLabel"] {{
     color: #FFFFFF !important;
     font-weight: bold !important;
+}}
+
+/* Pestañas */
+div[data-testid="stTabs"] button {{
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    border-radius: 10px !important;
+    color: #FFFFFF !important;
+    font-weight: bold !important;
+    font-size: 12px !important;
+    padding: 6px 12px !important;
+    margin: 0 3px !important;
+    border: 1px solid #FFD700 !important;
+}}
+
+div[data-testid="stTabs"] button:hover {{
+    background-color: #FFD700 !important;
+    color: #000000 !important;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -1470,7 +1475,7 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES (COMPLETO)
+# CONTENIDO DE LAS SECCIONES
 # ============================================
 
 if st.session_state.selected_tab == 0:
@@ -1510,7 +1515,6 @@ if st.session_state.selected_tab == 0:
         else:
             st.info("No hay reflexión activa")
 
-# --- NOTICIAS (TAB 1) ---
 elif st.session_state.selected_tab == 1:
     st.title("📰 Noticias")
     tab_nac, tab_inter, tab_dep, tab_suc, tab_far, tab_rep = st.tabs(["🇻🇪 Nacionales", "🌎 Internacionales", "⚽ Deportes", "🚨 Sucesos", "🎭 Farándula", "📽️ Reportajes"])
@@ -1528,7 +1532,6 @@ elif st.session_state.selected_tab == 1:
             else:
                 st.info(f"No hay noticias de {categoria}")
 
-# --- NEGOCIOS (TAB 2) ---
 elif st.session_state.selected_tab == 2:
     st.title("📍 Donde ir - Donde comprar")
     negocios = get_negocios()
@@ -1574,7 +1577,6 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
     ref = get_reflexion_activa()
@@ -1601,7 +1603,6 @@ elif st.session_state.selected_tab == 3:
     else:
         st.info("No hay reflexiones anteriores")
 
-# --- CRÓNICAS (TAB 4) ---
 elif st.session_state.selected_tab == 4:
     st.title("📜 Crónicas")
     estados = ["Todos", "Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"]
@@ -1621,7 +1622,6 @@ elif st.session_state.selected_tab == 4:
     else:
         st.info("No hay crónicas disponibles")
 
-# --- MULTIMEDIA (TAB 5) ---
 elif st.session_state.selected_tab == 5:
     st.title("🎬 Multimedia")
     tab_vid, tab_tik, tab_mus, tab_rad = st.tabs(["🎥 YouTube", "📱 TikTok", "🎵 Música", "📻 Radio"])
@@ -1699,7 +1699,6 @@ elif st.session_state.selected_tab == 5:
             st.audio("http://streaming.radionomy.com/InstrumentalSongs", format="audio/mp3")
             st.caption("🎶 Música instrumental para relajarse")
 
-# --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
     st.title("⚠️ Denuncias Ciudadanas")
     tab_den, tab_ver = st.tabs(["📝 Hacer Denuncia", "👁️ Ver Denuncias"])
@@ -1732,7 +1731,6 @@ elif st.session_state.selected_tab == 6:
         else:
             st.info("No hay denuncias registradas")
 
-# --- OPINIONES (TAB 7) ---
 elif st.session_state.selected_tab == 7:
     st.title("💬 Opiniones")
     tab_op, tab_ver_op = st.tabs(["✍️ Dar Opinión", "👁️ Ver Opiniones"])
@@ -1762,7 +1760,6 @@ elif st.session_state.selected_tab == 7:
         else:
             st.info("No hay opiniones aprobadas")
 
-# --- PERSONAJES (TAB 8) ---
 elif st.session_state.selected_tab == 8:
     st.title("👥 Personajes que hicieron historia")
     st.markdown("### 📋 Personajes Registrados")
@@ -1776,7 +1773,6 @@ elif st.session_state.selected_tab == 8:
     else:
         st.info("No hay personajes registrados")
 
-# --- EL CRIMEN NO PAGA (TAB 9) ---
 elif st.session_state.selected_tab == 9:
     st.title("⚖️ El Crimen No Paga")
     st.markdown("### Casos y noticias sobre justicia")
@@ -1795,7 +1791,6 @@ elif st.session_state.selected_tab == 9:
     else:
         st.info("No hay casos registrados")
 
-# --- EFEMÉRIDES MÉDICAS (TAB 10) ---
 elif st.session_state.selected_tab == 10:
     st.title("📅 Efemérides Médicas")
     fecha_actual_str = f"{ahora.day} de {meses[ahora.month-1]}"
