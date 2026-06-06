@@ -1139,7 +1139,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# 🖼️ ESTILOS - SIN RECUADRO BLANCO (CORREGIDO)
+# 🖼️ ESTILOS - SIN RECUADRO BLANCO
 # ============================================
 st.markdown(f"""
 <style>
@@ -1308,7 +1308,7 @@ document.getElementById('copyButton').addEventListener('click', function() {{
 st.markdown("---")
 
 # ============================================
-# ENCABEZADO PRINCIPAL - TODO EN UN RECUADRO
+# ENCABEZADO PRINCIPAL - CORREGIDO (SIN HTML VISIBLE)
 # ============================================
 ahora = get_fecha_hora_venezuela()
 dias = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
@@ -1331,29 +1331,31 @@ if 'usuario_id_permanente' not in st.session_state:
 usuario_id_permanente = st.session_state.usuario_id_permanente
 ya_like = ya_dio_like(usuario_id_permanente)
 
-# RECUADRO PRINCIPAL
-st.markdown(f"""
-<div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border-radius: 20px; padding: 30px 20px; border: 2px solid #FFD700; margin-bottom: 20px; text-align: center;">
-    <div style="font-size: 2.2em; font-weight: bold; color: #FFD700; margin-bottom: 10px;">Santa Teresa al Dia</div>
-    <div style="font-size: 1.2em; color: #FFFFFF; margin-bottom: 20px;">Informacion, Cultura y Fe de nuestro pueblo</div>
-    <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 8px;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</div>
-    <div style="font-size: 1.05em; color: #FFFFFF; margin-bottom: 8px;">🕐 {hora_str}</div>
-    <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 20px;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</div>
-    
-    <div style="border-top: 1px solid rgba(255, 215, 0, 0.3); margin: 10px 0; padding-top: 15px;">
-        <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
-            <div style="display: flex; align-items: center; gap: 5px;">
-                <span style="font-size: 1.3em;">❤️</span>
-                <span style="font-size: 0.9em;">Apoya</span>
-            </div>
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <span style="font-size: 1.8em;">👍</span>
-                <span style="font-size: 1.8em; font-weight: bold; color: #FFD700;">{total_likes:,}</span>
+# RECUADRO PRINCIPAL CORREGIDO - AHORA SÍ FUNCIONA
+st.markdown(
+    f"""
+    <div style="background: linear-gradient(135deg, #1a1a1a, #2a2a2a); border-radius: 20px; padding: 30px 20px; border: 2px solid #FFD700; margin-bottom: 20px; text-align: center;">
+        <div style="font-size: 2.2em; font-weight: bold; color: #FFD700; margin-bottom: 10px;">Santa Teresa al Dia</div>
+        <div style="font-size: 1.2em; color: #FFFFFF; margin-bottom: 20px;">Informacion, Cultura y Fe de nuestro pueblo</div>
+        <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 8px;">⭐ {dias[ahora.weekday()]}, {ahora.day} de {meses[ahora.month-1]} de {ahora.year} ⭐</div>
+        <div style="font-size: 1.05em; color: #FFFFFF; margin-bottom: 8px;">🕐 {hora_str}</div>
+        <div style="font-size: 0.95em; color: #FFD700; margin-bottom: 20px;">👥 Visitantes: {visitas:,} | 💵 Dólar BCV: {dolar:.2f} Bs</div>
+        <div style="border-top: 1px solid rgba(255, 215, 0, 0.3); margin: 10px 0; padding-top: 15px;">
+            <div style="display: flex; justify-content: center; align-items: center; gap: 20px; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 5px;">
+                    <span style="font-size: 1.3em;">❤️</span>
+                    <span style="font-size: 0.9em;">Apoya</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span style="font-size: 1.8em;">👍</span>
+                    <span style="font-size: 1.8em; font-weight: bold; color: #FFD700;">{total_likes:,}</span>
+                </div>
             </div>
         </div>
     </div>
-</div>
-""", unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
 # Botón de Me gusta funcional
 if not ya_like:
@@ -1475,7 +1477,7 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES
+# CONTENIDO DE LAS SECCIONES (COMPLETO)
 # ============================================
 
 if st.session_state.selected_tab == 0:
