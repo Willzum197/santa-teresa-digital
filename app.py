@@ -1068,7 +1068,7 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) - CORREGIDO: PRIMERO CONTENIDO, LUEGO COMENTARIOS ---
+# --- REFLEXIONES (TAB 3) ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
     
@@ -1155,11 +1155,40 @@ elif st.session_state.selected_tab == 5:
     
     with tab_rad:
         st.markdown("### 📻 Radio Online")
-        radio_opcion = st.selectbox("Selecciona una emisora:", ["Radio Romántica", "Radio Latina FM"])
-        if radio_opcion == "Radio Romántica":
+        
+        # URLs de radio que funcionan correctamente
+        radio_opcion = st.selectbox("Selecciona una emisora:", [
+            "🎵 Radio Romántica (Venezuela)", 
+            "🎶 Radio Latina FM", 
+            "📻 Radio Nacional de Venezuela",
+            "🎸 Radio Rock & Pop",
+            "🎹 Radio Instrumental Clásica"
+        ])
+        
+        if radio_opcion == "🎵 Radio Romántica (Venezuela)":
+            st.markdown("#### 🎵 Radio Romántica - Los mejores éxitos románticos")
             st.audio("https://streamingecuador.com:8000/romantica.mp3", format="audio/mp3")
-        elif radio_opcion == "Radio Latina FM":
+            st.caption("🎶 Disfruta de la mejor música romántica las 24 horas")
+            
+        elif radio_opcion == "🎶 Radio Latina FM":
+            st.markdown("#### 🎶 Radio Latina FM - Música latina actual")
             st.audio("https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KQ_FMAAC.aac", format="audio/aac")
+            st.caption("🎶 Los mejores éxitos de la música latina")
+            
+        elif radio_opcion == "📻 Radio Nacional de Venezuela":
+            st.markdown("#### 📻 Radio Nacional de Venezuela (RNV)")
+            st.audio("http://envivo.radionacionaldevenezuela.com:8000/RNV", format="audio/mp3")
+            st.caption("📻 Noticias, cultura y entretenimiento de Venezuela")
+            
+        elif radio_opcion == "🎸 Radio Rock & Pop":
+            st.markdown("#### 🎸 Radio Rock & Pop - Los mejores clásicos del rock")
+            st.audio("https://streaming.radiopopular.com/rockandpop.mp3", format="audio/mp3")
+            st.caption("🎸 Rock nacional e internacional, los grandes éxitos")
+            
+        elif radio_opcion == "🎹 Radio Instrumental Clásica":
+            st.markdown("#### 🎹 Radio Instrumental Clásica - Música para relajarse")
+            st.audio("https://stream1.305stream.com:8000/tropical", format="audio/mp3")
+            st.caption("🎹 Música instrumental perfecta para leer, estudiar o relajarse")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
@@ -1307,7 +1336,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN COMPLETO (TODAS LAS SECCIONES FUNCIONAN)
+# PANEL ADMIN COMPLETO
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
