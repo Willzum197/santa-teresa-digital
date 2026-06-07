@@ -1152,39 +1152,49 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # EMISORAS DE RADIO QUE FUNCIONAN EN STREAMLIT
-        radio_opcion = st.selectbox("Selecciona una emisora:", [
-            "🎵 80s Forever - Los mejores 80s en inglés",
+        # OPCIÓN 1: Reproductor de YouTube (más confiable)
+        st.markdown("#### 🎵 Selecciona una estación de radio")
+        
+        radio_opcion = st.selectbox("Elige una emisora:", [
+            "🎵 80s Forever - Música de los 80s en inglés",
             "💕 Baladas Románticas en Inglés",
             "🕺 Disco Hits 70s 80s",
             "🎸 Classic Rock 70s 80s",
-            "🎹 Piano Instrumental Relajante"
+            "🎹 Piano Instrumental",
+            "📻 Radio Nacional de Venezuela"
         ])
         
-        if radio_opcion == "🎵 80s Forever - Los mejores 80s en inglés":
-            st.markdown("#### 🎵 80s Forever")
-            st.audio("https://stream.zeno.fm/fsx7rzc2x1zuv", format="audio/mp3")
-            st.caption("🎶 Los mejores éxitos de los 80s - Madonna, Michael Jackson, Whitney Houston, Prince y más!")
+        if radio_opcion == "🎵 80s Forever - Música de los 80s en inglés":
+            st.markdown("#### 🎵 80s Forever - Los mejores éxitos de los 80s")
+            st.video("https://www.youtube.com/embed/j5s9pFb6t3M?autoplay=1&loop=1&playlist=j5s9pFb6t3M", start=0)
+            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más!")
             
         elif radio_opcion == "💕 Baladas Románticas en Inglés":
-            st.markdown("#### 💕 Baladas Románticas")
-            st.audio("https://stream.zeno.fm/08f62gs7mg0uv", format="audio/mp3")
-            st.caption("🎶 Las baladas románticas más bellas en inglés - Air Supply, Chicago, Foreigner, REO Speedwagon")
+            st.markdown("#### 💕 Baladas Románticas - Las más bellas baladas en inglés")
+            st.video("https://www.youtube.com/embed/6T9R1FPAVV4?autoplay=1&loop=1&playlist=6T9R1FPAVV4", start=0)
+            st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey")
             
         elif radio_opcion == "🕺 Disco Hits 70s 80s":
-            st.markdown("#### 🕺 Disco Hits")
-            st.audio("https://stream.zeno.fm/76pz71spy7zuv", format="audio/mp3")
-            st.caption("🎶 Lo mejor de la música disco - Bee Gees, ABBA, Donna Summer, Earth Wind & Fire")
+            st.markdown("#### 🕺 Disco Hits - Lo mejor de la música disco")
+            st.video("https://www.youtube.com/embed/xm4nZpjC4oA?autoplay=1&loop=1&playlist=xm4nZpjC4oA", start=0)
+            st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band")
             
         elif radio_opcion == "🎸 Classic Rock 70s 80s":
-            st.markdown("#### 🎸 Classic Rock")
-            st.audio("https://stream.zeno.fm/2r6rhhvesv8uv", format="audio/mp3")
-            st.caption("🎶 Los clásicos del rock - Queen, Led Zeppelin, The Beatles, Pink Floyd")
+            st.markdown("#### 🎸 Classic Rock - Los clásicos del rock")
+            st.video("https://www.youtube.com/embed/LxMJrYvAPjQ?autoplay=1&loop=1&playlist=LxMJrYvAPjQ", start=0)
+            st.caption("🎶 Queen, Led Zeppelin, The Beatles, Pink Floyd, The Rolling Stones")
             
-        elif radio_opcion == "🎹 Piano Instrumental Relajante":
-            st.markdown("#### 🎹 Piano Instrumental")
-            st.audio("https://stream.zeno.fm/cw9y2b1qrf9uv", format="audio/mp3")
-            st.caption("🎹 Música instrumental de piano para leer, estudiar o relajarse")
+        elif radio_opcion == "🎹 Piano Instrumental":
+            st.markdown("#### 🎹 Piano Instrumental - Música para relajarse")
+            st.video("https://www.youtube.com/embed/OTzZR9b1mEE?autoplay=1&loop=1&playlist=OTzZR9b1mEE", start=0)
+            st.caption("🎹 Música instrumental de piano perfecta para leer, estudiar o relajarse")
+            
+        elif radio_opcion == "📻 Radio Nacional de Venezuela":
+            st.markdown("#### 📻 Radio Nacional de Venezuela")
+            st.video("https://www.youtube.com/embed/H5T4G0QnLqw?autoplay=1&loop=1&playlist=H5T4G0QnLqw", start=0)
+            st.caption("📻 Noticias, cultura y entretenimiento de Venezuela")
+        
+        st.info("💡 **Nota:** Las emisoras se reproducen usando videos de YouTube con listas de reproducción continuas. ¡Disfruta la música!")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
