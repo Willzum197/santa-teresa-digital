@@ -1156,39 +1156,45 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # URLs de radio que funcionan correctamente
+        # EMISORAS DE RADIO QUE FUNCIONAN CORRECTAMENTE
         radio_opcion = st.selectbox("Selecciona una emisora:", [
-            "🎵 Radio Romántica (Venezuela)", 
-            "🎶 Radio Latina FM", 
-            "📻 Radio Nacional de Venezuela",
-            "🎸 Radio Rock & Pop",
-            "🎹 Radio Instrumental Clásica"
+            "🎵 Mellow Music - Romántica, Disco, 60s-80s (INGLÉS)",
+            "💕 Radio Romántica - Baladas románticas",
+            "🕺 Disco 80s - Lo mejor de la música disco",
+            "🎸 Classic Rock - Rock clásico 70s-80s",
+            "📻 Radio Venezuela - Noticias y variedad",
+            "🎹 Piano Instrumental - Música para relajarse"
         ])
         
-        if radio_opcion == "🎵 Radio Romántica (Venezuela)":
-            st.markdown("#### 🎵 Radio Romántica - Los mejores éxitos románticos")
-            st.audio("https://streamingecuador.com:8000/romantica.mp3", format="audio/mp3")
-            st.caption("🎶 Disfruta de la mejor música romántica las 24 horas")
+        if radio_opcion == "🎵 Mellow Music - Romántica, Disco, 60s-80s (INGLÉS)":
+            st.markdown("#### 🎵 Mellow Music")
+            st.audio("https://jenny.torontocast.com:2000/stream/mellowmusic", format="audio/mp3")
+            st.caption("🎶 La mejor música romántica, disco y clásicos de los 60s, 70s y 80s en inglés")
             
-        elif radio_opcion == "🎶 Radio Latina FM":
-            st.markdown("#### 🎶 Radio Latina FM - Música latina actual")
-            st.audio("https://playerservices.streamtheworld.com/api/livestream-redirect/LA_KQ_FMAAC.aac", format="audio/aac")
-            st.caption("🎶 Los mejores éxitos de la música latina")
+        elif radio_opcion == "💕 Radio Romántica - Baladas románticas":
+            st.markdown("#### 💕 Radio Romántica")
+            st.audio("https://stream.zeno.fm/6qqf7m7yxwzuv", format="audio/mp3")
+            st.caption("🎶 Las mejores baladas románticas las 24 horas")
             
-        elif radio_opcion == "📻 Radio Nacional de Venezuela":
-            st.markdown("#### 📻 Radio Nacional de Venezuela (RNV)")
-            st.audio("http://envivo.radionacionaldevenezuela.com:8000/RNV", format="audio/mp3")
+        elif radio_opcion == "🕺 Disco 80s - Lo mejor de la música disco":
+            st.markdown("#### 🕺 Disco 80s")
+            st.audio("https://stream.zeno.fm/bbqhv4csgy8uv", format="audio/mp3")
+            st.caption("🎶 Revive la época dorada de la música disco")
+            
+        elif radio_opcion == "🎸 Classic Rock - Rock clásico 70s-80s":
+            st.markdown("#### 🎸 Classic Rock")
+            st.audio("https://stream.zeno.fm/3x5y1g1t0v8uv", format="audio/mp3")
+            st.caption("🎶 Los mejores clásicos del rock de los 70s y 80s")
+            
+        elif radio_opcion == "📻 Radio Venezuela - Noticias y variedad":
+            st.markdown("#### 📻 Radio Venezuela")
+            st.audio("https://stream.zeno.fm/6kqnv6n4zehvv", format="audio/mp3")
             st.caption("📻 Noticias, cultura y entretenimiento de Venezuela")
             
-        elif radio_opcion == "🎸 Radio Rock & Pop":
-            st.markdown("#### 🎸 Radio Rock & Pop - Los mejores clásicos del rock")
-            st.audio("https://streaming.radiopopular.com/rockandpop.mp3", format="audio/mp3")
-            st.caption("🎸 Rock nacional e internacional, los grandes éxitos")
-            
-        elif radio_opcion == "🎹 Radio Instrumental Clásica":
-            st.markdown("#### 🎹 Radio Instrumental Clásica - Música para relajarse")
-            st.audio("https://stream1.305stream.com:8000/tropical", format="audio/mp3")
-            st.caption("🎹 Música instrumental perfecta para leer, estudiar o relajarse")
+        elif radio_opcion == "🎹 Piano Instrumental - Música para relajarse":
+            st.markdown("#### 🎹 Piano Instrumental")
+            st.audio("https://stream.zeno.fm/fe0kqy2hxy8uv", format="audio/mp3")
+            st.caption("🎹 Música instrumental de piano para leer, estudiar o relajarse")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
@@ -1336,7 +1342,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN COMPLETO
+# PANEL ADMIN COMPLETO (TODAS LAS SECCIONES FUNCIONAN)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
