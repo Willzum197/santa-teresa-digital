@@ -434,7 +434,7 @@ def get_reflexion_activa():
 
 def get_reflexiones():
     try:
-        response = supabase.table("reflexiones").select("*").order("id", desc=True).execute()
+        response = supabase.table("reflexiones").select("*").order("fecha", desc=True).execute()
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
     except: return pd.DataFrame()
 
@@ -991,16 +991,18 @@ if st.session_state.selected_tab == 0:
             st.info("No hay reportajes disponibles")
     
     with col2:
-        st.markdown("### ✝️ Reflexión del Día")
-        ref = get_reflexion_activa()
-        if ref:
-            with st.expander(f"✨ {ref['titulo']}", expanded=True):
-                st.write(ref['contenido'])
-                if ref.get('versiculo'):
-                    st.caption(f"📖 {ref['versiculo']}")
-                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
+        st.markdown("### ✝️ Reflexiones")
+        reflexiones = get_reflexiones()
+        if not reflexiones.empty:
+            for _, ref in reflexiones.iterrows():
+                with st.expander(f"✨ {ref['titulo']} - {ref['fecha']}"):
+                    st.write(ref['contenido'])
+                    if ref.get('versiculo'):
+                        st.caption(f"📖 {ref['versiculo']}")
+                    st.caption(f"📅 {ref['fecha']}")
+                    mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
         else:
-            st.info("No hay reflexión activa")
+            st.info("No hay reflexiones disponibles")
 
 # --- NOTICIAS (TAB 1) ---
 elif st.session_state.selected_tab == 1:
@@ -1066,32 +1068,26 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) ---
+# --- REFLEXIONES (TAB 3) - CORREGIDO: PRIMERO CONTENIDO, LUEGO COMENTARIOS ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
-    ref = get_reflexion_activa()
-    if ref:
-        with st.expander(f"✨ ACTUAL: {ref['titulo']}", expanded=True):
-            st.write(ref['contenido'])
-            if ref.get('versiculo'):
-                st.caption(f"📖 {ref['versiculo']}")
-            st.caption(f"📅 {ref['fecha']}")
-            mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
-    else:
-        st.info("No hay reflexión activa")
-    st.markdown("---")
-    st.markdown("### 📜 Reflexiones Anteriores")
+    
+    # Obtener TODAS las reflexiones ordenadas por fecha (más reciente primero)
     reflexiones = get_reflexiones()
+    
     if not reflexiones.empty:
-        for _, r in reflexiones.iterrows():
-            if ref is None or r['id'] != ref['id']:
-                with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
-                    st.write(r['contenido'])
-                    if r.get('versiculo'):
-                        st.caption(f"📖 {r['versiculo']}")
-                    mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'])
+        # Mostrar todas las reflexiones en orden de fecha
+        for _, ref in reflexiones.iterrows():
+            with st.expander(f"✨ {ref['titulo']} - {ref['fecha']}"):
+                # PRIMERO: Contenido de la reflexión
+                st.write(ref['contenido'])
+                if ref.get('versiculo'):
+                    st.caption(f"📖 {ref['versiculo']}")
+                st.caption(f"📅 {ref['fecha']}")
+                # DESPUÉS: Comentarios y opiniones
+                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
     else:
-        st.info("No hay reflexiones anteriores")
+        st.info("No hay reflexiones disponibles")
 
 # --- CRÓNICAS (TAB 4) ---
 elif st.session_state.selected_tab == 4:
@@ -1311,7 +1307,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN COMPLETO (RESUMIDO - TODAS LAS SECCIONES FUNCIONAN)
+# PANEL ADMIN COMPLETO (TODAS LAS SECCIONES FUNCIONAN)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
@@ -1476,7 +1472,7 @@ if st.session_state.get('es_admin', False):
                 titulo = st.text_input("Título *")
                 versiculo = st.text_input("Versículo (opcional)")
                 contenido = st.text_area("Contenido *")
-                if st.form_submit_button("💾 Guardar como activa"):
+                if st.form_submit_button("💾 Guardar Reflexión"):
                     if titulo and contenido:
                         if add_reflexion(titulo, contenido, versiculo):
                             st.success("✅ Reflexión guardada")
@@ -1487,7 +1483,7 @@ if st.session_state.get('es_admin', False):
                         st.error("❌ Título y contenido son obligatorios")
         
         st.markdown("---")
-        st.markdown("### 📋 Reflexiones existentes")
+        st.markdown("### 📋 Todas las Reflexiones")
         reflexiones = get_reflexiones()
         if not reflexiones.empty:
             for _, r in reflexiones.iterrows():
