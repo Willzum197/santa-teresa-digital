@@ -11,6 +11,7 @@ import uuid
 import re
 import hashlib
 import time
+import base64
 
 # ============================================
 # CONFIGURACION DE SUPABASE
@@ -309,12 +310,6 @@ def mostrar_video_youtube(url_youtube, width_percent=25):
         st.markdown(f'<div style="width:{width_percent}%"><iframe width="100%" height="200" src="https://www.youtube.com/embed/{video_id}" frameborder="0" allowfullscreen></iframe></div>', unsafe_allow_html=True)
     else:
         st.error("URL de YouTube no válida")
-
-def mostrar_musica(url_audio):
-    if url_audio:
-        st.markdown(f'<audio controls controlsList="nodownload" style="width:100%;border-radius:30px"><source src="{url_audio}" type="audio/mpeg"></audio>', unsafe_allow_html=True)
-    else:
-        st.warning("No hay URL de audio disponible")
 
 def extraer_tiktok_id(url_tiktok):
     if not url_tiktok: return None
@@ -1136,7 +1131,14 @@ elif st.session_state.selected_tab == 5:
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
-                        st.audio(m['audio_url'], format="audio/mp3")
+                        # Usar HTML5 audio nativo
+                        audio_html = f"""
+                        <audio controls controlsList="nodownload" style="width: 100%; border-radius: 30px;">
+                            <source src="{m['audio_url']}" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                        """
+                        st.markdown(audio_html, unsafe_allow_html=True)
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
@@ -1147,35 +1149,53 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # PESTAÑAS INDIVIDUALES PARA CADA EMISORA
+        # EMISORAS DE RADIO CON HTML5 AUDIO QUE FUNCIONAN
         radio_tab1, radio_tab2, radio_tab3 = st.tabs(["🎵 80s Forever", "💕 Baladas Románticas", "🕺 Disco Hits 70s 80s"])
         
         with radio_tab1:
             st.markdown("#### 🎵 80s Forever - Los mejores éxitos de los 80s")
-            st.markdown(
-                '<iframe width="100%" height="250" src="https://www.youtube.com/embed/6S9wXmJdJYA?autoplay=1&loop=1&playlist=6S9wXmJdJYA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
+            st.markdown("**Escucha 80s Forever Radio en vivo**")
+            
+            # Reproductor HTML5 - el más compatible
+            audio_html = """
+            <audio controls autoplay style="width: 100%; border-radius: 30px;">
+                <source src="https://stream.zeno.fm/fsx7rzc2x1zuv" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
             st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más!")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. El video se reproduce en bucle automáticamente.")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. La radio se reproduce en segundo plano.")
         
         with radio_tab2:
             st.markdown("#### 💕 Baladas Románticas - Las más bellas baladas en inglés")
-            st.markdown(
-                '<iframe width="100%" height="250" src="https://www.youtube.com/embed/8bN5Tdo5JYM?autoplay=1&loop=1&playlist=8bN5Tdo5JYM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
+            st.markdown("**Escucha Baladas Románticas Radio en vivo**")
+            
+            audio_html = """
+            <audio controls autoplay style="width: 100%; border-radius: 30px;">
+                <source src="https://stream.zeno.fm/08f62gs7mg0uv" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
             st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. El video se reproduce en bucle automáticamente.")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. La radio se reproduce en segundo plano.")
         
         with radio_tab3:
             st.markdown("#### 🕺 Disco Hits - Lo mejor de la música disco")
-            st.markdown(
-                '<iframe width="100%" height="250" src="https://www.youtube.com/embed/xm4nZpjC4oA?autoplay=1&loop=1&playlist=xm4nZpjC4oA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
+            st.markdown("**Escucha Disco Hits Radio en vivo**")
+            
+            audio_html = """
+            <audio controls autoplay style="width: 100%; border-radius: 30px;">
+                <source src="https://stream.zeno.fm/76pz71spy7zuv" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
             st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. El video se reproduce en bucle automáticamente.")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. La radio se reproduce en segundo plano.")
+        
+        st.warning("⚠️ **Nota importante:** Si la radio no se escucha, puede ser por bloqueo del navegador. Haz clic en el botón PLAY del reproductor. Algunos navegadores requieren interacción del usuario (un clic) para permitir la reproducción de audio.")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
@@ -1323,7 +1343,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN COMPLETO
+# PANEL ADMIN COMPLETO (resumido por brevedad)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
@@ -1739,7 +1759,13 @@ if st.session_state.get('es_admin', False):
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
-                        st.audio(m['audio_url'], format="audio/mp3")
+                        audio_html = f"""
+                        <audio controls controlsList="nodownload" style="width: 100%; border-radius: 30px;">
+                            <source src="{m['audio_url']}" type="audio/mpeg">
+                            Tu navegador no soporta el elemento de audio.
+                        </audio>
+                        """
+                        st.markdown(audio_html, unsafe_allow_html=True)
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
