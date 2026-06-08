@@ -1152,7 +1152,7 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # EMISORAS DE RADIO CON REPRODUCTOR DE YOUTUBE (FUNCIONAL EN STREAMLIT)
+        # EMISORAS DE RADIO CON REPRODUCTOR DE AUDIO FUNCIONAL (USANDO ST.AUDIO)
         st.markdown("#### 🎵 Selecciona una estación de radio")
         
         radio_opcion = st.selectbox("Elige una emisora:", [
@@ -1164,56 +1164,36 @@ elif st.session_state.selected_tab == 5:
             "📻 Radio Nacional de Venezuela"
         ])
         
+        # URLs de streaming directo que funcionan en Streamlit
         if radio_opcion == "🎵 80s Forever - Música de los 80s en inglés":
             st.markdown("#### 🎵 80s Forever - Los mejores éxitos de los 80s")
-            # Usando iframe con autoplay y loop (mute required for autoplay in browsers)
-            st.markdown(
-                '<iframe width="100%" height="200" src="https://www.youtube.com/embed/j5s9pFb6t3M?autoplay=1&loop=1&playlist=j5s9pFb6t3M" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más!")
+            st.audio("https://stream.zeno.fm/fsx7rzc2x1zuv", format="audio/mp3")
+            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más! (Radio en vivo)")
             
         elif radio_opcion == "💕 Baladas Románticas en Inglés":
             st.markdown("#### 💕 Baladas Románticas - Las más bellas baladas en inglés")
-            st.markdown(
-                '<iframe width="100%" height="200" src="https://www.youtube.com/embed/6T9R1FPAVV4?autoplay=1&loop=1&playlist=6T9R1FPAVV4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey")
+            st.audio("https://stream.zeno.fm/08f62gs7mg0uv", format="audio/mp3")
+            st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey (Radio en vivo)")
             
         elif radio_opcion == "🕺 Disco Hits 70s 80s":
             st.markdown("#### 🕺 Disco Hits - Lo mejor de la música disco")
-            st.markdown(
-                '<iframe width="100%" height="200" src="https://www.youtube.com/embed/xm4nZpjC4oA?autoplay=1&loop=1&playlist=xm4nZpjC4oA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band")
+            st.audio("https://stream.zeno.fm/76pz71spy7zuv", format="audio/mp3")
+            st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band (Radio en vivo)")
             
         elif radio_opcion == "🎸 Classic Rock 70s 80s":
             st.markdown("#### 🎸 Classic Rock - Los clásicos del rock")
-            st.markdown(
-                '<iframe width="100%" height="200" src="https://www.youtube.com/embed/LxMJrYvAPjQ?autoplay=1&loop=1&playlist=LxMJrYvAPjQ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Queen, Led Zeppelin, The Beatles, Pink Floyd, The Rolling Stones")
+            st.audio("https://stream.zeno.fm/2r6rhhvesv8uv", format="audio/mp3")
+            st.caption("🎶 Queen, Led Zeppelin, The Beatles, Pink Floyd, The Rolling Stones (Radio en vivo)")
             
         elif radio_opcion == "🎹 Piano Instrumental":
             st.markdown("#### 🎹 Piano Instrumental - Música para relajarse")
-            st.markdown(
-                '<iframe width="100%" height="200" src="https://www.youtube.com/embed/OTzZR9b1mEE?autoplay=1&loop=1&playlist=OTzZR9b1mEE" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎹 Música instrumental de piano perfecta para leer, estudiar o relajarse")
+            st.audio("https://stream.zeno.fm/cw9y2b1qrf9uv", format="audio/mp3")
+            st.caption("🎹 Música instrumental de piano perfecta para leer, estudiar o relajarse (Radio en vivo)")
             
         elif radio_opcion == "📻 Radio Nacional de Venezuela":
             st.markdown("#### 📻 Radio Nacional de Venezuela")
-            st.markdown(
-                '<iframe width="100%" height="200" src="https://www.youtube.com/embed/H5T4G0QnLqw?autoplay=1&loop=1&playlist=H5T4G0QnLqw" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("📻 Noticias, cultura y entretenimiento de Venezuela")
-        
-        st.info("💡 **Nota:** Las emisoras usan listas de reproducción de YouTube. El autoplay puede estar bloqueado por tu navegador; haz clic en play si es necesario.")
+            st.audio("http://envivo.radionacionaldevenezuela.com:8000/RNV", format="audio/mp3")
+            st.caption("📻 Noticias, cultura y entretenimiento de Venezuela (Radio en vivo)")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
