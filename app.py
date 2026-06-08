@@ -1147,51 +1147,38 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # Radio.garden - La mejor opción para radio en vivo
-        st.markdown("#### 🎵 Escucha Radio en Vivo")
-        st.markdown("---")
-        
-        # Opción 1: Radio Garden (reproductor mundial de radios)
-        st.markdown("### 🌍 Radio Garden - Explora radios del mundo entero")
-        st.markdown(
-            '<iframe src="https://radio.garden/embed/" width="100%" height="600" frameborder="0"></iframe>',
-            unsafe_allow_html=True
-        )
-        st.caption("🌎 Puedes hacer clic en cualquier punto del mapa para escuchar radios locales de todo el mundo")
-        
-        st.markdown("---")
-        
-        # Opción 2: Radios específicas de los 80s (embebidos de Streema)
-        st.markdown("### 🎵 Radios Especializadas de los 80s")
-        
-        radio_tab1, radio_tab2, radio_tab3 = st.tabs(["🎵 80s Forever", "💕 Baladas Románticas", "🕺 Disco Hits"])
+        # DOS EMISORAS: SALSA Y CHATARRITAS EN INGLÉS
+        radio_tab1, radio_tab2 = st.tabs(["🎺 Salsa Clásica", "🎵 Chatarritas en Inglés (60s-80s)"])
         
         with radio_tab1:
-            st.markdown("#### 🎵 80s Forever Radio")
-            st.markdown(
-                '<iframe src="https://stream.zeno.fm/embed/fsx7rzc2x1zuv" width="100%" height="155" frameborder="0" scrolling="no"></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más!")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar.")
+            st.markdown("#### 🎺 Salsa Clásica - La mejor salsa de todos los tiempos")
+            st.markdown("**Escucha Salsa Clásica Radio en vivo**")
+            
+            # Reproductor de Salsa (Radio Zeno FM - Salsa)
+            audio_html = """
+            <audio controls style="width: 100%; border-radius: 30px;">
+                <source src="https://stream.zeno.fm/cf6uxm5sd6quv" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
+            st.caption("🎺 Héctor Lavoe, Celia Cruz, Rubén Blades, Willie Colón, Eddie Santiago y más!")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar salsa en vivo.")
         
         with radio_tab2:
-            st.markdown("#### 💕 Baladas Románticas Radio")
-            st.markdown(
-                '<iframe src="https://stream.zeno.fm/embed/08f62gs7mg0uv" width="100%" height="155" frameborder="0" scrolling="no"></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar.")
-        
-        with radio_tab3:
-            st.markdown("#### 🕺 Disco Hits Radio")
-            st.markdown(
-                '<iframe src="https://stream.zeno.fm/embed/76pz71spy7zuv" width="100%" height="155" frameborder="0" scrolling="no"></iframe>',
-                unsafe_allow_html=True
-            )
-            st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar.")
+            st.markdown("#### 🎵 Chatarritas en Inglés - Los clásicos de los 60s, 70s y 80s")
+            st.markdown("**Escucha los grandes éxitos en inglés**")
+            
+            # Reproductor de Chatarritas en Inglés (Bee Gees, Air Supply, Chicago, etc.)
+            audio_html = """
+            <audio controls style="width: 100%; border-radius: 30px;">
+                <source src="https://stream.zeno.fm/fsx7rzc2x1zuv" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+            """
+            st.markdown(audio_html, unsafe_allow_html=True)
+            st.caption("🎶 Bee Gees, Air Supply, Chicago, ABBA, Queen, Madonna, Michael Jackson y más!")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar los clásicos en inglés.")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
