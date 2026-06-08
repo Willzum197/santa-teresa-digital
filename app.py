@@ -772,11 +772,6 @@ input, textarea, .stSelectbox > div > div {
     color: white !important;
 }
 
-audio {
-    width: 100%;
-    border-radius: 30px;
-}
-
 [data-testid="stMetricValue"] {
     color: #FFD700 !important;
     font-size: 1.5rem !important;
@@ -1141,7 +1136,7 @@ elif st.session_state.selected_tab == 5:
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
-                        mostrar_musica(m['audio_url'])
+                        st.audio(m['audio_url'], format="audio/mp3")
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
@@ -1152,48 +1147,35 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # EMISORAS DE RADIO CON REPRODUCTOR DE AUDIO FUNCIONAL (USANDO ST.AUDIO)
-        st.markdown("#### 🎵 Selecciona una estación de radio")
+        # PESTAÑAS INDIVIDUALES PARA CADA EMISORA
+        radio_tab1, radio_tab2, radio_tab3 = st.tabs(["🎵 80s Forever", "💕 Baladas Románticas", "🕺 Disco Hits 70s 80s"])
         
-        radio_opcion = st.selectbox("Elige una emisora:", [
-            "🎵 80s Forever - Música de los 80s en inglés",
-            "💕 Baladas Románticas en Inglés",
-            "🕺 Disco Hits 70s 80s",
-            "🎸 Classic Rock 70s 80s",
-            "🎹 Piano Instrumental",
-            "📻 Radio Nacional de Venezuela"
-        ])
-        
-        # URLs de streaming directo que funcionan en Streamlit
-        if radio_opcion == "🎵 80s Forever - Música de los 80s en inglés":
+        with radio_tab1:
             st.markdown("#### 🎵 80s Forever - Los mejores éxitos de los 80s")
-            st.audio("https://stream.zeno.fm/fsx7rzc2x1zuv", format="audio/mp3")
-            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más! (Radio en vivo)")
-            
-        elif radio_opcion == "💕 Baladas Románticas en Inglés":
+            st.markdown(
+                '<iframe width="100%" height="250" src="https://www.youtube.com/embed/6S9wXmJdJYA?autoplay=1&loop=1&playlist=6S9wXmJdJYA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+                unsafe_allow_html=True
+            )
+            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más!")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. El video se reproduce en bucle automáticamente.")
+        
+        with radio_tab2:
             st.markdown("#### 💕 Baladas Románticas - Las más bellas baladas en inglés")
-            st.audio("https://stream.zeno.fm/08f62gs7mg0uv", format="audio/mp3")
-            st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey (Radio en vivo)")
-            
-        elif radio_opcion == "🕺 Disco Hits 70s 80s":
+            st.markdown(
+                '<iframe width="100%" height="250" src="https://www.youtube.com/embed/8bN5Tdo5JYM?autoplay=1&loop=1&playlist=8bN5Tdo5JYM" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+                unsafe_allow_html=True
+            )
+            st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. El video se reproduce en bucle automáticamente.")
+        
+        with radio_tab3:
             st.markdown("#### 🕺 Disco Hits - Lo mejor de la música disco")
-            st.audio("https://stream.zeno.fm/76pz71spy7zuv", format="audio/mp3")
-            st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band (Radio en vivo)")
-            
-        elif radio_opcion == "🎸 Classic Rock 70s 80s":
-            st.markdown("#### 🎸 Classic Rock - Los clásicos del rock")
-            st.audio("https://stream.zeno.fm/2r6rhhvesv8uv", format="audio/mp3")
-            st.caption("🎶 Queen, Led Zeppelin, The Beatles, Pink Floyd, The Rolling Stones (Radio en vivo)")
-            
-        elif radio_opcion == "🎹 Piano Instrumental":
-            st.markdown("#### 🎹 Piano Instrumental - Música para relajarse")
-            st.audio("https://stream.zeno.fm/cw9y2b1qrf9uv", format="audio/mp3")
-            st.caption("🎹 Música instrumental de piano perfecta para leer, estudiar o relajarse (Radio en vivo)")
-            
-        elif radio_opcion == "📻 Radio Nacional de Venezuela":
-            st.markdown("#### 📻 Radio Nacional de Venezuela")
-            st.audio("http://envivo.radionacionaldevenezuela.com:8000/RNV", format="audio/mp3")
-            st.caption("📻 Noticias, cultura y entretenimiento de Venezuela (Radio en vivo)")
+            st.markdown(
+                '<iframe width="100%" height="250" src="https://www.youtube.com/embed/xm4nZpjC4oA?autoplay=1&loop=1&playlist=xm4nZpjC4oA" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>',
+                unsafe_allow_html=True
+            )
+            st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. El video se reproduce en bucle automáticamente.")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
@@ -1757,20 +1739,11 @@ if st.session_state.get('es_admin', False):
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
-                        mostrar_musica(m['audio_url'])
+                        st.audio(m['audio_url'], format="audio/mp3")
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_mus_{m['id']}"):
-                            st.session_state.edit_musica = m.to_dict()
-                            st.rerun()
-                    with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_mus_{m['id']}"):
-                            if delete_musica(m['id']):
-                                st.success("✅ Música eliminada")
-                                st.rerun()
+                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'])
         else:
             st.info("No hay canciones registradas")
         
