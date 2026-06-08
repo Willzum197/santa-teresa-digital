@@ -11,7 +11,6 @@ import uuid
 import re
 import hashlib
 import time
-import base64
 
 # ============================================
 # CONFIGURACION DE SUPABASE
@@ -1131,7 +1130,6 @@ elif st.session_state.selected_tab == 5:
             for _, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
-                        # Usar HTML5 audio nativo
                         audio_html = f"""
                         <audio controls controlsList="nodownload" style="width: 100%; border-radius: 30px;">
                             <source src="{m['audio_url']}" type="audio/mpeg">
@@ -1149,53 +1147,51 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        # EMISORAS DE RADIO CON HTML5 AUDIO QUE FUNCIONAN
-        radio_tab1, radio_tab2, radio_tab3 = st.tabs(["🎵 80s Forever", "💕 Baladas Románticas", "🕺 Disco Hits 70s 80s"])
+        # Radio.garden - La mejor opción para radio en vivo
+        st.markdown("#### 🎵 Escucha Radio en Vivo")
+        st.markdown("---")
+        
+        # Opción 1: Radio Garden (reproductor mundial de radios)
+        st.markdown("### 🌍 Radio Garden - Explora radios del mundo entero")
+        st.markdown(
+            '<iframe src="https://radio.garden/embed/" width="100%" height="600" frameborder="0"></iframe>',
+            unsafe_allow_html=True
+        )
+        st.caption("🌎 Puedes hacer clic en cualquier punto del mapa para escuchar radios locales de todo el mundo")
+        
+        st.markdown("---")
+        
+        # Opción 2: Radios específicas de los 80s (embebidos de Streema)
+        st.markdown("### 🎵 Radios Especializadas de los 80s")
+        
+        radio_tab1, radio_tab2, radio_tab3 = st.tabs(["🎵 80s Forever", "💕 Baladas Románticas", "🕺 Disco Hits"])
         
         with radio_tab1:
-            st.markdown("#### 🎵 80s Forever - Los mejores éxitos de los 80s")
-            st.markdown("**Escucha 80s Forever Radio en vivo**")
-            
-            # Reproductor HTML5 - el más compatible
-            audio_html = """
-            <audio controls autoplay style="width: 100%; border-radius: 30px;">
-                <source src="https://stream.zeno.fm/fsx7rzc2x1zuv" type="audio/mpeg">
-                Tu navegador no soporta el elemento de audio.
-            </audio>
-            """
-            st.markdown(audio_html, unsafe_allow_html=True)
+            st.markdown("#### 🎵 80s Forever Radio")
+            st.markdown(
+                '<iframe src="https://stream.zeno.fm/embed/fsx7rzc2x1zuv" width="100%" height="155" frameborder="0" scrolling="no"></iframe>',
+                unsafe_allow_html=True
+            )
             st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince, Bon Jovi y más!")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. La radio se reproduce en segundo plano.")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar.")
         
         with radio_tab2:
-            st.markdown("#### 💕 Baladas Románticas - Las más bellas baladas en inglés")
-            st.markdown("**Escucha Baladas Románticas Radio en vivo**")
-            
-            audio_html = """
-            <audio controls autoplay style="width: 100%; border-radius: 30px;">
-                <source src="https://stream.zeno.fm/08f62gs7mg0uv" type="audio/mpeg">
-                Tu navegador no soporta el elemento de audio.
-            </audio>
-            """
-            st.markdown(audio_html, unsafe_allow_html=True)
+            st.markdown("#### 💕 Baladas Románticas Radio")
+            st.markdown(
+                '<iframe src="https://stream.zeno.fm/embed/08f62gs7mg0uv" width="100%" height="155" frameborder="0" scrolling="no"></iframe>',
+                unsafe_allow_html=True
+            )
             st.caption("🎶 Air Supply, Chicago, Foreigner, REO Speedwagon, Journey")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. La radio se reproduce en segundo plano.")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar.")
         
         with radio_tab3:
-            st.markdown("#### 🕺 Disco Hits - Lo mejor de la música disco")
-            st.markdown("**Escucha Disco Hits Radio en vivo**")
-            
-            audio_html = """
-            <audio controls autoplay style="width: 100%; border-radius: 30px;">
-                <source src="https://stream.zeno.fm/76pz71spy7zuv" type="audio/mpeg">
-                Tu navegador no soporta el elemento de audio.
-            </audio>
-            """
-            st.markdown(audio_html, unsafe_allow_html=True)
+            st.markdown("#### 🕺 Disco Hits Radio")
+            st.markdown(
+                '<iframe src="https://stream.zeno.fm/embed/76pz71spy7zuv" width="100%" height="155" frameborder="0" scrolling="no"></iframe>',
+                unsafe_allow_html=True
+            )
             st.caption("🎶 Bee Gees, ABBA, Donna Summer, Earth Wind & Fire, KC & The Sunshine Band")
-            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar. La radio se reproduce en segundo plano.")
-        
-        st.warning("⚠️ **Nota importante:** Si la radio no se escucha, puede ser por bloqueo del navegador. Haz clic en el botón PLAY del reproductor. Algunos navegadores requieren interacción del usuario (un clic) para permitir la reproducción de audio.")
+            st.info("💡 Haz clic en ▶️ PLAY para comenzar a escuchar.")
 
 # --- DENUNCIAS (TAB 6) ---
 elif st.session_state.selected_tab == 6:
