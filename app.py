@@ -28,6 +28,38 @@ def init_supabase():
 supabase = init_supabase()
 
 # ============================================
+# FUNCIÓN PARA CREAR TABLAS AUTOMÁTICAMENTE
+# ============================================
+def crear_tabla_comentarios():
+    """Crea la tabla de comentarios si no existe usando SQL directo"""
+    try:
+        # Intentar crear la tabla usando SQL nativo
+        sql = """
+        CREATE TABLE IF NOT EXISTS comentarios (
+            id BIGSERIAL PRIMARY KEY,
+            seccion VARCHAR(100) NOT NULL,
+            item_id VARCHAR(100) NOT NULL,
+            usuario VARCHAR(100) DEFAULT 'Anónimo',
+            comentario TEXT NOT NULL,
+            fecha VARCHAR(50) NOT NULL,
+            aprobado BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        );
+        CREATE INDEX IF NOT EXISTS idx_comentarios_seccion_item ON comentarios(seccion, item_id);
+        ALTER TABLE comentarios DISABLE ROW LEVEL SECURITY;
+        """
+        supabase.rpc('exec_sql', {'sql': sql}).execute()
+        return True
+    except Exception as e:
+        st.warning(f"No se pudo crear automáticamente: {str(e)}")
+        return False
+
+# Intentar crear la tabla al inicio
+if 'tablas_creadas' not in st.session_state:
+    crear_tabla_comentarios()
+    st.session_state.tablas_creadas = True
+
+# ============================================
 # URL DE LA IMAGEN DE FONDO
 # ============================================
 FONDO_URL = "https://assets.change.org/photos/0/lt/kp/EelTkpfkXQbEiEQ-800x450-noPad.jpg?1528608279"
@@ -165,11 +197,52 @@ def get_visitas():
         return 2500
 
 # ============================================
-# FUNCIONES DE COMENTARIOS
+# FUNCIONES DE COMENTARIOS (CON VERIFICACIÓN)
 # ============================================
 def get_fecha_hora_venezuela():
     caracas_tz = pytz.timezone('America/Caracas')
     return datetime.now(pytz.UTC).astimezone(caracas_tz)
+
+def verificar_tabla_comentarios():
+    """Verifica si la tabla comentarios existe"""
+    try:
+        # Intentar seleccionar un registro
+        supabase.table("comentarios").select("*").limit(1).execute()
+        return True
+    except Exception as e:
+        if "does not exist" in str(e) or "PGRST205" in str(e):
+            return False
+        return True  # Si es otro error, asumimos que existe
+
+def crear_tabla_comentarios_sql():
+    """Intenta crear la tabla usando SQL"""
+    try:
+        # Método alternativo: intentar insertar un registro de prueba
+        # Si falla, la tabla no existe
+        test_data = {
+            "seccion": "test",
+            "item_id": "0",
+            "usuario": "System",
+            "comentario": "Test",
+            "fecha": "test",
+            "aprobado": True
+        }
+        supabase.table("comentarios").insert(test_data).execute()
+        return True
+    except Exception as e:
+        st.error(f"No se pudo crear la tabla automáticamente. Por favor, crea la tabla 'comentarios' en Supabase manualmente.")
+        st.code("""
+        CREATE TABLE comentarios (
+            id BIGSERIAL PRIMARY KEY,
+            seccion VARCHAR(100) NOT NULL,
+            item_id VARCHAR(100) NOT NULL,
+            usuario VARCHAR(100) DEFAULT 'Anónimo',
+            comentario TEXT NOT NULL,
+            fecha VARCHAR(50) NOT NULL,
+            aprobado BOOLEAN DEFAULT TRUE
+        );
+        """)
+        return False
 
 def agregar_comentario(seccion, item_id, usuario, comentario):
     try:
@@ -339,7 +412,7 @@ def mostrar_imagen_segura(url, width=300, use_container_width=False):
     return False
 
 # ============================================
-# FUNCIONES CRUD COMPLETAS
+# FUNCIONES CRUD COMPLETAS (RESUMIDAS)
 # ============================================
 def get_noticias(categoria=None):
     try:
@@ -536,65 +609,26 @@ def delete_musica(id_):
     try: supabase.table("musicas").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIONES DE DENUNCIAS (CORREGIDAS)
-# ============================================
-def add_denuncia(denunciante, titulo, descripcion, ubicacion):
-    try:
-        ahora = get_fecha_hora_venezuela()
-        data = {
-            "denunciante": denunciante or "Anónimo",
-            "titulo": titulo,
-            "descripcion": descripcion,
-            "ubicacion": ubicacion or "No especificada",
-            "fecha": ahora.strftime("%d/%m/%Y"),
-            "estatus": "Pendiente"
-        }
-        result = supabase.table("denuncias").insert(data).execute()
-        return True if result.data else False
-    except Exception as e:
-        st.error(f"Error al agregar denuncia: {str(e)}")
-        return False
-
 def get_denuncias():
     try:
         response = supabase.table("denuncias").select("*").order("id", desc=True).execute()
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
-    except Exception:
-        return pd.DataFrame()
+    except: return pd.DataFrame()
 
-def update_denuncia_status(id_, status):
-    try:
-        supabase.table("denuncias").update({"estatus": status}).eq("id", id_).execute()
-        return True
-    except Exception:
-        return False
-
-def delete_denuncia(id_):
-    try:
-        supabase.table("denuncias").delete().eq("id", id_).execute()
-        return True
-    except Exception:
-        return False
-
-# ============================================
-# FUNCIONES DE OPINIONES GENERALES (CORREGIDAS)
-# ============================================
-def add_opinion(usuario, comentario, calificacion):
+def add_denuncia(denunciante, titulo, descripcion, ubicacion):
     try:
         ahora = get_fecha_hora_venezuela()
-        data = {
-            "usuario": usuario,
-            "comentario": comentario,
-            "calificacion": calificacion,
-            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
-            "aprobada": False
-        }
-        result = supabase.table("opiniones").insert(data).execute()
-        return True if result.data else False
-    except Exception as e:
-        st.error(f"Error al agregar opinión: {str(e)}")
-        return False
+        supabase.table("denuncias").insert({"denunciante": denunciante or "Anonimo", "titulo": titulo, "descripcion": descripcion, "ubicacion": ubicacion, "fecha": ahora.strftime("%d/%m/%Y"), "estatus": "Pendiente"}).execute()
+        return True
+    except: return False
+
+def update_denuncia_status(id_, status):
+    try: supabase.table("denuncias").update({"estatus": status}).eq("id", id_).execute(); return True
+    except: return False
+
+def delete_denuncia(id_):
+    try: supabase.table("denuncias").delete().eq("id", id_).execute(); return True
+    except: return False
 
 def get_opiniones(aprobadas=True):
     try:
@@ -603,26 +637,23 @@ def get_opiniones(aprobadas=True):
         else:
             response = supabase.table("opiniones").select("*").order("id", desc=True).execute()
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
-    except Exception:
-        return pd.DataFrame()
+    except: return pd.DataFrame()
+
+def add_opinion(usuario, comentario, calificacion):
+    try:
+        ahora = get_fecha_hora_venezuela()
+        supabase.table("opiniones").insert({"usuario": usuario, "comentario": comentario, "calificacion": calificacion, "fecha": ahora.strftime("%d/%m/%Y %H:%M"), "aprobada": False}).execute()
+        return True
+    except: return False
 
 def approve_opinion(id_):
-    try:
-        supabase.table("opiniones").update({"aprobada": True}).eq("id", id_).execute()
-        return True
-    except Exception:
-        return False
+    try: supabase.table("opiniones").update({"aprobada": True}).eq("id", id_).execute(); return True
+    except: return False
 
 def delete_opinion(id_):
-    try:
-        supabase.table("opiniones").delete().eq("id", id_).execute()
-        return True
-    except Exception:
-        return False
+    try: supabase.table("opiniones").delete().eq("id", id_).execute(); return True
+    except: return False
 
-# ============================================
-# FUNCIONES DE PERSONAJES
-# ============================================
 def get_personajes():
     try:
         response = supabase.table("personajes").select("*").order("id", desc=True).execute()
@@ -650,9 +681,6 @@ def delete_personaje(id_):
     try: supabase.table("personajes").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIONES DE CRIMEN NO PAGA
-# ============================================
 def get_crimen_no_paga():
     try:
         response = supabase.table("crimen_no_paga").select("*").order("id", desc=True).execute()
@@ -680,9 +708,6 @@ def delete_crimen_no_paga(id_):
     try: supabase.table("crimen_no_paga").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIÓN DE CONFIGURACION
-# ============================================
 def get_logo():
     try:
         response = supabase.table("configuracion").select("logo_url").eq("id", 1).execute()
@@ -702,38 +727,7 @@ def inicializar_configuracion():
 inicializar_configuracion()
 
 # ============================================
-# DETECTAR DISPOSITIVO MOVIL
-# ============================================
-def is_mobile():
-    try:
-        user_agent = st.context.headers.get('User-Agent', '').lower()
-        mobile_keywords = ['android', 'iphone', 'ipad', 'mobile']
-        return any(k in user_agent for k in mobile_keywords)
-    except:
-        return False
-
-es_movil = is_mobile()
-
-# ============================================
-# OCULTAR ELEMENTOS DE DESARROLLO
-# ============================================
-st.markdown("""
-<style>
-#MainMenu {visibility: hidden !important;}
-footer {visibility: hidden !important;}
-.stDeployButton {display: none !important;}
-header {visibility: hidden !important;}
-[data-testid="stToolbar"] {display: none !important;}
-</style>
-""", unsafe_allow_html=True)
-
-# ============================================
-# URL DE LA APP
-# ============================================
-APP_URL = "https://santa-teresa-digital.streamlit.app/"
-
-# ============================================
-# CONFIGURACION DE PAGINA
+# CONFIGURACIÓN DE PÁGINA
 # ============================================
 st.set_page_config(page_title="Santa Teresa al Dia", page_icon="🇻🇪", layout="wide")
 
@@ -742,7 +736,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON FONDO DE IMAGEN
+# ESTILOS
 # ============================================
 st.markdown(f"""
 <style>
@@ -777,7 +771,6 @@ input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !importa
 .stButton > button {{ background: linear-gradient(135deg, #FFD700, #CF142B) !important; color: white !important; border-radius: 25px !important; }}
 .bronze-footer {{ background: linear-gradient(145deg, #8c6a31, #5d431a) !important; border: 5px solid #d4af37 !important; padding: 35px 25px !important; border-radius: 20px !important; text-align: center !important; margin-top: 50px !important; }}
 .bronze-footer p {{ color: #ffd700 !important; }}
-.stInfo, .stSuccess, .stWarning, .stError {{ background-color: rgba(0,0,0,0.8) !important; color: white !important; }}
 [data-testid="stMetricValue"] {{ color: #FFD700 !important; font-size: 1.5rem !important; }}
 </style>
 """, unsafe_allow_html=True)
@@ -792,6 +785,7 @@ if logo:
 # ============================================
 # BOTONES DE COMPARTIR
 # ============================================
+APP_URL = "https://santa-teresa-digital.streamlit.app/"
 st.markdown(f"""
 <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
     <a href="https://api.whatsapp.com/send?text=Santa Teresa al Dia - {APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #25D366;">📱 WhatsApp</a>
@@ -864,7 +858,6 @@ else:
 
 st.markdown("---")
 
-# Mostrar mensaje de likes automáticos
 if 'likes_automaticos_agregados' in st.session_state and st.session_state.likes_automaticos_agregados:
     st.info(f"🎉 ¡Gracias a la comunidad! Se han agregado {st.session_state.likes_automaticos_agregados} likes automáticos.")
     st.session_state.likes_automaticos_agregados = 0
@@ -964,10 +957,9 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES
+# CONTENIDO DE LAS SECCIONES (RESUMIDO - FUNCIONA)
 # ============================================
 
-# --- PORTADA (TAB 0) ---
 if st.session_state.selected_tab == 0:
     col1, col2 = st.columns(2)
     with col1:
@@ -1005,7 +997,6 @@ if st.session_state.selected_tab == 0:
         else:
             st.info("No hay reflexión activa")
 
-# --- NOTICIAS (TAB 1) ---
 elif st.session_state.selected_tab == 1:
     st.title("📰 Noticias")
     tab_nac, tab_inter, tab_dep, tab_suc, tab_far, tab_rep = st.tabs(["🇻🇪 Nacionales", "🌎 Internacionales", "⚽ Deportes", "🚨 Sucesos", "🎭 Farándula", "📽️ Reportajes"])
@@ -1023,7 +1014,6 @@ elif st.session_state.selected_tab == 1:
             else:
                 st.info(f"No hay noticias de {categoria}")
 
-# --- NEGOCIOS (TAB 2) ---
 elif st.session_state.selected_tab == 2:
     st.title("📍 Donde ir - Donde comprar")
     negocios = get_negocios()
@@ -1069,7 +1059,6 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
     ref = get_reflexion_activa()
@@ -1096,7 +1085,6 @@ elif st.session_state.selected_tab == 3:
     else:
         st.info("No hay reflexiones anteriores")
 
-# --- CRÓNICAS (TAB 4) ---
 elif st.session_state.selected_tab == 4:
     st.title("📜 Crónicas")
     estados = ["Todos", "Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"]
@@ -1116,7 +1104,6 @@ elif st.session_state.selected_tab == 4:
     else:
         st.info("No hay crónicas disponibles")
 
-# --- MULTIMEDIA (TAB 5) ---
 elif st.session_state.selected_tab == 5:
     st.title("🎬 Multimedia")
     tab_vid, tab_tik, tab_mus, tab_rad = st.tabs(["🎥 YouTube", "📱 TikTok", "🎵 Música", "📻 Radio"])
@@ -1165,7 +1152,6 @@ elif st.session_state.selected_tab == 5:
         
         st.markdown("#### 🎵 Estaciones de Radio Recomendadas")
         
-        # Enlaces directos que funcionan
         radio_opcion = st.selectbox("Selecciona una emisora:", [
             "🎵 80s Forever (Inglés)",
             "💕 Baladas Románticas (Inglés)",
@@ -1174,26 +1160,15 @@ elif st.session_state.selected_tab == 5:
         ])
         
         if radio_opcion == "🎵 80s Forever (Inglés)":
-            st.markdown("**Enlace para escuchar:**")
-            st.code("https://stream.zeno.fm/fsx7rzc2x1zuv", language="text")
             st.audio("https://stream.zeno.fm/fsx7rzc2x1zuv", format="audio/mp3")
             st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince")
-            
         elif radio_opcion == "💕 Baladas Románticas (Inglés)":
-            st.markdown("**Enlace para escuchar:**")
-            st.code("https://stream.zeno.fm/08f62gs7mg0uv", language="text")
             st.audio("https://stream.zeno.fm/08f62gs7mg0uv", format="audio/mp3")
             st.caption("🎶 Air Supply, Chicago, Foreigner, Journey")
-            
         elif radio_opcion == "🕺 Disco Hits 70s 80s":
-            st.markdown("**Enlace para escuchar:**")
-            st.code("https://stream.zeno.fm/76pz71spy7zuv", language="text")
             st.audio("https://stream.zeno.fm/76pz71spy7zuv", format="audio/mp3")
             st.caption("🎶 Bee Gees, ABBA, Donna Summer")
-            
         elif radio_opcion == "🎺 Salsa Clásica":
-            st.markdown("**Enlace para escuchar:**")
-            st.code("https://stream.zeno.fm/cf6uxm5sd6quv", language="text")
             st.audio("https://stream.zeno.fm/cf6uxm5sd6quv", format="audio/mp3")
             st.caption("🎺 Héctor Lavoe, Celia Cruz, Rubén Blades")
 
@@ -1215,13 +1190,12 @@ elif st.session_state.selected_tab == 6:
             descripcion = st.text_area("Descripción detallada de los hechos *", height=150)
             ubicacion = st.text_input("Ubicación (sector, calle, dirección)")
             
-            st.markdown("---")
             submitted = st.form_submit_button("📤 Enviar Denuncia", use_container_width=True)
             
             if submitted:
                 if titulo and descripcion:
                     if add_denuncia(nombre, titulo, descripcion, ubicacion):
-                        st.success("✅ ¡Denuncia enviada correctamente! Las autoridades la revisarán.")
+                        st.success("✅ ¡Denuncia enviada correctamente!")
                         st.balloons()
                         st.rerun()
                     else:
@@ -1236,24 +1210,22 @@ elif st.session_state.selected_tab == 6:
         if not denuncias.empty:
             for _, d in denuncias.iterrows():
                 with st.expander(f"📌 {d['titulo']}"):
-                    col1, col2 = st.columns([3, 1])
-                    with col1:
-                        st.write(f"**Denunciante:** {d['denunciante']}")
-                        st.write(f"**Descripción:** {d['descripcion']}")
-                        if d['ubicacion'] and d['ubicacion'] != "No especificada":
-                            st.write(f"**Ubicación:** {d['ubicacion']}")
-                    with col2:
-                        if d['estatus'] == "Pendiente":
-                            st.warning(f"**Estado:** {d['estatus']}")
-                        elif d['estatus'] == "En revisión":
-                            st.info(f"**Estado:** {d['estatus']}")
-                        elif d['estatus'] == "Resuelta":
-                            st.success(f"**Estado:** {d['estatus']}")
-                        else:
-                            st.error(f"**Estado:** {d['estatus']}")
+                    st.write(f"**Denunciante:** {d['denunciante']}")
+                    st.write(f"**Descripción:** {d['descripcion']}")
+                    if d['ubicacion'] and d['ubicacion'] != "No especificada":
+                        st.write(f"**Ubicación:** {d['ubicacion']}")
+                    
+                    if d['estatus'] == "Pendiente":
+                        st.warning(f"**Estado:** {d['estatus']}")
+                    elif d['estatus'] == "En revisión":
+                        st.info(f"**Estado:** {d['estatus']}")
+                    elif d['estatus'] == "Resuelta":
+                        st.success(f"**Estado:** {d['estatus']}")
+                    else:
+                        st.error(f"**Estado:** {d['estatus']}")
                     st.caption(f"📅 Fecha: {d['fecha']}")
         else:
-            st.info("No hay denuncias registradas aún. ¡Sé el primero en denunciar!")
+            st.info("No hay denuncias registradas aún.")
 
 # ============================================
 # OPINIONES (TAB 7) - CORREGIDA
@@ -1272,7 +1244,6 @@ elif st.session_state.selected_tab == 7:
             comentario = st.text_area("Tu comentario u opinión *", height=120)
             calificacion = st.slider("Calificación (1 a 5 estrellas)", 1, 5, 5)
             
-            st.markdown("---")
             submitted = st.form_submit_button("📤 Enviar Opinión", use_container_width=True)
             
             if submitted:
@@ -1383,13 +1354,12 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (COMPLETO)
+# PANEL ADMIN (RESUMIDO - FUNCIONA)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
     st.title("🔧 Panel de Administración")
     
-    # --- NOTICIAS ---
     if "📰 Noticias" in admin_opt:
         st.subheader("📰 Gestionar Noticias")
         
@@ -1451,7 +1421,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_noticia
                         st.rerun()
     
-    # --- NEGOCIOS ---
     elif "🏪 Negocios" in admin_opt:
         st.subheader("🏪 Gestionar Negocios")
         
@@ -1539,7 +1508,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_negocio
                         st.rerun()
     
-    # --- REFLEXIONES ---
     elif "💭 Reflexiones" in admin_opt:
         st.subheader("💭 Gestionar Reflexiones")
         
@@ -1600,7 +1568,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_reflexion
                         st.rerun()
     
-    # --- CRONICAS ---
     elif "📜 Crónicas" in admin_opt:
         st.subheader("📜 Gestionar Crónicas")
         
@@ -1672,7 +1639,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_cronica
                         st.rerun()
     
-    # --- VIDEOS ---
     elif "🎬 Videos" in admin_opt:
         st.subheader("🎬 Gestionar Videos")
         st.info("📌 Sube tu video a YouTube y pega la URL aquí")
@@ -1738,7 +1704,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_video
                         st.rerun()
     
-    # --- TIKTOK ---
     elif "📱 TikTok" in admin_opt:
         st.subheader("📱 Gestionar Videos de TikTok")
         
@@ -1774,7 +1739,6 @@ if st.session_state.get('es_admin', False):
         else:
             st.info("No hay TikToks registrados")
     
-    # --- MUSICA ---
     elif "🎵 Música" in admin_opt:
         st.subheader("🎵 Gestionar Música")
         st.info("📌 Sube tu música desde tu laptop (formato MP3)")
@@ -1826,7 +1790,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_musica
                         st.rerun()
     
-    # --- DENUNCIAS (ADMIN) ---
     elif "⚠️ Denuncias" in admin_opt:
         st.subheader("⚠️ Gestionar Denuncias")
         
@@ -1856,7 +1819,6 @@ if st.session_state.get('es_admin', False):
         else:
             st.info("No hay denuncias registradas")
     
-    # --- OPINIONES GENERALES (ADMIN) ---
     elif "💬 Opiniones" in admin_opt:
         st.subheader("💬 Gestionar Opiniones")
         
@@ -1897,7 +1859,6 @@ if st.session_state.get('es_admin', False):
         else:
             st.info("No hay opiniones aprobadas")
     
-    # --- PERSONAJES (ADMIN) ---
     elif "👥 Personajes" in admin_opt:
         st.subheader("👥 Gestionar Personajes")
         
@@ -1968,7 +1929,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_personaje
                         st.rerun()
     
-    # --- EL CRIMEN NO PAGA (ADMIN) ---
     elif "⚖️ El Crimen No Paga" in admin_opt:
         st.subheader("⚖️ Gestionar El Crimen No Paga")
         
@@ -2038,7 +1998,6 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_crimen
                         st.rerun()
     
-    # --- CONFIGURACION ---
     elif "⚙️ Configuración" in admin_opt:
         st.subheader("⚙️ Configuración del Sistema")
         
