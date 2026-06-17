@@ -339,7 +339,7 @@ def mostrar_imagen_segura(url, width=300, use_container_width=False):
     return False
 
 # ============================================
-# FUNCIONES CRUD COMPLETAS (RESUMIDAS)
+# FUNCIONES CRUD COMPLETAS
 # ============================================
 def get_noticias(categoria=None):
     try:
@@ -557,6 +557,9 @@ def delete_denuncia(id_):
     try: supabase.table("denuncias").delete().eq("id", id_).execute(); return True
     except: return False
 
+# ============================================
+# FUNCIONES DE OPINIONES
+# ============================================
 def get_opiniones(aprobadas=True):
     try:
         if aprobadas:
@@ -581,6 +584,9 @@ def delete_opinion(id_):
     try: supabase.table("opiniones").delete().eq("id", id_).execute(); return True
     except: return False
 
+# ============================================
+# FUNCIONES DE PERSONAJES
+# ============================================
 def get_personajes():
     try:
         response = supabase.table("personajes").select("*").order("id", desc=True).execute()
@@ -608,6 +614,9 @@ def delete_personaje(id_):
     try: supabase.table("personajes").delete().eq("id", id_).execute(); return True
     except: return False
 
+# ============================================
+# FUNCIONES DE CRIMEN NO PAGA
+# ============================================
 def get_crimen_no_paga():
     try:
         response = supabase.table("crimen_no_paga").select("*").order("id", desc=True).execute()
@@ -635,6 +644,9 @@ def delete_crimen_no_paga(id_):
     try: supabase.table("crimen_no_paga").delete().eq("id", id_).execute(); return True
     except: return False
 
+# ============================================
+# FUNCIÓN DE CONFIGURACION
+# ============================================
 def get_logo():
     try:
         response = supabase.table("configuracion").select("logo_url").eq("id", 1).execute()
@@ -654,7 +666,38 @@ def inicializar_configuracion():
 inicializar_configuracion()
 
 # ============================================
-# CONFIGURACIÓN DE PÁGINA
+# DETECTAR DISPOSITIVO MOVIL
+# ============================================
+def is_mobile():
+    try:
+        user_agent = st.context.headers.get('User-Agent', '').lower()
+        mobile_keywords = ['android', 'iphone', 'ipad', 'mobile']
+        return any(k in user_agent for k in mobile_keywords)
+    except:
+        return False
+
+es_movil = is_mobile()
+
+# ============================================
+# OCULTAR ELEMENTOS DE DESARROLLO
+# ============================================
+st.markdown("""
+<style>
+#MainMenu {visibility: hidden !important;}
+footer {visibility: hidden !important;}
+.stDeployButton {display: none !important;}
+header {visibility: hidden !important;}
+[data-testid="stToolbar"] {display: none !important;}
+</style>
+""", unsafe_allow_html=True)
+
+# ============================================
+# URL DE LA APP
+# ============================================
+APP_URL = "https://santa-teresa-digital.streamlit.app/"
+
+# ============================================
+# CONFIGURACION DE PAGINA
 # ============================================
 st.set_page_config(page_title="Santa Teresa al Dia", page_icon="🇻🇪", layout="wide")
 
@@ -663,7 +706,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS
+# ESTILOS - CON FONDO DE IMAGEN
 # ============================================
 st.markdown(f"""
 <style>
@@ -698,6 +741,7 @@ input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !importa
 .stButton > button {{ background: linear-gradient(135deg, #FFD700, #CF142B) !important; color: white !important; border-radius: 25px !important; }}
 .bronze-footer {{ background: linear-gradient(145deg, #8c6a31, #5d431a) !important; border: 5px solid #d4af37 !important; padding: 35px 25px !important; border-radius: 20px !important; text-align: center !important; margin-top: 50px !important; }}
 .bronze-footer p {{ color: #ffd700 !important; }}
+.stInfo, .stSuccess, .stWarning, .stError {{ background-color: rgba(0,0,0,0.8) !important; color: white !important; }}
 [data-testid="stMetricValue"] {{ color: #FFD700 !important; font-size: 1.5rem !important; }}
 </style>
 """, unsafe_allow_html=True)
@@ -712,7 +756,6 @@ if logo:
 # ============================================
 # BOTONES DE COMPARTIR
 # ============================================
-APP_URL = "https://santa-teresa-digital.streamlit.app/"
 st.markdown(f"""
 <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
     <a href="https://api.whatsapp.com/send?text=Santa Teresa al Dia - {APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #25D366;">📱 WhatsApp</a>
@@ -785,6 +828,7 @@ else:
 
 st.markdown("---")
 
+# Mostrar mensaje de likes automáticos
 if 'likes_automaticos_agregados' in st.session_state and st.session_state.likes_automaticos_agregados:
     st.info(f"🎉 ¡Gracias a la comunidad! Se han agregado {st.session_state.likes_automaticos_agregados} likes automáticos.")
     st.session_state.likes_automaticos_agregados = 0
@@ -887,7 +931,7 @@ if 'selected_tab' not in st.session_state:
 # CONTENIDO DE LAS SECCIONES
 # ============================================
 
-# --- PORTADA (TAB 0) ---
+# --- PORTADA (TAB 0) - CON OPINIONES VISIBLES ---
 if st.session_state.selected_tab == 0:
     col1, col2 = st.columns(2)
     with col1:
@@ -924,6 +968,29 @@ if st.session_state.selected_tab == 0:
                 mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
         else:
             st.info("No hay reflexión activa")
+        
+        # ============================================
+        # OPINIONES VISIBLES EN LA PORTADA
+        # ============================================
+        st.markdown("---")
+        st.markdown("### 💬 Opiniones de la Comunidad")
+        
+        opiniones_portada = get_opiniones(aprobadas=True)
+        
+        if not opiniones_portada.empty:
+            # Mostrar las últimas 5 opiniones
+            for _, op in opiniones_portada.head(5).iterrows():
+                stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
+                with st.container():
+                    st.markdown(f"**👤 {op['usuario']}** {stars}")
+                    st.markdown(f"\"{op['comentario']}\"")
+                    st.caption(f"📅 {op['fecha']}")
+                    st.divider()
+            
+            if len(opiniones_portada) > 5:
+                st.caption(f"📌 Mostrando 5 de {len(opiniones_portada)} opiniones. Ve a la sección 'Opiniones' para ver todas.")
+        else:
+            st.info("💬 No hay opiniones aún. ¡Sé el primero en opinar!")
 
 # --- NOTICIAS (TAB 1) ---
 elif st.session_state.selected_tab == 1:
@@ -1083,7 +1150,7 @@ elif st.session_state.selected_tab == 5:
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        st.markdown("#### 🎵 Estaciones de Radio")
+        st.markdown("#### 🎵 Estaciones de Radio Recomendadas")
         
         radio_opcion = st.selectbox("Selecciona una emisora:", [
             "🎵 80s Forever (Inglés)",
@@ -1121,6 +1188,7 @@ elif st.session_state.selected_tab == 6:
             descripcion = st.text_area("Descripción detallada de los hechos *", height=150)
             ubicacion = st.text_input("Ubicación (sector, calle, dirección)")
             
+            st.markdown("---")
             submitted = st.form_submit_button("📤 Enviar Denuncia", use_container_width=True)
             
             if submitted:
@@ -1158,14 +1226,14 @@ elif st.session_state.selected_tab == 6:
         else:
             st.info("No hay denuncias registradas aún.")
 
-# --- OPINIONES (TAB 7) ---
+# --- OPINIONES (TAB 7) - Sección completa de opiniones ---
 elif st.session_state.selected_tab == 7:
     st.title("💬 Opiniones de la Comunidad")
     
-    tab_op, tab_ver_op = st.tabs(["✍️ Dar Opinión", "👁️ Ver Opiniones Aprobadas"])
+    tab_op, tab_ver_op = st.tabs(["✍️ Dar Opinión", "👁️ Todas las Opiniones Aprobadas"])
     
     with tab_op:
-        st.markdown("### Comparte tu opinión")
+        st.markdown("### Comparte tu opinión sobre Santa Teresa al Día")
         st.caption("Tu opinión será revisada por un administrador antes de ser publicada.")
         
         with st.form("form_opinion"):
@@ -1173,6 +1241,7 @@ elif st.session_state.selected_tab == 7:
             comentario = st.text_area("Tu comentario u opinión *", height=120)
             calificacion = st.slider("Calificación (1 a 5 estrellas)", 1, 5, 5)
             
+            st.markdown("---")
             submitted = st.form_submit_button("📤 Enviar Opinión", use_container_width=True)
             
             if submitted:
@@ -1187,7 +1256,7 @@ elif st.session_state.selected_tab == 7:
                     st.error("❌ El nombre y el comentario son obligatorios.")
     
     with tab_ver_op:
-        st.markdown("### Opiniones Aprobadas")
+        st.markdown("### Todas las Opiniones Aprobadas")
         opiniones = get_opiniones(aprobadas=True)
         
         if not opiniones.empty:
