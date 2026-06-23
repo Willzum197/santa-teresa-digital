@@ -407,7 +407,7 @@ def mostrar_imagen_segura(url, width=300, use_container_width=False):
     return False
 
 # ============================================
-# FUNCIONES CRUD COMPLETAS (RESUMIDAS PARA EL APP)
+# FUNCIONES CRUD COMPLETAS
 # ============================================
 def get_noticias(categoria=None):
     try:
@@ -707,7 +707,9 @@ def get_logo():
     try:
         response = supabase.table("configuracion").select("logo_url").eq("id", 1).execute()
         return response.data[0].get("logo_url") if response.data else None
-    except: return Nonedef save_logo(url):
+    except: return None
+
+def save_logo(url):
     try: supabase.table("configuracion").update({"logo_url": url}).eq("id", 1).execute(); return True
     except: return False
 
@@ -1439,7 +1441,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (COMPLETO - RESUMIDO PARA NO DUPLICAR)
+# PANEL ADMIN (COMPLETO - RESUMIDO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
@@ -1448,6 +1450,7 @@ if st.session_state.get('es_admin', False):
     # --- NOTICIAS ---
     if "📰 Noticias" in admin_opt:
         st.subheader("📰 Gestionar Noticias")
+        
         with st.expander("➕ CREAR nueva noticia", expanded=True):
             with st.form("fn"):
                 titulo = st.text_input("Título *")
@@ -1654,9 +1657,6 @@ if st.session_state.get('es_admin', False):
                     if st.form_submit_button("❌ Cancelar"):
                         del st.session_state.edit_reflexion
                         st.rerun()
-    
-    # --- CRONICAS (ADMIN) - YA ESTÁ GESTIONADO ARRIBA ---
-    # Nota: La gestión de crónicas y comentarios ya está incluida en la sección de Crónicas (TAB 4)
     
     # --- VIDEOS ---
     elif "🎬 Videos" in admin_opt:
