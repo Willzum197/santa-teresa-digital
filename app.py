@@ -165,7 +165,7 @@ def get_visitas():
         return 2500
 
 # ============================================
-# FUNCIONES DE COMENTARIOS
+# FUNCIONES DE COMENTARIOS Y OPINIONES (CON ADMIN)
 # ============================================
 def get_fecha_hora_venezuela():
     caracas_tz = pytz.timezone('America/Caracas')
@@ -195,10 +195,36 @@ def obtener_comentarios(seccion, item_id):
     except Exception:
         return pd.DataFrame()
 
-def mostrar_seccion_comentarios(seccion, item_id, titulo_item):
+def obtener_comentarios_todos(seccion=None):
+    """Obtiene todos los comentarios para el admin, opcionalmente filtrados por sección"""
+    try:
+        if seccion:
+            response = supabase.table("comentarios").select("*").eq("seccion", seccion).order("id", desc=True).execute()
+        else:
+            response = supabase.table("comentarios").select("*").order("id", desc=True).execute()
+        return pd.DataFrame(response.data) if response.data else pd.DataFrame()
+    except Exception:
+        return pd.DataFrame()
+
+def eliminar_comentario(id_):
+    try:
+        supabase.table("comentarios").delete().eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
+def actualizar_comentario(id_, nuevo_comentario):
+    try:
+        supabase.table("comentarios").update({"comentario": nuevo_comentario}).eq("id", id_).execute()
+        return True
+    except Exception:
+        return False
+
+def mostrar_seccion_comentarios(seccion, item_id, titulo_item, es_admin=False):
     st.markdown("---")
     st.markdown("### 💬 Comentarios y Opiniones")
     
+    # Formulario para agregar comentario
     with st.form(key=f"comentario_form_{seccion}_{item_id}"):
         col_nom, col_com = st.columns([1, 3])
         with col_nom:
@@ -216,16 +242,50 @@ def mostrar_seccion_comentarios(seccion, item_id, titulo_item):
             else:
                 st.error("❌ Escribe un comentario antes de enviar")
     
+    # Mostrar comentarios existentes
     comentarios = obtener_comentarios(seccion, item_id)
     if not comentarios.empty:
         st.markdown(f"#### 📌 {len(comentarios)} comentarios")
         for _, com in comentarios.iterrows():
             with st.container():
-                st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
-                st.markdown(f"💬 {com['comentario']}")
+                col1, col2 = st.columns([8, 2])
+                with col1:
+                    st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
+                    st.markdown(f"💬 {com['comentario']}")
+                with col2:
+                    if es_admin:
+                        # Botón para editar
+                        if st.button(f"✏️", key=f"edit_com_{com['id']}", help="Editar comentario"):
+                            st.session_state.edit_comentario_id = com['id']
+                            st.session_state.edit_comentario_text = com['comentario']
+                            st.rerun()
+                        # Botón para eliminar
+                        if st.button(f"🗑️", key=f"del_com_{com['id']}", help="Eliminar comentario"):
+                            if eliminar_comentario(com['id']):
+                                st.success("✅ Comentario eliminado")
+                                st.rerun()
                 st.divider()
     else:
         st.info("💬 No hay comentarios aún. ¡Sé el primero en opinar!")
+    
+    # Formulario de edición (si está activo)
+    if st.session_state.get('edit_comentario_id') and st.session_state.edit_comentario_id:
+        st.markdown("### ✏️ Editar comentario")
+        with st.form(key=f"edit_comentario_form_{st.session_state.edit_comentario_id}"):
+            nuevo_texto = st.text_area("Nuevo texto del comentario", value=st.session_state.edit_comentario_text)
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Guardar cambios"):
+                    if actualizar_comentario(st.session_state.edit_comentario_id, nuevo_texto):
+                        st.success("✅ Comentario actualizado")
+                        del st.session_state.edit_comentario_id
+                        del st.session_state.edit_comentario_text
+                        st.rerun()
+            with col2:
+                if st.form_submit_button("❌ Cancelar"):
+                    del st.session_state.edit_comentario_id
+                    del st.session_state.edit_comentario_text
+                    st.rerun()
 
 # ============================================
 # FUNCIÓN DE OPTIMIZACIÓN DE IMÁGENES
@@ -339,7 +399,7 @@ def mostrar_imagen_segura(url, width=300, use_container_width=False):
     return False
 
 # ============================================
-# FUNCIONES CRUD COMPLETAS
+# FUNCIONES CRUD COMPLETAS (RESUMIDAS)
 # ============================================
 def get_noticias(categoria=None):
     try:
@@ -557,9 +617,6 @@ def delete_denuncia(id_):
     try: supabase.table("denuncias").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIONES DE OPINIONES
-# ============================================
 def get_opiniones(aprobadas=True):
     try:
         if aprobadas:
@@ -584,9 +641,6 @@ def delete_opinion(id_):
     try: supabase.table("opiniones").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIONES DE PERSONAJES
-# ============================================
 def get_personajes():
     try:
         response = supabase.table("personajes").select("*").order("id", desc=True).execute()
@@ -614,9 +668,6 @@ def delete_personaje(id_):
     try: supabase.table("personajes").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIONES DE CRIMEN NO PAGA
-# ============================================
 def get_crimen_no_paga():
     try:
         response = supabase.table("crimen_no_paga").select("*").order("id", desc=True).execute()
@@ -644,9 +695,6 @@ def delete_crimen_no_paga(id_):
     try: supabase.table("crimen_no_paga").delete().eq("id", id_).execute(); return True
     except: return False
 
-# ============================================
-# FUNCIÓN DE CONFIGURACION
-# ============================================
 def get_logo():
     try:
         response = supabase.table("configuracion").select("logo_url").eq("id", 1).execute()
@@ -931,7 +979,7 @@ if 'selected_tab' not in st.session_state:
 # CONTENIDO DE LAS SECCIONES
 # ============================================
 
-# --- PORTADA (TAB 0) - CON OPINIONES VISIBLES ---
+# --- PORTADA (TAB 0) ---
 if st.session_state.selected_tab == 0:
     col1, col2 = st.columns(2)
     with col1:
@@ -942,7 +990,7 @@ if st.session_state.selected_tab == 0:
                 with st.expander(f"📰 {n['titulo']} - {n['categoria']} ({n['fecha']})"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
-                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'], es_admin)
         else:
             st.info("No hay noticias disponibles")
         
@@ -953,7 +1001,7 @@ if st.session_state.selected_tab == 0:
                 with st.expander(f"📽️ {r['titulo']} - {r['fecha']}"):
                     mostrar_imagen_segura(r.get('imagen_url'), 300)
                     st.write(r['contenido'])
-                    mostrar_seccion_comentarios("reportaje", r['id'], r['titulo'])
+                    mostrar_seccion_comentarios("reportaje", r['id'], r['titulo'], es_admin)
         else:
             st.info("No hay reportajes disponibles")
     
@@ -965,20 +1013,16 @@ if st.session_state.selected_tab == 0:
                 st.write(ref['contenido'])
                 if ref.get('versiculo'):
                     st.caption(f"📖 {ref['versiculo']}")
-                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
+                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'], es_admin)
         else:
             st.info("No hay reflexión activa")
         
-        # ============================================
-        # OPINIONES VISIBLES EN LA PORTADA
-        # ============================================
         st.markdown("---")
         st.markdown("### 💬 Opiniones de la Comunidad")
         
         opiniones_portada = get_opiniones(aprobadas=True)
         
         if not opiniones_portada.empty:
-            # Mostrar las últimas 5 opiniones
             for _, op in opiniones_portada.head(5).iterrows():
                 stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
                 with st.container():
@@ -1006,7 +1050,7 @@ elif st.session_state.selected_tab == 1:
                     with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                         mostrar_imagen_segura(n.get('imagen_url'), 300)
                         st.write(n['contenido'])
-                        mostrar_seccion_comentarios("noticia" if categoria != "Reportajes" else "reportaje", n['id'], n['titulo'])
+                        mostrar_seccion_comentarios("noticia" if categoria != "Reportajes" else "reportaje", n['id'], n['titulo'], es_admin)
             else:
                 st.info(f"No hay noticias de {categoria}")
 
@@ -1066,7 +1110,7 @@ elif st.session_state.selected_tab == 3:
             if ref.get('versiculo'):
                 st.caption(f"📖 {ref['versiculo']}")
             st.caption(f"📅 {ref['fecha']}")
-            mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'])
+            mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'], es_admin)
     else:
         st.info("No hay reflexión activa")
     st.markdown("---")
@@ -1079,7 +1123,7 @@ elif st.session_state.selected_tab == 3:
                     st.write(r['contenido'])
                     if r.get('versiculo'):
                         st.caption(f"📖 {r['versiculo']}")
-                    mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'])
+                    mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'], es_admin)
     else:
         st.info("No hay reflexiones anteriores")
 
@@ -1099,7 +1143,7 @@ elif st.session_state.selected_tab == 4:
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(c['contenido'])
                 st.caption(f"📅 {c['fecha']}")
-                mostrar_seccion_comentarios("cronica", c['id'], c['titulo'])
+                mostrar_seccion_comentarios("cronica", c['id'], c['titulo'], es_admin)
     else:
         st.info("No hay crónicas disponibles")
 
@@ -1116,7 +1160,7 @@ elif st.session_state.selected_tab == 5:
                 with st.expander(f"🎬 {v['titulo']}"):
                     mostrar_video_youtube(v['video_url'], width_percent=50)
                     st.caption(f"📅 {v['fecha']}")
-                    mostrar_seccion_comentarios("video", v['id'], v['titulo'])
+                    mostrar_seccion_comentarios("video", v['id'], v['titulo'], es_admin)
         else:
             st.info("No hay videos disponibles")
     
@@ -1128,7 +1172,7 @@ elif st.session_state.selected_tab == 5:
                 with st.expander(f"📱 {t['titulo']}"):
                     mostrar_tiktok(t['tiktok_url'], width_percent=50)
                     st.caption(f"📅 {t['fecha']}")
-                    mostrar_seccion_comentarios("tiktok", t['id'], t['titulo'])
+                    mostrar_seccion_comentarios("tiktok", t['id'], t['titulo'], es_admin)
         else:
             st.info("No hay videos de TikTok disponibles")
     
@@ -1143,14 +1187,14 @@ elif st.session_state.selected_tab == 5:
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
-                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'])
+                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'], es_admin)
         else:
             st.info("No hay música disponible")
     
     with tab_rad:
         st.markdown("### 📻 Radio Online")
         
-        st.markdown("#### 🎵 Estaciones de Radio Recomendadas")
+        st.markdown("#### 🎵 Estaciones de Radio")
         
         radio_opcion = st.selectbox("Selecciona una emisora:", [
             "🎵 80s Forever (Inglés)",
@@ -1226,7 +1270,7 @@ elif st.session_state.selected_tab == 6:
         else:
             st.info("No hay denuncias registradas aún.")
 
-# --- OPINIONES (TAB 7) - Sección completa de opiniones ---
+# --- OPINIONES (TAB 7) ---
 elif st.session_state.selected_tab == 7:
     st.title("💬 Opiniones de la Comunidad")
     
@@ -1279,7 +1323,7 @@ elif st.session_state.selected_tab == 8:
             with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
                 mostrar_imagen_segura(p.get('imagen_url'), 200)
                 st.write(f"**Biografía:** {p['descripcion']}")
-                mostrar_seccion_comentarios("personaje", p['id'], p['nombre'])
+                mostrar_seccion_comentarios("personaje", p['id'], p['nombre'], es_admin)
     else:
         st.info("No hay personajes registrados")
 
@@ -1298,7 +1342,7 @@ elif st.session_state.selected_tab == 9:
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(f"**Descripción:** {c['descripcion']}")
                 st.caption(f"📅 Publicado: {c['fecha']}")
-                mostrar_seccion_comentarios("crimen", c['id'], c['titulo'])
+                mostrar_seccion_comentarios("crimen", c['id'], c['titulo'], es_admin)
     else:
         st.info("No hay casos registrados")
 
@@ -1569,7 +1613,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_reflexion
                         st.rerun()
     
-    # --- CRONICAS ---
+    # --- CRONICAS (ADMIN) ---
     elif "📜 Crónicas" in admin_opt:
         st.subheader("📜 Gestionar Crónicas")
         
@@ -1606,13 +1650,42 @@ if st.session_state.get('es_admin', False):
                             mostrar_imagen_segura(c['imagenes_url'], 200)
                     st.write(c['contenido'])
                     st.caption(f"📅 {c['fecha']}")
+                    
+                    # ADMIN: Gestionar comentarios de esta crónica
+                    st.markdown("---")
+                    st.markdown("### 🔧 Administrar comentarios de esta crónica")
+                    
+                    # Obtener todos los comentarios de esta crónica
+                    comentarios_cronica = obtener_comentarios_todos(seccion="cronica")
+                    comentarios_cronica = comentarios_cronica[comentarios_cronica['item_id'] == str(c['id'])] if not comentarios_cronica.empty else pd.DataFrame()
+                    
+                    if not comentarios_cronica.empty:
+                        for _, com in comentarios_cronica.iterrows():
+                            col1, col2, col3 = st.columns([6, 1, 1])
+                            with col1:
+                                st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
+                                st.markdown(f"💬 {com['comentario']}")
+                            with col2:
+                                if st.button(f"✏️", key=f"edit_cron_com_{com['id']}", help="Editar comentario"):
+                                    st.session_state.edit_comentario_id = com['id']
+                                    st.session_state.edit_comentario_text = com['comentario']
+                                    st.rerun()
+                            with col3:
+                                if st.button(f"🗑️", key=f"del_cron_com_{com['id']}", help="Eliminar comentario"):
+                                    if eliminar_comentario(com['id']):
+                                        st.success("✅ Comentario eliminado")
+                                        st.rerun()
+                    else:
+                        st.info("No hay comentarios en esta crónica")
+                    
+                    # Botones para editar/eliminar la crónica
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_cron_{c['id']}"):
+                        if st.button(f"✏️ MODIFICAR CRÓNICA", key=f"edit_cron_{c['id']}"):
                             st.session_state.edit_cronica = c.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_cron_{c['id']}"):
+                        if st.button(f"🗑️ ELIMINAR CRÓNICA", key=f"del_cron_{c['id']}"):
                             if delete_cronica(c['id']):
                                 st.success("✅ Crónica eliminada")
                                 st.rerun()
@@ -1772,7 +1845,7 @@ if st.session_state.get('es_admin', False):
                         st.caption(f"📅 {m['fecha']}")
                     else:
                         st.warning("No hay URL de audio disponible")
-                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'])
+                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'], es_admin)
         else:
             st.info("No hay canciones registradas")
         
