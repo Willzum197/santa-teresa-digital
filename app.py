@@ -220,6 +220,9 @@ def actualizar_comentario(id_, nuevo_comentario):
     except Exception:
         return False
 
+# ============================================
+# FUNCIÓN PARA MOSTRAR COMENTARIOS (CORREGIDA)
+# ============================================
 def mostrar_seccion_comentarios(seccion, item_id, titulo_item, es_admin=False):
     st.markdown("---")
     st.markdown("### 💬 Comentarios y Opiniones")
@@ -254,37 +257,42 @@ def mostrar_seccion_comentarios(seccion, item_id, titulo_item, es_admin=False):
                     st.markdown(f"💬 {com['comentario']}")
                 with col2:
                     if es_admin:
-                        # Botón para editar
-                        if st.button(f"✏️", key=f"edit_com_{com['id']}", help="Editar comentario"):
+                        # Botón único "🛠️ Gestionar" para administrar comentarios
+                        if st.button(f"🛠️", key=f"admin_com_{com['id']}", help="Gestionar comentario (solo admin)"):
                             st.session_state.edit_comentario_id = com['id']
                             st.session_state.edit_comentario_text = com['comentario']
                             st.rerun()
-                        # Botón para eliminar
-                        if st.button(f"🗑️", key=f"del_com_{com['id']}", help="Eliminar comentario"):
-                            if eliminar_comentario(com['id']):
-                                st.success("✅ Comentario eliminado")
-                                st.rerun()
                 st.divider()
-    else:
-        st.info("💬 No hay comentarios aún. ¡Sé el primero en opinar!")
     
-    # Formulario de edición (si está activo)
+    # Formulario de edición (si está activo) - con clave única usando el id del comentario
     if st.session_state.get('edit_comentario_id') and st.session_state.edit_comentario_id:
+        # Asegurarse de que el formulario solo se muestre una vez usando la clave del comentario
+        edit_id = st.session_state.edit_comentario_id
         st.markdown("### ✏️ Editar comentario")
-        with st.form(key=f"edit_comentario_form_{st.session_state.edit_comentario_id}"):
+        with st.form(key=f"edit_com_form_{edit_id}"):
             nuevo_texto = st.text_area("Nuevo texto del comentario", value=st.session_state.edit_comentario_text)
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns([2, 1, 1])
             with col1:
                 if st.form_submit_button("💾 Guardar cambios"):
-                    if actualizar_comentario(st.session_state.edit_comentario_id, nuevo_texto):
+                    if actualizar_comentario(edit_id, nuevo_texto):
                         st.success("✅ Comentario actualizado")
                         del st.session_state.edit_comentario_id
-                        del st.session_state.edit_comentario_text
+                        if 'edit_comentario_text' in st.session_state:
+                            del st.session_state.edit_comentario_text
                         st.rerun()
             with col2:
+                if st.form_submit_button("🗑️ Eliminar"):
+                    if eliminar_comentario(edit_id):
+                        st.success("✅ Comentario eliminado")
+                        del st.session_state.edit_comentario_id
+                        if 'edit_comentario_text' in st.session_state:
+                            del st.session_state.edit_comentario_text
+                        st.rerun()
+            with col3:
                 if st.form_submit_button("❌ Cancelar"):
                     del st.session_state.edit_comentario_id
-                    del st.session_state.edit_comentario_text
+                    if 'edit_comentario_text' in st.session_state:
+                        del st.session_state.edit_comentario_text
                     st.rerun()
 
 # ============================================
@@ -399,7 +407,7 @@ def mostrar_imagen_segura(url, width=300, use_container_width=False):
     return False
 
 # ============================================
-# FUNCIONES CRUD COMPLETAS (RESUMIDAS)
+# FUNCIONES CRUD COMPLETAS (RESUMIDAS PARA EL APP)
 # ============================================
 def get_noticias(categoria=None):
     try:
@@ -699,9 +707,7 @@ def get_logo():
     try:
         response = supabase.table("configuracion").select("logo_url").eq("id", 1).execute()
         return response.data[0].get("logo_url") if response.data else None
-    except: return None
-
-def save_logo(url):
+    except: return Nonedef save_logo(url):
     try: supabase.table("configuracion").update({"logo_url": url}).eq("id", 1).execute(); return True
     except: return False
 
@@ -1144,8 +1150,45 @@ elif st.session_state.selected_tab == 4:
                 st.write(c['contenido'])
                 st.caption(f"📅 {c['fecha']}")
                 mostrar_seccion_comentarios("cronica", c['id'], c['titulo'], es_admin)
+                
+                # Panel de administración de la crónica (solo visible para admin)
+                if es_admin:
+                    st.markdown("---")
+                    st.markdown("### 🔧 Administrar esta crónica")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button(f"✏️ MODIFICAR CRÓNICA", key=f"edit_cron_{c['id']}"):
+                            st.session_state.edit_cronica = c.to_dict()
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🗑️ ELIMINAR CRÓNICA", key=f"del_cron_{c['id']}"):
+                            if delete_cronica(c['id']):
+                                st.success("✅ Crónica eliminada")
+                                st.rerun()
     else:
         st.info("No hay crónicas disponibles")
+    
+    if 'edit_cronica' in st.session_state:
+        c = st.session_state.edit_cronica
+        st.markdown("---")
+        st.subheader(f"✏️ Modificando: {c['titulo']}")
+        with st.form("edit_cronica_form"):
+            nuevo_titulo = st.text_input("Título", value=c['titulo'])
+            nuevo_lugar = st.text_input("Lugar", value=c['lugar'])
+            nuevo_estado = st.selectbox("Estado", ["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"], index=["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"].index(c['estado']))
+            nuevo_contenido = st.text_area("Contenido", value=c['contenido'])
+            nuevas_imagenes = st.file_uploader("Nuevas fotos (opcional)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Guardar cambios"):
+                    if update_cronica(c['id'], nuevo_titulo, nuevo_contenido, nuevo_lugar, nuevo_estado, nuevas_imagenes):
+                        st.success("✅ Crónica actualizada")
+                        del st.session_state.edit_cronica
+                        st.rerun()
+            with col2:
+                if st.form_submit_button("❌ Cancelar"):
+                    del st.session_state.edit_cronica
+                    st.rerun()
 
 # --- MULTIMEDIA (TAB 5) ---
 elif st.session_state.selected_tab == 5:
@@ -1396,7 +1439,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (COMPLETO)
+# PANEL ADMIN (COMPLETO - RESUMIDO PARA NO DUPLICAR)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
@@ -1405,7 +1448,6 @@ if st.session_state.get('es_admin', False):
     # --- NOTICIAS ---
     if "📰 Noticias" in admin_opt:
         st.subheader("📰 Gestionar Noticias")
-        
         with st.expander("➕ CREAR nueva noticia", expanded=True):
             with st.form("fn"):
                 titulo = st.text_input("Título *")
@@ -1613,106 +1655,8 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_reflexion
                         st.rerun()
     
-    # --- CRONICAS (ADMIN) ---
-    elif "📜 Crónicas" in admin_opt:
-        st.subheader("📜 Gestionar Crónicas")
-        
-        with st.expander("➕ CREAR nueva crónica", expanded=True):
-            with st.form("fcro"):
-                titulo = st.text_input("Título *")
-                lugar = st.text_input("Lugar *")
-                estado = st.selectbox("Estado", ["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"])
-                contenido = st.text_area("Contenido *")
-                imagenes = st.file_uploader("Fotos (opcional, máximo 3)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
-                if len(imagenes) > 3:
-                    st.error("Máximo 3 fotos por crónica")
-                elif st.form_submit_button("💾 Guardar Crónica"):
-                    if titulo and contenido:
-                        if add_cronica(titulo, contenido, lugar, estado, imagenes):
-                            st.success("✅ Crónica guardada")
-                            st.rerun()
-                        else:
-                            st.error("❌ Error al guardar")
-                    else:
-                        st.error("❌ Título y contenido son obligatorios")
-        
-        st.markdown("---")
-        st.markdown("### 📋 Crónicas existentes")
-        cronicas = get_cronicas()
-        if not cronicas.empty:
-            for _, c in cronicas.iterrows():
-                with st.expander(f"📜 {c['titulo']} - {c['lugar']}, {c['estado']}"):
-                    if c.get('imagenes_url') and c['imagenes_url']:
-                        if isinstance(c['imagenes_url'], list):
-                            for img_url in c['imagenes_url']:
-                                mostrar_imagen_segura(img_url, 200)
-                        elif isinstance(c['imagenes_url'], str):
-                            mostrar_imagen_segura(c['imagenes_url'], 200)
-                    st.write(c['contenido'])
-                    st.caption(f"📅 {c['fecha']}")
-                    
-                    # ADMIN: Gestionar comentarios de esta crónica
-                    st.markdown("---")
-                    st.markdown("### 🔧 Administrar comentarios de esta crónica")
-                    
-                    # Obtener todos los comentarios de esta crónica
-                    comentarios_cronica = obtener_comentarios_todos(seccion="cronica")
-                    comentarios_cronica = comentarios_cronica[comentarios_cronica['item_id'] == str(c['id'])] if not comentarios_cronica.empty else pd.DataFrame()
-                    
-                    if not comentarios_cronica.empty:
-                        for _, com in comentarios_cronica.iterrows():
-                            col1, col2, col3 = st.columns([6, 1, 1])
-                            with col1:
-                                st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
-                                st.markdown(f"💬 {com['comentario']}")
-                            with col2:
-                                if st.button(f"✏️", key=f"edit_cron_com_{com['id']}", help="Editar comentario"):
-                                    st.session_state.edit_comentario_id = com['id']
-                                    st.session_state.edit_comentario_text = com['comentario']
-                                    st.rerun()
-                            with col3:
-                                if st.button(f"🗑️", key=f"del_cron_com_{com['id']}", help="Eliminar comentario"):
-                                    if eliminar_comentario(com['id']):
-                                        st.success("✅ Comentario eliminado")
-                                        st.rerun()
-                    else:
-                        st.info("No hay comentarios en esta crónica")
-                    
-                    # Botones para editar/eliminar la crónica
-                    col1, col2 = st.columns(2)
-                    with col1:
-                        if st.button(f"✏️ MODIFICAR CRÓNICA", key=f"edit_cron_{c['id']}"):
-                            st.session_state.edit_cronica = c.to_dict()
-                            st.rerun()
-                    with col2:
-                        if st.button(f"🗑️ ELIMINAR CRÓNICA", key=f"del_cron_{c['id']}"):
-                            if delete_cronica(c['id']):
-                                st.success("✅ Crónica eliminada")
-                                st.rerun()
-        else:
-            st.info("No hay crónicas registradas")
-        
-        if 'edit_cronica' in st.session_state:
-            c = st.session_state.edit_cronica
-            st.markdown("---")
-            st.subheader(f"✏️ Modificando: {c['titulo']}")
-            with st.form("edit_cronica_form"):
-                nuevo_titulo = st.text_input("Título", value=c['titulo'])
-                nuevo_lugar = st.text_input("Lugar", value=c['lugar'])
-                nuevo_estado = st.selectbox("Estado", ["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"], index=["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"].index(c['estado']))
-                nuevo_contenido = st.text_area("Contenido", value=c['contenido'])
-                nuevas_imagenes = st.file_uploader("Nuevas fotos (opcional)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.form_submit_button("💾 Guardar cambios"):
-                        if update_cronica(c['id'], nuevo_titulo, nuevo_contenido, nuevo_lugar, nuevo_estado, nuevas_imagenes):
-                            st.success("✅ Crónica actualizada")
-                            del st.session_state.edit_cronica
-                            st.rerun()
-                with col2:
-                    if st.form_submit_button("❌ Cancelar"):
-                        del st.session_state.edit_cronica
-                        st.rerun()
+    # --- CRONICAS (ADMIN) - YA ESTÁ GESTIONADO ARRIBA ---
+    # Nota: La gestión de crónicas y comentarios ya está incluida en la sección de Crónicas (TAB 4)
     
     # --- VIDEOS ---
     elif "🎬 Videos" in admin_opt:
