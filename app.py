@@ -926,7 +926,8 @@ with st.sidebar:
         admin_opt = st.radio("Seleccionar módulo:", [
             "📰 Noticias", "🏪 Negocios", "💭 Reflexiones", "📜 Crónicas",
             "🎬 Videos", "📱 TikTok", "🎵 Música", "⚠️ Denuncias", 
-            "💬 Opiniones", "👥 Personajes", "⚖️ El Crimen No Paga", "⚙️ Configuración"
+            "💬 Opiniones", "👥 Personajes", "⚖️ El Crimen No Paga", 
+            "⚙️ Configuración", "💬 GESTIONAR COMENTARIOS"
         ])
         st.session_state.admin_opt = admin_opt
         st.session_state.es_admin = True
@@ -1456,14 +1457,83 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# PANEL ADMIN (COMPLETO - CON GESTIÓN DE COMENTARIOS EN CRÓNICAS)
+# PANEL ADMIN (COMPLETO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
     st.title("🔧 Panel de Administración")
     
+    # --- GESTIONAR COMENTARIOS (NUEVO MÓDULO CENTRALIZADO) ---
+    if "💬 GESTIONAR COMENTARIOS" in admin_opt:
+        st.subheader("💬 Gestión Centralizada de Comentarios")
+        st.markdown("### Todos los comentarios de las crónicas")
+        st.info("Desde aquí puedes modificar o eliminar cualquier comentario de las crónicas")
+        
+        # Obtener todos los comentarios de la sección "cronica"
+        comentarios = obtener_comentarios_todos(seccion="cronica")
+        
+        if comentarios.empty:
+            st.info("No hay comentarios registrados en las crónicas")
+        else:
+            # Obtener información de las crónicas para mostrar el título
+            cronicas = get_cronicas()
+            cronica_dict = {str(c['id']): c['titulo'] for _, c in cronicas.iterrows()}
+            
+            st.markdown(f"**Total de comentarios:** {len(comentarios)}")
+            
+            # Botón para eliminar TODOS los comentarios
+            if st.button("🗑️ ELIMINAR TODOS LOS COMENTARIOS", key="eliminar_todos_comentarios"):
+                if st.session_state.get('confirmar_eliminar_todos', False):
+                    for _, com in comentarios.iterrows():
+                        eliminar_comentario(com['id'])
+                    st.success(f"✅ Se eliminaron {len(comentarios)} comentarios")
+                    st.session_state['confirmar_eliminar_todos'] = False
+                    st.rerun()
+                else:
+                    st.session_state['confirmar_eliminar_todos'] = True
+                    st.warning("⚠️ ¡CONFIRMAR! Haz clic nuevamente en ELIMINAR TODOS para confirmar")
+            
+            st.markdown("---")
+            
+            # Mostrar cada comentario con opciones de modificar y eliminar
+            for idx, com in comentarios.iterrows():
+                with st.container():
+                    # Obtener el título de la crónica
+                    titulo_cronica = cronica_dict.get(str(com['item_id']), f"ID: {com['item_id']}")
+                    
+                    col1, col2, col3, col4 = st.columns([4, 2, 1, 1])
+                    with col1:
+                        st.markdown(f"**📖 Crónica:** {titulo_cronica}")
+                        st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
+                        # Text area para editar el comentario
+                        text_key = f"text_com_central_{com['id']}"
+                        nuevo_texto = st.text_area(
+                            "Comentario", 
+                            value=com['comentario'], 
+                            key=text_key,
+                            label_visibility="collapsed"
+                        )
+                    with col2:
+                        st.markdown(f"**ID:** {com['id']}")
+                    with col3:
+                        if st.button(f"💾 Guardar", key=f"guardar_central_{com['id']}"):
+                            texto_actualizado = st.session_state.get(text_key, com['comentario'])
+                            if actualizar_comentario(com['id'], texto_actualizado):
+                                st.success("✅ Comentario actualizado")
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al actualizar")
+                    with col4:
+                        if st.button(f"🗑️ Eliminar", key=f"eliminar_central_{com['id']}"):
+                            if eliminar_comentario(com['id']):
+                                st.success("✅ Comentario eliminado")
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al eliminar")
+                    st.divider()
+    
     # --- NOTICIAS ---
-    if "📰 Noticias" in admin_opt:
+    elif "📰 Noticias" in admin_opt:
         st.subheader("📰 Gestionar Noticias")
         
         with st.expander("➕ CREAR nueva noticia", expanded=True):
@@ -1673,7 +1743,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_reflexion
                         st.rerun()
     
-    # --- CRÓNICAS (ADMIN) --- CON BOTÓN GENERAL PARA GESTIONAR COMENTARIOS
+    # --- CRÓNICAS (ADMIN) ---
     elif "📜 Crónicas" in admin_opt:
         st.subheader("📜 Gestionar Crónicas")
         
@@ -1711,81 +1781,6 @@ if st.session_state.get('es_admin', False):
                     st.write(f"**Contenido:** {c['contenido']}")
                     st.caption(f"📅 {c['fecha']}")
                     
-                    # BOTÓN GENERAL PARA GESTIONAR COMENTARIOS DE ESTA CRÓNICA
-                    if st.button(f"💬 GESTIONAR COMENTARIOS", key=f"gestionar_com_cron_admin_{c['id']}"):
-                        st.session_state.gestionar_comentarios_cronica = c['id']
-                        st.rerun()
-                    
-                    # Gestión de comentarios con botón general para eliminar/modificar
-                    if st.session_state.get('gestionar_comentarios_cronica') == c['id']:
-                        st.markdown("---")
-                        st.markdown("### 💬 Gestión de Comentarios")
-                        
-                        # Obtener comentarios de esta crónica
-                        comentarios_cronica = obtener_comentarios_todos(seccion="cronica")
-                        comentarios_filtrados = comentarios_cronica[comentarios_cronica['item_id'] == str(c['id'])] if not comentarios_cronica.empty else pd.DataFrame()
-                        
-                        if comentarios_filtrados.empty:
-                            st.info("Esta crónica no tiene comentarios")
-                        else:
-                            st.markdown(f"**Total de comentarios:** {len(comentarios_filtrados)}")
-                            
-                            # Botón para eliminar TODOS los comentarios
-                            if st.button(f"🗑️ ELIMINAR TODOS LOS COMENTARIOS", key=f"eliminar_todos_cron_{c['id']}"):
-                                if st.session_state.get(f'confirmar_eliminar_cron_{c['id']}', False):
-                                    for _, com in comentarios_filtrados.iterrows():
-                                        eliminar_comentario(com['id'])
-                                    st.success(f"✅ Se eliminaron {len(comentarios_filtrados)} comentarios")
-                                    st.session_state[f'confirmar_eliminar_cron_{c['id']}'] = False
-                                    st.rerun()
-                                else:
-                                    st.session_state[f'confirmar_eliminar_cron_{c['id']}'] = True
-                                    st.warning("⚠️ ¡CONFIRMAR! Haz clic nuevamente en ELIMINAR TODOS para confirmar")
-                            
-                            st.markdown("---")
-                            
-                            # Mostrar comentarios individuales con opciones de modificar y eliminar
-                            for idx, com in comentarios_filtrados.iterrows():
-                                with st.container():
-                                    # Usar un key único para el text area
-                                    text_key = f"text_cron_{com['id']}_{c['id']}"
-                                    
-                                    col1, col2, col3 = st.columns([6, 2, 2])
-                                    with col1:
-                                        st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
-                                        # Text area para editar el comentario
-                                        nuevo_texto = st.text_area(
-                                            f"Comentario", 
-                                            value=com['comentario'], 
-                                            key=text_key,
-                                            label_visibility="collapsed"
-                                        )
-                                    with col2:
-                                        if st.button(f"💾 Guardar", key=f"guardar_cron_{com['id']}_{c['id']}"):
-                                            # Obtener el valor actual del text area
-                                            texto_actualizado = st.session_state.get(text_key, com['comentario'])
-                                            if actualizar_comentario(com['id'], texto_actualizado):
-                                                st.success("✅ Comentario actualizado")
-                                                st.rerun()
-                                            else:
-                                                st.error("❌ Error al actualizar")
-                                    with col3:
-                                        if st.button(f"🗑️ Eliminar", key=f"eliminar_cron_{com['id']}_{c['id']}"):
-                                            if eliminar_comentario(com['id']):
-                                                st.success("✅ Comentario eliminado")
-                                                st.rerun()
-                                            else:
-                                                st.error("❌ Error al eliminar")
-                                    st.divider()
-                        
-                        # Botón para cerrar la gestión
-                        if st.button("❌ Cerrar gestión de comentarios", key=f"cerrar_gestion_cron_{c['id']}"):
-                            del st.session_state.gestionar_comentarios_cronica
-                            if f'confirmar_eliminar_cron_{c['id']}' in st.session_state:
-                                del st.session_state[f'confirmar_eliminar_cron_{c['id']}']
-                            st.rerun()
-                    
-                    # Botones de acción para la crónica
                     col1, col2 = st.columns(2)
                     with col1:
                         if st.button(f"✏️ MODIFICAR", key=f"edit_cron_admin_{c['id']}"):
