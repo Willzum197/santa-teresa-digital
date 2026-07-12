@@ -251,7 +251,7 @@ def mostrar_seccion_comentarios(seccion, item_id, titulo_item, es_admin=False):
     comentarios = obtener_comentarios(seccion, item_id)
     if not comentarios.empty:
         st.markdown(f"#### 📌 {len(comentarios)} comentarios")
-        for _, com in comentarios.iterrows():
+        for idx, com in comentarios.iterrows():
             with st.container():
                 col1, col2 = st.columns([8, 2])
                 with col1:
@@ -259,7 +259,7 @@ def mostrar_seccion_comentarios(seccion, item_id, titulo_item, es_admin=False):
                     st.markdown(f"💬 {com['comentario']}")
                 with col2:
                     if es_admin:
-                        if st.button(f"🛠️", key=f"admin_com_{com['id']}_{seccion}_{item_id}", help="Gestionar comentario (solo admin)"):
+                        if st.button(f"🛠️", key=f"admin_com_{com['id']}_{seccion}_{item_id}_{idx}", help="Gestionar comentario (solo admin)"):
                             st.session_state.edit_comentario_id = com['id']
                             st.session_state.edit_comentario_text = com['comentario']
                             st.session_state.edit_comentario_seccion = seccion
@@ -518,11 +518,7 @@ def get_reflexiones():
 def add_reflexion(titulo, contenido, versiculo):
     try:
         ahora = get_fecha_hora_venezuela()
-        
-        # Primero desactivar todas las reflexiones
         supabase.table("reflexiones").update({"activo": False}).execute()
-        
-        # Luego insertar la nueva reflexión como activa
         data = {
             "titulo": titulo,
             "contenido": contenido,
@@ -530,17 +526,10 @@ def add_reflexion(titulo, contenido, versiculo):
             "fecha": ahora.strftime("%d/%m/%Y"),
             "activo": True
         }
-        
         result = supabase.table("reflexiones").insert(data).execute()
-        
-        if result.data:
-            return True
-        else:
-            print(f"Error: No se pudo insertar la reflexión. Result: {result}")
-            return False
+        return True if result.data else False
     except Exception as e:
         print(f"Error en add_reflexion: {str(e)}")
-        st.error(f"Error detallado: {str(e)}")
         return False
 
 def update_reflexion(id_, titulo, contenido, versiculo):
@@ -553,7 +542,7 @@ def update_reflexion(id_, titulo, contenido, versiculo):
         result = supabase.table("reflexiones").update(data).eq("id", id_).execute()
         return True if result.data else False
     except Exception as e:
-        st.error(f"Error al actualizar reflexión: {str(e)}")
+        print(f"Error en update_reflexion: {str(e)}")
         return False
 
 def delete_reflexion(id_):
@@ -1039,7 +1028,7 @@ if st.session_state.selected_tab == 0:
         st.markdown("### 📰 Últimas Noticias")
         noticias = get_noticias()
         if not noticias.empty:
-            for _, n in noticias.head(5).iterrows():
+            for idx, n in noticias.head(5).iterrows():
                 with st.expander(f"📰 {n['titulo']} - {n['categoria']} ({n['fecha']})"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(n['contenido'])
@@ -1050,7 +1039,7 @@ if st.session_state.selected_tab == 0:
         st.markdown("### 📽️ Últimos Reportajes")
         reportajes = get_noticias(categoria="Reportajes")
         if not reportajes.empty:
-            for _, r in reportajes.head(3).iterrows():
+            for idx, r in reportajes.head(3).iterrows():
                 with st.expander(f"📽️ {r['titulo']} - {r['fecha']}"):
                     mostrar_imagen_segura(r.get('imagen_url'), 300)
                     st.write(r['contenido'])
@@ -1076,7 +1065,7 @@ if st.session_state.selected_tab == 0:
         opiniones_portada = get_opiniones(aprobadas=True)
         
         if not opiniones_portada.empty:
-            for _, op in opiniones_portada.head(5).iterrows():
+            for idx, op in opiniones_portada.head(5).iterrows():
                 stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
                 with st.container():
                     st.markdown(f"**👤 {op['usuario']}** {stars}")
@@ -1099,7 +1088,7 @@ elif st.session_state.selected_tab == 1:
         with tab:
             noticias_cat = get_noticias(categoria=categoria)
             if not noticias_cat.empty:
-                for _, n in noticias_cat.iterrows():
+                for idx, n in noticias_cat.iterrows():
                     with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
                         mostrar_imagen_segura(n.get('imagen_url'), 300)
                         st.write(n['contenido'])
@@ -1112,7 +1101,7 @@ elif st.session_state.selected_tab == 2:
     st.title("📍 Donde ir - Donde comprar")
     negocios = get_negocios()
     if not negocios.empty:
-        for _, n in negocios.iterrows():
+        for idx, n in negocios.iterrows():
             with st.expander(f"🏪 {n['nombre']}"):
                 if n.get('imagenes_url') and n['imagenes_url']:
                     if isinstance(n['imagenes_url'], list) and len(n['imagenes_url']) > 0:
@@ -1142,7 +1131,7 @@ elif st.session_state.selected_tab == 2:
                             st.error("❌ Nombre y comentario son obligatorios")
                 opiniones = get_opiniones_negocio(n['id'])
                 if not opiniones.empty:
-                    for _, op in opiniones.iterrows():
+                    for idx2, op in opiniones.iterrows():
                         stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
                         st.markdown(f"**👤 {op['usuario']}** {stars}")
                         st.write(f"\"{op['comentario']}\"")
@@ -1153,11 +1142,10 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) CORREGIDA ---
+# --- REFLEXIONES (TAB 3) ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
     
-    # Mostrar reflexión activa
     ref = get_reflexion_activa()
     if ref:
         with st.expander(f"✨ ACTUAL: {ref['titulo']}", expanded=True):
@@ -1171,7 +1159,6 @@ elif st.session_state.selected_tab == 3:
     
     st.markdown("---")
     
-    # Si es administrador, mostrar formulario para crear nueva reflexión
     if es_admin:
         st.markdown("### ✏️ Crear Nueva Reflexión")
         with st.form("nueva_reflexion_form"):
@@ -1188,7 +1175,7 @@ elif st.session_state.selected_tab == 3:
                             st.balloons()
                             st.rerun()
                         else:
-                            st.error("❌ Error al guardar la reflexión. Revisa los logs.")
+                            st.error("❌ Error al guardar la reflexión")
                     else:
                         st.error("❌ Título y contenido son obligatorios")
             with col2:
@@ -1197,28 +1184,25 @@ elif st.session_state.selected_tab == 3:
         
         st.markdown("---")
     
-    # Mostrar reflexiones anteriores
     st.markdown("### 📜 Reflexiones Anteriores")
     reflexiones = get_reflexiones()
     if not reflexiones.empty:
-        for _, r in reflexiones.iterrows():
-            # No mostrar la reflexión activa si ya se mostró arriba
+        for idx, r in reflexiones.iterrows():
             if ref is None or r['id'] != ref['id']:
                 with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
                     st.write(r['contenido'])
                     if r.get('versiculo'):
                         st.caption(f"📖 {r['versiculo']}")
                     
-                    # Si es admin, mostrar opciones para gestionar esta reflexión
                     if es_admin:
                         st.markdown("---")
                         col1, col2 = st.columns(2)
                         with col1:
-                            if st.button(f"✏️ MODIFICAR", key=f"edit_ref_{r['id']}"):
+                            if st.button(f"✏️ MODIFICAR", key=f"edit_ref_{r['id']}_{idx}"):
                                 st.session_state.edit_reflexion = r.to_dict()
                                 st.rerun()
                         with col2:
-                            if st.button(f"🗑️ ELIMINAR", key=f"del_ref_{r['id']}"):
+                            if st.button(f"🗑️ ELIMINAR", key=f"del_ref_{r['id']}_{idx}"):
                                 if delete_reflexion(r['id']):
                                     st.success("✅ Reflexión eliminada")
                                     st.rerun()
@@ -1227,7 +1211,6 @@ elif st.session_state.selected_tab == 3:
     else:
         st.info("No hay reflexiones anteriores")
     
-    # Formulario de edición (si está activo)
     if st.session_state.get('edit_reflexion'):
         r = st.session_state.edit_reflexion
         st.markdown("---")
@@ -1256,7 +1239,7 @@ elif st.session_state.selected_tab == 4:
     estado_filtro = st.selectbox("Filtrar por estado:", estados)
     cronicas = get_cronicas(estado_filtro if estado_filtro != "Todos" else None)
     if not cronicas.empty:
-        for _, c in cronicas.iterrows():
+        for idx, c in cronicas.iterrows():
             with st.expander(f"📖 {c['titulo']} - {c['lugar']}, {c['estado']}"):
                 if c.get('imagenes_url') and c['imagenes_url']:
                     if isinstance(c['imagenes_url'], list) and len(c['imagenes_url']) > 0:
@@ -1265,21 +1248,18 @@ elif st.session_state.selected_tab == 4:
                         mostrar_imagen_segura(c['imagenes_url'], 200)
                 st.write(c['contenido'])
                 st.caption(f"📅 {c['fecha']}")
-                
-                # Mostrar comentarios con funcionalidad admin
                 mostrar_seccion_comentarios("cronica", c['id'], c['titulo'], es_admin)
                 
-                # Panel de administración de la crónica (solo visible para admin)
                 if es_admin:
                     st.markdown("---")
                     st.markdown("### 🔧 Administrar esta crónica")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR CRÓNICA", key=f"edit_cron_{c['id']}"):
+                        if st.button(f"✏️ MODIFICAR CRÓNICA", key=f"edit_cron_{c['id']}_{idx}"):
                             st.session_state.edit_cronica = c.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR CRÓNICA", key=f"del_cron_{c['id']}"):
+                        if st.button(f"🗑️ ELIMINAR CRÓNICA", key=f"del_cron_{c['id']}_{idx}"):
                             if delete_cronica(c['id']):
                                 st.success("✅ Crónica eliminada")
                                 st.rerun()
@@ -1317,7 +1297,7 @@ elif st.session_state.selected_tab == 5:
         st.markdown("### 🎥 Videos de YouTube")
         videos = get_videos()
         if not videos.empty:
-            for _, v in videos.iterrows():
+            for idx, v in videos.iterrows():
                 with st.expander(f"🎬 {v['titulo']}"):
                     mostrar_video_youtube(v['video_url'], width_percent=50)
                     st.caption(f"📅 {v['fecha']}")
@@ -1329,7 +1309,7 @@ elif st.session_state.selected_tab == 5:
         st.markdown("### 📱 Videos de TikTok")
         tiktoks = get_tiktoks()
         if not tiktoks.empty:
-            for _, t in tiktoks.iterrows():
+            for idx, t in tiktoks.iterrows():
                 with st.expander(f"📱 {t['titulo']}"):
                     mostrar_tiktok(t['tiktok_url'], width_percent=50)
                     st.caption(f"📅 {t['fecha']}")
@@ -1341,7 +1321,7 @@ elif st.session_state.selected_tab == 5:
         st.markdown("### 🎵 Lista de Música")
         musicas = get_musicas()
         if not musicas.empty:
-            for _, m in musicas.iterrows():
+            for idx, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
                         st.audio(m['audio_url'], format="audio/mp3")
@@ -1354,7 +1334,6 @@ elif st.session_state.selected_tab == 5:
     
     with tab_rad:
         st.markdown("### 📻 Radio Online")
-        
         st.markdown("#### 🎵 Estaciones de Radio")
         
         radio_opcion = st.selectbox("Selecciona una emisora:", [
@@ -1412,7 +1391,7 @@ elif st.session_state.selected_tab == 6:
         denuncias = get_denuncias()
         
         if not denuncias.empty:
-            for _, d in denuncias.iterrows():
+            for idx, d in denuncias.iterrows():
                 with st.expander(f"📌 {d['titulo']}"):
                     st.write(f"**Denunciante:** {d['denunciante']}")
                     st.write(f"**Descripción:** {d['descripcion']}")
@@ -1465,7 +1444,7 @@ elif st.session_state.selected_tab == 7:
         opiniones = get_opiniones(aprobadas=True)
         
         if not opiniones.empty:
-            for _, op in opiniones.iterrows():
+            for idx, op in opiniones.iterrows():
                 stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
                 st.markdown(f"**👤 {op['usuario']}** {stars}")
                 st.write(f"\"{op['comentario']}\"")
@@ -1480,7 +1459,7 @@ elif st.session_state.selected_tab == 8:
     st.markdown("### 📋 Personajes Registrados")
     personajes = get_personajes()
     if not personajes.empty:
-        for _, p in personajes.iterrows():
+        for idx, p in personajes.iterrows():
             with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
                 mostrar_imagen_segura(p.get('imagen_url'), 200)
                 st.write(f"**Biografía:** {p['descripcion']}")
@@ -1494,7 +1473,7 @@ elif st.session_state.selected_tab == 9:
     st.markdown("### Casos y noticias sobre justicia")
     crimenes = get_crimen_no_paga()
     if not crimenes.empty:
-        for _, c in crimenes.iterrows():
+        for idx, c in crimenes.iterrows():
             with st.expander(f"⚖️ {c['titulo']} - {c['fecha']}"):
                 if c.get('imagenes_url') and c['imagenes_url']:
                     if isinstance(c['imagenes_url'], list) and len(c['imagenes_url']) > 0:
@@ -1563,28 +1542,25 @@ if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
     st.title("🔧 Panel de Administración")
     
-    # --- GESTIONAR COMENTARIOS (NUEVO MÓDULO CENTRALIZADO) ---
+    # --- GESTIONAR COMENTARIOS ---
     if "💬 GESTIONAR COMENTARIOS" in admin_opt:
         st.subheader("💬 Gestión Centralizada de Comentarios")
         st.markdown("### Todos los comentarios de las crónicas")
         st.info("Desde aquí puedes modificar o eliminar cualquier comentario de las crónicas")
         
-        # Obtener todos los comentarios de la sección "cronica"
         comentarios = obtener_comentarios_todos(seccion="cronica")
         
         if comentarios.empty:
             st.info("No hay comentarios registrados en las crónicas")
         else:
-            # Obtener información de las crónicas para mostrar el título
             cronicas = get_cronicas()
-            cronica_dict = {str(c['id']): c['titulo'] for _, c in cronicas.iterrows()}
+            cronica_dict = {str(c['id']): c['titulo'] for idx, c in cronicas.iterrows()}
             
             st.markdown(f"**Total de comentarios:** {len(comentarios)}")
             
-            # Botón para eliminar TODOS los comentarios
             if st.button("🗑️ ELIMINAR TODOS LOS COMENTARIOS", key="eliminar_todos_comentarios"):
                 if st.session_state.get('confirmar_eliminar_todos', False):
-                    for _, com in comentarios.iterrows():
+                    for idx2, com in comentarios.iterrows():
                         eliminar_comentario(com['id'])
                     st.success(f"✅ Se eliminaron {len(comentarios)} comentarios")
                     st.session_state['confirmar_eliminar_todos'] = False
@@ -1595,18 +1571,15 @@ if st.session_state.get('es_admin', False):
             
             st.markdown("---")
             
-            # Mostrar cada comentario con opciones de modificar y eliminar
             for idx, com in comentarios.iterrows():
                 with st.container():
-                    # Obtener el título de la crónica
                     titulo_cronica = cronica_dict.get(str(com['item_id']), f"ID: {com['item_id']}")
                     
                     col1, col2, col3, col4 = st.columns([4, 2, 1, 1])
                     with col1:
                         st.markdown(f"**📖 Crónica:** {titulo_cronica}")
                         st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
-                        # Text area para editar el comentario
-                        text_key = f"text_com_central_{com['id']}"
+                        text_key = f"text_com_central_{com['id']}_{idx}"
                         nuevo_texto = st.text_area(
                             "Comentario", 
                             value=com['comentario'], 
@@ -1616,7 +1589,7 @@ if st.session_state.get('es_admin', False):
                     with col2:
                         st.markdown(f"**ID:** {com['id']}")
                     with col3:
-                        if st.button(f"💾 Guardar", key=f"guardar_central_{com['id']}"):
+                        if st.button(f"💾 Guardar", key=f"guardar_central_{com['id']}_{idx}"):
                             texto_actualizado = st.session_state.get(text_key, com['comentario'])
                             if actualizar_comentario(com['id'], texto_actualizado):
                                 st.success("✅ Comentario actualizado")
@@ -1624,7 +1597,7 @@ if st.session_state.get('es_admin', False):
                             else:
                                 st.error("❌ Error al actualizar")
                     with col4:
-                        if st.button(f"🗑️ Eliminar", key=f"eliminar_central_{com['id']}"):
+                        if st.button(f"🗑️ Eliminar", key=f"eliminar_central_{com['id']}_{idx}"):
                             if eliminar_comentario(com['id']):
                                 st.success("✅ Comentario eliminado")
                                 st.rerun()
@@ -1656,32 +1629,31 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Noticias existentes")
         noticias = get_noticias()
         if not noticias.empty:
-            for _, n in noticias.iterrows():
+            for idx, n in noticias.iterrows():
                 with st.expander(f"📰 {n['titulo']} - {n['categoria']} ({n['fecha']})"):
                     mostrar_imagen_segura(n.get('imagen_url'), 300)
                     st.write(f"**Contenido:** {n['contenido']}")
                     
-                    # Botón para gestionar comentarios de esta noticia
-                    if st.button(f"💬 GESTIONAR COMENTARIOS", key=f"gestionar_com_noti_{n['id']}"):
-                        st.session_state.gestionar_comentarios_noticia = n['id']
-                        st.rerun()
-                    
-                    if st.session_state.get('gestionar_comentarios_noticia') == n['id']:
-                        gestionar_comentarios_admin("noticia", n['id'], n['titulo'])
-                        if st.button("❌ Cerrar gestión", key=f"cerrar_com_noti_{n['id']}"):
-                            del st.session_state.gestionar_comentarios_noticia
-                            st.rerun()
-                    
-                    col1, col2 = st.columns(2)
+                    col1, col2, col3 = st.columns(3)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_noti_{n['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_noti_{n['id']}_{idx}"):
                             st.session_state.edit_noticia = n.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_noti_{n['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_noti_{n['id']}_{idx}"):
                             if delete_noticia(n['id']):
                                 st.success("✅ Noticia eliminada")
                                 st.rerun()
+                    with col3:
+                        if st.button(f"💬 COMENTARIOS", key=f"com_noti_{n['id']}_{idx}"):
+                            st.session_state.gestionar_comentarios_noticia = n['id']
+                            st.rerun()
+                    
+                    if st.session_state.get('gestionar_comentarios_noticia') == n['id']:
+                        gestionar_comentarios_admin("noticia", n['id'], n['titulo'])
+                        if st.button("❌ Cerrar", key=f"cerrar_com_noti_{n['id']}_{idx}"):
+                            del st.session_state.gestionar_comentarios_noticia
+                            st.rerun()
         else:
             st.info("No hay noticias registradas")
         
@@ -1732,7 +1704,7 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Negocios existentes")
         negocios = get_negocios()
         if not negocios.empty:
-            for _, n in negocios.iterrows():
+            for idx, n in negocios.iterrows():
                 with st.expander(f"🏪 {n['nombre']}"):
                     if n.get('imagenes_url') and n['imagenes_url']:
                         if isinstance(n['imagenes_url'], list):
@@ -1749,12 +1721,12 @@ if st.session_state.get('es_admin', False):
                     st.markdown("#### 💬 Opiniones del negocio")
                     opiniones_neg = get_opiniones_negocio(n['id'])
                     if not opiniones_neg.empty:
-                        for _, op in opiniones_neg.iterrows():
+                        for idx2, op in opiniones_neg.iterrows():
                             stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
                             st.markdown(f"**👤 {op['usuario']}** {stars}")
                             st.write(f"\"{op['comentario']}\"")
                             st.caption(f"📅 {op['fecha']}")
-                            if st.button(f"🗑️ Eliminar opinión", key=f"del_opinion_{op['id']}"):
+                            if st.button(f"🗑️ Eliminar opinión", key=f"del_opinion_{op['id']}_{idx2}"):
                                 if delete_opinion_negocio(op['id']):
                                     st.rerun()
                             st.divider()
@@ -1762,11 +1734,11 @@ if st.session_state.get('es_admin', False):
                         st.info("No hay opiniones para este negocio")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_neg_{n['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_neg_{n['id']}_{idx}"):
                             st.session_state.edit_negocio = n.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_neg_{n['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_neg_{n['id']}_{idx}"):
                             if delete_negocio(n['id']):
                                 st.success("✅ Negocio eliminado")
                                 st.rerun()
@@ -1794,7 +1766,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_negocio
                         st.rerun()
     
-    # --- REFLEXIONES ---
+    # --- REFLEXIONES (ADMIN) ---
     elif "💭 Reflexiones" in admin_opt:
         st.subheader("💭 Gestionar Reflexiones")
         
@@ -1817,33 +1789,32 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Reflexiones existentes")
         reflexiones = get_reflexiones()
         if not reflexiones.empty:
-            for _, r in reflexiones.iterrows():
+            for idx, r in reflexiones.iterrows():
                 with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
                     st.write(r['contenido'])
                     if r.get('versiculo'):
                         st.caption(f"📖 {r['versiculo']}")
                     
-                    # Botón para gestionar comentarios de esta reflexión
-                    if st.button(f"💬 GESTIONAR COMENTARIOS", key=f"gestionar_com_ref_{r['id']}"):
-                        st.session_state.gestionar_comentarios_reflexion = r['id']
-                        st.rerun()
-                    
-                    if st.session_state.get('gestionar_comentarios_reflexion') == r['id']:
-                        gestionar_comentarios_admin("reflexion", r['id'], r['titulo'])
-                        if st.button("❌ Cerrar gestión", key=f"cerrar_com_ref_{r['id']}"):
-                            del st.session_state.gestionar_comentarios_reflexion
-                            st.rerun()
-                    
-                    col1, col2 = st.columns(2)
+                    col1, col2, col3 = st.columns(3)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_ref_{r['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_ref_admin_{r['id']}_{idx}"):
                             st.session_state.edit_reflexion = r.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_ref_{r['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_ref_admin_{r['id']}_{idx}"):
                             if delete_reflexion(r['id']):
                                 st.success("✅ Reflexión eliminada")
                                 st.rerun()
+                    with col3:
+                        if st.button(f"💬 COMENTARIOS", key=f"com_ref_{r['id']}_{idx}"):
+                            st.session_state.gestionar_comentarios_reflexion = r['id']
+                            st.rerun()
+                    
+                    if st.session_state.get('gestionar_comentarios_reflexion') == r['id']:
+                        gestionar_comentarios_admin("reflexion", r['id'], r['titulo'])
+                        if st.button("❌ Cerrar", key=f"cerrar_com_ref_{r['id']}_{idx}"):
+                            del st.session_state.gestionar_comentarios_reflexion
+                            st.rerun()
         else:
             st.info("No hay reflexiones registradas")
         
@@ -1851,7 +1822,7 @@ if st.session_state.get('es_admin', False):
             r = st.session_state.edit_reflexion
             st.markdown("---")
             st.subheader(f"✏️ Modificando: {r['titulo']}")
-            with st.form("edit_reflexion_form"):
+            with st.form("edit_reflexion_admin_form"):
                 nuevo_titulo = st.text_input("Título", value=r['titulo'])
                 nuevo_versiculo = st.text_input("Versículo", value=r.get('versiculo', ''))
                 nuevo_contenido = st.text_area("Contenido", value=r['contenido'])
@@ -1894,7 +1865,7 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Crónicas existentes")
         cronicas = get_cronicas()
         if not cronicas.empty:
-            for _, c in cronicas.iterrows():
+            for idx, c in cronicas.iterrows():
                 with st.expander(f"📖 {c['titulo']} - {c['lugar']}, {c['estado']}"):
                     if c.get('imagenes_url') and c['imagenes_url']:
                         if isinstance(c['imagenes_url'], list):
@@ -1905,28 +1876,26 @@ if st.session_state.get('es_admin', False):
                     st.write(f"**Contenido:** {c['contenido']}")
                     st.caption(f"📅 {c['fecha']}")
                     
-                    # BOTÓN PARA GESTIONAR COMENTARIOS DE ESTA CRÓNICA
-                    if st.button(f"💬 GESTIONAR COMENTARIOS", key=f"gestionar_com_cron_admin_{c['id']}"):
-                        st.session_state.gestionar_comentarios_cronica = c['id']
-                        st.rerun()
-                    
-                    # Mostrar gestión de comentarios si está activa
-                    if st.session_state.get('gestionar_comentarios_cronica') == c['id']:
-                        gestionar_comentarios_admin("cronica", c['id'], c['titulo'])
-                        if st.button("❌ Cerrar gestión", key=f"cerrar_gestion_cron_{c['id']}"):
-                            del st.session_state.gestionar_comentarios_cronica
-                            st.rerun()
-                    
-                    col1, col2 = st.columns(2)
+                    col1, col2, col3 = st.columns(3)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_cron_admin_{c['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_cron_admin_{c['id']}_{idx}"):
                             st.session_state.edit_cronica = c.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_cron_admin_{c['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_cron_admin_{c['id']}_{idx}"):
                             if delete_cronica(c['id']):
                                 st.success("✅ Crónica eliminada")
                                 st.rerun()
+                    with col3:
+                        if st.button(f"💬 COMENTARIOS", key=f"com_cron_{c['id']}_{idx}"):
+                            st.session_state.gestionar_comentarios_cronica = c['id']
+                            st.rerun()
+                    
+                    if st.session_state.get('gestionar_comentarios_cronica') == c['id']:
+                        gestionar_comentarios_admin("cronica", c['id'], c['titulo'])
+                        if st.button("❌ Cerrar", key=f"cerrar_com_cron_{c['id']}_{idx}"):
+                            del st.session_state.gestionar_comentarios_cronica
+                            st.rerun()
         else:
             st.info("No hay crónicas registradas")
         
@@ -1978,17 +1947,17 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Videos existentes")
         videos = get_videos()
         if not videos.empty:
-            for _, v in videos.iterrows():
+            for idx, v in videos.iterrows():
                 with st.expander(f"🎬 {v['titulo']}"):
                     mostrar_video_youtube(v['video_url'], width_percent=50)
                     st.caption(f"📅 {v['fecha']}")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_vid_{v['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_vid_{v['id']}_{idx}"):
                             st.session_state.edit_video = v.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_vid_{v['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_vid_{v['id']}_{idx}"):
                             if delete_video(v['id']):
                                 st.success("✅ Video eliminado")
                                 st.rerun()
@@ -2037,17 +2006,17 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 TikToks existentes")
         tiktoks = get_tiktoks()
         if not tiktoks.empty:
-            for _, t in tiktoks.iterrows():
+            for idx, t in tiktoks.iterrows():
                 with st.expander(f"📱 {t['titulo']}"):
                     mostrar_tiktok(t['tiktok_url'], width_percent=50)
                     st.caption(f"📅 {t['fecha']}")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_tik_{t['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_tik_{t['id']}_{idx}"):
                             st.session_state.edit_tiktok = t.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_tik_{t['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_tik_{t['id']}_{idx}"):
                             if delete_tiktok(t['id']):
                                 st.success("✅ TikTok eliminado")
                                 st.rerun()
@@ -2076,7 +2045,7 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Canciones existentes")
         musicas = get_musicas()
         if not musicas.empty:
-            for _, m in musicas.iterrows():
+            for idx, m in musicas.iterrows():
                 with st.expander(f"🎵 {m['titulo']}"):
                     if m.get('audio_url') and m['audio_url']:
                         st.audio(m['audio_url'], format="audio/mp3")
@@ -2112,7 +2081,7 @@ if st.session_state.get('es_admin', False):
         
         denuncias = get_denuncias()
         if not denuncias.empty:
-            for _, d in denuncias.iterrows():
+            for idx, d in denuncias.iterrows():
                 with st.expander(f"📌 {d['titulo']} - {d['estatus']}"):
                     st.write(f"**Denunciante:** {d['denunciante']}")
                     st.write(f"**Descripción:** {d['descripcion']}")
@@ -2121,15 +2090,15 @@ if st.session_state.get('es_admin', False):
                     
                     nuevo_estado = st.selectbox("Cambiar estado:", ["Pendiente", "En revisión", "Resuelta", "Descartada"], 
                                                index=["Pendiente", "En revisión", "Resuelta", "Descartada"].index(d['estatus']),
-                                               key=f"est_{d['id']}")
+                                               key=f"est_{d['id']}_{idx}")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button("✅ Actualizar estado", key=f"upd_{d['id']}"):
+                        if st.button("✅ Actualizar estado", key=f"upd_{d['id']}_{idx}"):
                             if update_denuncia_status(d['id'], nuevo_estado):
                                 st.success("Estado actualizado")
                                 st.rerun()
                     with col2:
-                        if st.button("🗑️ ELIMINAR denuncia", key=f"del_den_{d['id']}"):
+                        if st.button("🗑️ ELIMINAR denuncia", key=f"del_den_{d['id']}_{idx}"):
                             if delete_denuncia(d['id']):
                                 st.success("Denuncia eliminada")
                                 st.rerun()
@@ -2143,19 +2112,19 @@ if st.session_state.get('es_admin', False):
         st.markdown("### ⏳ Opiniones pendientes de aprobar")
         opiniones_pendientes = get_opiniones(aprobadas=False)
         if not opiniones_pendientes.empty:
-            for _, op in opiniones_pendientes.iterrows():
+            for idx, op in opiniones_pendientes.iterrows():
                 if not op['aprobada']:
                     with st.expander(f"👤 {op['usuario']} - {op['calificacion']}⭐"):
                         st.write(f"**Comentario:** {op['comentario']}")
                         st.caption(f"📅 {op['fecha']}")
                         col1, col2 = st.columns(2)
                         with col1:
-                            if st.button("✅ APROBAR", key=f"aprob_{op['id']}"):
+                            if st.button("✅ APROBAR", key=f"aprob_{op['id']}_{idx}"):
                                 if approve_opinion(op['id']):
                                     st.success("Opinión aprobada")
                                     st.rerun()
                         with col2:
-                            if st.button("🗑️ ELIMINAR", key=f"del_op_{op['id']}"):
+                            if st.button("🗑️ ELIMINAR", key=f"del_op_{op['id']}_{idx}"):
                                 if delete_opinion(op['id']):
                                     st.success("Opinión eliminada")
                                     st.rerun()
@@ -2166,11 +2135,11 @@ if st.session_state.get('es_admin', False):
         st.markdown("### ✅ Opiniones aprobadas")
         opiniones_aprobadas = get_opiniones(aprobadas=True)
         if not opiniones_aprobadas.empty:
-            for _, op in opiniones_aprobadas.iterrows():
+            for idx, op in opiniones_aprobadas.iterrows():
                 with st.expander(f"👤 {op['usuario']} - {op['calificacion']}⭐"):
                     st.write(f"**Comentario:** {op['comentario']}")
                     st.caption(f"📅 {op['fecha']}")
-                    if st.button("🗑️ ELIMINAR", key=f"del_op_aprob_{op['id']}"):
+                    if st.button("🗑️ ELIMINAR", key=f"del_op_aprob_{op['id']}_{idx}"):
                         if delete_opinion(op['id']):
                             st.success("Opinión eliminada")
                             st.rerun()
@@ -2201,22 +2170,22 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Personajes Registrados")
         personajes = get_personajes()
         if not personajes.empty:
-            for _, p in personajes.iterrows():
+            for idx, p in personajes.iterrows():
                 with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
                     mostrar_imagen_segura(p.get('imagen_url'), 150)
                     st.write(f"**Biografía:** {p['descripcion']}")
                     col1, col2, col3 = st.columns(3)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_{p['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_pers_{p['id']}_{idx}"):
                             st.session_state.edit_personaje = p.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_{p['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_pers_{p['id']}_{idx}"):
                             if delete_personaje(p['id']):
                                 st.success(f"✅ {p['nombre']} eliminado")
                                 st.rerun()
                     with col3:
-                        if st.button(f"⭐ DESTACAR HOY", key=f"destacar_{p['id']}"):
+                        if st.button(f"⭐ DESTACAR HOY", key=f"destacar_pers_{p['id']}_{idx}"):
                             if update_personaje(p['id'], p['nombre'], p['descripcion'], None, datetime.now().strftime("%d/%m/%Y")):
                                 st.success(f"✅ {p['nombre']} será el personaje destacado")
                                 st.rerun()
@@ -2273,7 +2242,7 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Casos existentes")
         crimenes = get_crimen_no_paga()
         if not crimenes.empty:
-            for _, c in crimenes.iterrows():
+            for idx, c in crimenes.iterrows():
                 with st.expander(f"⚖️ {c['titulo']} - {c['fecha']}"):
                     if c.get('imagenes_url') and c['imagenes_url']:
                         if isinstance(c['imagenes_url'], list):
@@ -2285,11 +2254,11 @@ if st.session_state.get('es_admin', False):
                     st.caption(f"📅 Publicado: {c['fecha']}")
                     col1, col2 = st.columns(2)
                     with col1:
-                        if st.button(f"✏️ MODIFICAR", key=f"edit_crimen_{c['id']}"):
+                        if st.button(f"✏️ MODIFICAR", key=f"edit_crimen_{c['id']}_{idx}"):
                             st.session_state.edit_crimen = c.to_dict()
                             st.rerun()
                     with col2:
-                        if st.button(f"🗑️ ELIMINAR", key=f"del_crimen_{c['id']}"):
+                        if st.button(f"🗑️ ELIMINAR", key=f"del_crimen_{c['id']}_{idx}"):
                             if delete_crimen_no_paga(c['id']):
                                 st.success("✅ Caso eliminado")
                                 st.rerun()
