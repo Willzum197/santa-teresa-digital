@@ -311,83 +311,6 @@ def mostrar_seccion_comentarios(seccion, item_id, titulo_item, es_admin=False):
                         st.rerun()
 
 # ============================================
-# FUNCIÓN PARA GESTIONAR COMENTARIOS EN ADMIN (CORREGIDA)
-# ============================================
-def gestionar_comentarios_admin(seccion, item_id=None, titulo_item=None):
-    """Función para gestionar comentarios desde el panel de administración"""
-    st.markdown("### 💬 Gestión de Comentarios")
-    
-    # Obtener todos los comentarios de la sección
-    comentarios = obtener_comentarios_todos(seccion=seccion)
-    
-    if comentarios.empty:
-        st.info("No hay comentarios registrados en esta sección")
-        return
-    
-    # Si se especifica un item_id, filtrar
-    if item_id is not None:
-        comentarios = comentarios[comentarios['item_id'] == str(item_id)]
-        if comentarios.empty:
-            st.info(f"No hay comentarios para este elemento")
-            return
-        if titulo_item:
-            st.markdown(f"#### Comentarios de: {titulo_item}")
-    
-    st.markdown(f"**Total de comentarios:** {len(comentarios)}")
-    
-    # Botón para eliminar todos los comentarios
-    col1, col2 = st.columns([1, 3])
-    with col1:
-        if st.button(f"🗑️ ELIMINAR TODOS", key=f"eliminar_todos_{seccion}_{item_id}"):
-            st.session_state[f'confirmar_eliminar_{seccion}_{item_id}'] = True
-            st.rerun()
-    
-    with col2:
-        if st.session_state.get(f'confirmar_eliminar_{seccion}_{item_id}', False):
-            st.warning("⚠️ ¡CONFIRMAR! Haz clic en ELIMINAR TODOS nuevamente para confirmar")
-            if st.button("✅ CONFIRMAR ELIMINACIÓN", key=f"confirmar_eliminar_{seccion}_{item_id}"):
-                for _, com in comentarios.iterrows():
-                    eliminar_comentario(com['id'])
-                st.success(f"✅ Se eliminaron {len(comentarios)} comentarios")
-                st.session_state[f'confirmar_eliminar_{seccion}_{item_id}'] = False
-                st.rerun()
-    
-    st.markdown("---")
-    
-    # Mostrar comentarios con opciones de gestión
-    for idx, com in comentarios.iterrows():
-        with st.container():
-            # Clave única para cada elemento
-            unique_key = f"com_{com['id']}_{idx}"
-            
-            col1, col2, col3 = st.columns([6, 1, 1])
-            with col1:
-                st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
-                # Text area para editar con clave única
-                text_key = f"edit_text_{unique_key}"
-                nuevo_texto = st.text_area(
-                    "Comentario", 
-                    value=com['comentario'], 
-                    key=text_key,
-                    label_visibility="collapsed"
-                )
-            with col2:
-                if st.button(f"💾 Guardar", key=f"guardar_{unique_key}"):
-                    if actualizar_comentario(com['id'], nuevo_texto):
-                        st.success("✅ Comentario actualizado")
-                        st.rerun()
-                    else:
-                        st.error("❌ Error al actualizar")
-            with col3:
-                if st.button(f"🗑️ Eliminar", key=f"eliminar_{unique_key}"):
-                    if eliminar_comentario(com['id']):
-                        st.success("✅ Comentario eliminado")
-                        st.rerun()
-                    else:
-                        st.error("❌ Error al eliminar")
-            st.divider()
-
-# ============================================
 # FUNCIÓN DE OPTIMIZACIÓN DE IMÁGENES
 # ============================================
 def optimizar_imagen(file, max_width=1024, quality=75):
@@ -595,14 +518,43 @@ def get_reflexiones():
 def add_reflexion(titulo, contenido, versiculo):
     try:
         ahora = get_fecha_hora_venezuela()
+        
+        # Primero desactivar todas las reflexiones
         supabase.table("reflexiones").update({"activo": False}).execute()
-        supabase.table("reflexiones").insert({"titulo": titulo, "contenido": contenido, "versiculo": versiculo, "fecha": ahora.strftime("%d/%m/%Y"), "activo": True}).execute()
-        return True
-    except: return False
+        
+        # Luego insertar la nueva reflexión como activa
+        data = {
+            "titulo": titulo,
+            "contenido": contenido,
+            "versiculo": versiculo if versiculo else None,
+            "fecha": ahora.strftime("%d/%m/%Y"),
+            "activo": True
+        }
+        
+        result = supabase.table("reflexiones").insert(data).execute()
+        
+        if result.data:
+            return True
+        else:
+            print(f"Error: No se pudo insertar la reflexión. Result: {result}")
+            return False
+    except Exception as e:
+        print(f"Error en add_reflexion: {str(e)}")
+        st.error(f"Error detallado: {str(e)}")
+        return False
 
 def update_reflexion(id_, titulo, contenido, versiculo):
-    try: supabase.table("reflexiones").update({"titulo": titulo, "contenido": contenido, "versiculo": versiculo}).eq("id", id_).execute(); return True
-    except: return False
+    try:
+        data = {
+            "titulo": titulo,
+            "contenido": contenido,
+            "versiculo": versiculo if versiculo else None
+        }
+        result = supabase.table("reflexiones").update(data).eq("id", id_).execute()
+        return True if result.data else False
+    except Exception as e:
+        st.error(f"Error al actualizar reflexión: {str(e)}")
+        return False
 
 def delete_reflexion(id_):
     try: supabase.table("reflexiones").delete().eq("id", id_).execute(); return True
@@ -1006,7 +958,7 @@ with st.sidebar:
             "📰 Noticias", "🏪 Negocios", "💭 Reflexiones", "📜 Crónicas",
             "🎬 Videos", "📱 TikTok", "🎵 Música", "⚠️ Denuncias", 
             "💬 Opiniones", "👥 Personajes", "⚖️ El Crimen No Paga", 
-            "⚙️ Configuración"
+            "⚙️ Configuración", "💬 GESTIONAR COMENTARIOS"
         ])
         st.session_state.admin_opt = admin_opt
         st.session_state.es_admin = True
@@ -1201,9 +1153,11 @@ elif st.session_state.selected_tab == 2:
     else:
         st.info("No hay negocios agregados aún")
 
-# --- REFLEXIONES (TAB 3) ---
+# --- REFLEXIONES (TAB 3) CORREGIDA ---
 elif st.session_state.selected_tab == 3:
     st.title("💭 Reflexiones")
+    
+    # Mostrar reflexión activa
     ref = get_reflexion_activa()
     if ref:
         with st.expander(f"✨ ACTUAL: {ref['titulo']}", expanded=True):
@@ -1214,19 +1168,86 @@ elif st.session_state.selected_tab == 3:
             mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'], es_admin)
     else:
         st.info("No hay reflexión activa")
+    
     st.markdown("---")
+    
+    # Si es administrador, mostrar formulario para crear nueva reflexión
+    if es_admin:
+        st.markdown("### ✏️ Crear Nueva Reflexión")
+        with st.form("nueva_reflexion_form"):
+            nuevo_titulo = st.text_input("Título de la reflexión *")
+            nuevo_versiculo = st.text_input("Versículo (opcional)")
+            nuevo_contenido = st.text_area("Contenido de la reflexión *", height=150)
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Guardar como activa", use_container_width=True):
+                    if nuevo_titulo and nuevo_contenido:
+                        if add_reflexion(nuevo_titulo, nuevo_contenido, nuevo_versiculo):
+                            st.success("✅ Reflexión guardada correctamente")
+                            st.balloons()
+                            st.rerun()
+                        else:
+                            st.error("❌ Error al guardar la reflexión. Revisa los logs.")
+                    else:
+                        st.error("❌ Título y contenido son obligatorios")
+            with col2:
+                if st.form_submit_button("❌ Limpiar", use_container_width=True):
+                    st.rerun()
+        
+        st.markdown("---")
+    
+    # Mostrar reflexiones anteriores
     st.markdown("### 📜 Reflexiones Anteriores")
     reflexiones = get_reflexiones()
     if not reflexiones.empty:
         for _, r in reflexiones.iterrows():
+            # No mostrar la reflexión activa si ya se mostró arriba
             if ref is None or r['id'] != ref['id']:
                 with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
                     st.write(r['contenido'])
                     if r.get('versiculo'):
                         st.caption(f"📖 {r['versiculo']}")
+                    
+                    # Si es admin, mostrar opciones para gestionar esta reflexión
+                    if es_admin:
+                        st.markdown("---")
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.button(f"✏️ MODIFICAR", key=f"edit_ref_{r['id']}"):
+                                st.session_state.edit_reflexion = r.to_dict()
+                                st.rerun()
+                        with col2:
+                            if st.button(f"🗑️ ELIMINAR", key=f"del_ref_{r['id']}"):
+                                if delete_reflexion(r['id']):
+                                    st.success("✅ Reflexión eliminada")
+                                    st.rerun()
+                    
                     mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'], es_admin)
     else:
         st.info("No hay reflexiones anteriores")
+    
+    # Formulario de edición (si está activo)
+    if st.session_state.get('edit_reflexion'):
+        r = st.session_state.edit_reflexion
+        st.markdown("---")
+        st.subheader(f"✏️ Modificando: {r['titulo']}")
+        with st.form("edit_reflexion_form"):
+            nuevo_titulo = st.text_input("Título", value=r['titulo'])
+            nuevo_versiculo = st.text_input("Versículo", value=r.get('versiculo', ''))
+            nuevo_contenido = st.text_area("Contenido", value=r['contenido'])
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Guardar cambios"):
+                    if update_reflexion(r['id'], nuevo_titulo, nuevo_contenido, nuevo_versiculo):
+                        st.success("✅ Reflexión actualizada")
+                        del st.session_state.edit_reflexion
+                        st.rerun()
+            with col2:
+                if st.form_submit_button("❌ Cancelar"):
+                    del st.session_state.edit_reflexion
+                    st.rerun()
 
 # --- CRÓNICAS (TAB 4) ---
 elif st.session_state.selected_tab == 4:
@@ -1542,8 +1563,77 @@ if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
     st.title("🔧 Panel de Administración")
     
+    # --- GESTIONAR COMENTARIOS (NUEVO MÓDULO CENTRALIZADO) ---
+    if "💬 GESTIONAR COMENTARIOS" in admin_opt:
+        st.subheader("💬 Gestión Centralizada de Comentarios")
+        st.markdown("### Todos los comentarios de las crónicas")
+        st.info("Desde aquí puedes modificar o eliminar cualquier comentario de las crónicas")
+        
+        # Obtener todos los comentarios de la sección "cronica"
+        comentarios = obtener_comentarios_todos(seccion="cronica")
+        
+        if comentarios.empty:
+            st.info("No hay comentarios registrados en las crónicas")
+        else:
+            # Obtener información de las crónicas para mostrar el título
+            cronicas = get_cronicas()
+            cronica_dict = {str(c['id']): c['titulo'] for _, c in cronicas.iterrows()}
+            
+            st.markdown(f"**Total de comentarios:** {len(comentarios)}")
+            
+            # Botón para eliminar TODOS los comentarios
+            if st.button("🗑️ ELIMINAR TODOS LOS COMENTARIOS", key="eliminar_todos_comentarios"):
+                if st.session_state.get('confirmar_eliminar_todos', False):
+                    for _, com in comentarios.iterrows():
+                        eliminar_comentario(com['id'])
+                    st.success(f"✅ Se eliminaron {len(comentarios)} comentarios")
+                    st.session_state['confirmar_eliminar_todos'] = False
+                    st.rerun()
+                else:
+                    st.session_state['confirmar_eliminar_todos'] = True
+                    st.warning("⚠️ ¡CONFIRMAR! Haz clic nuevamente en ELIMINAR TODOS para confirmar")
+            
+            st.markdown("---")
+            
+            # Mostrar cada comentario con opciones de modificar y eliminar
+            for idx, com in comentarios.iterrows():
+                with st.container():
+                    # Obtener el título de la crónica
+                    titulo_cronica = cronica_dict.get(str(com['item_id']), f"ID: {com['item_id']}")
+                    
+                    col1, col2, col3, col4 = st.columns([4, 2, 1, 1])
+                    with col1:
+                        st.markdown(f"**📖 Crónica:** {titulo_cronica}")
+                        st.markdown(f"**👤 {com['usuario']}** *{com['fecha']}*")
+                        # Text area para editar el comentario
+                        text_key = f"text_com_central_{com['id']}"
+                        nuevo_texto = st.text_area(
+                            "Comentario", 
+                            value=com['comentario'], 
+                            key=text_key,
+                            label_visibility="collapsed"
+                        )
+                    with col2:
+                        st.markdown(f"**ID:** {com['id']}")
+                    with col3:
+                        if st.button(f"💾 Guardar", key=f"guardar_central_{com['id']}"):
+                            texto_actualizado = st.session_state.get(text_key, com['comentario'])
+                            if actualizar_comentario(com['id'], texto_actualizado):
+                                st.success("✅ Comentario actualizado")
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al actualizar")
+                    with col4:
+                        if st.button(f"🗑️ Eliminar", key=f"eliminar_central_{com['id']}"):
+                            if eliminar_comentario(com['id']):
+                                st.success("✅ Comentario eliminado")
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al eliminar")
+                    st.divider()
+    
     # --- NOTICIAS ---
-    if "📰 Noticias" in admin_opt:
+    elif "📰 Noticias" in admin_opt:
         st.subheader("📰 Gestionar Noticias")
         
         with st.expander("➕ CREAR nueva noticia", expanded=True):
@@ -1777,7 +1867,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_reflexion
                         st.rerun()
     
-    # --- CRÓNICAS (ADMIN) --- CON GESTIÓN DE COMENTARIOS
+    # --- CRÓNICAS (ADMIN) ---
     elif "📜 Crónicas" in admin_opt:
         st.subheader("📜 Gestionar Crónicas")
         
