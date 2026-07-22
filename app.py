@@ -462,23 +462,48 @@ def get_negocios():
         return pd.DataFrame(response.data) if response.data else pd.DataFrame()
     except: return pd.DataFrame()
 
-def add_negocio(nombre, resena, google_maps_url, imagenes):
+def add_negocio(nombre, resena, google_maps_url, video_url, imagenes):
     try:
         ahora = get_fecha_hora_venezuela()
-        data = {"nombre": nombre, "resena": resena, "google_maps_url": google_maps_url, "imagenes_url": subir_multiples_imagenes(imagenes, "negocios") if imagenes else [], "fecha": ahora.strftime("%d/%m/%Y")}
+        data = {
+            "nombre": nombre, 
+            "resena": resena, 
+            "google_maps_url": google_maps_url if google_maps_url else None,
+            "video_url": video_url if video_url else None,
+            "imagenes_url": subir_multiples_imagenes(imagenes, "negocios") if imagenes else [], 
+            "fecha": ahora.strftime("%d/%m/%Y")
+        }
         supabase.table("negocios").insert(data).execute()
         return True
-    except: return False
+    except Exception as e:
+        print(f"Error en add_negocio: {e}")
+        return False
 
-def update_negocio(id_, nombre, resena, google_maps_url, imagenes):
+def update_negocio(id_, nombre, resena, google_maps_url, video_url, imagenes):
     try:
         imagenes_urls = subir_multiples_imagenes(imagenes, "negocios") if imagenes else None
         if not imagenes_urls:
             existing = supabase.table("negocios").select("imagenes_url").eq("id", id_).execute()
-            if existing.data: imagenes_urls = existing.data[0].get("imagenes_url")
-        supabase.table("negocios").update({"nombre": nombre, "resena": resena, "google_maps_url": google_maps_url, "imagenes_url": imagenes_urls if imagenes_urls else []}).eq("id", id_).execute()
+            if existing.data: 
+                imagenes_urls = existing.data[0].get("imagenes_url")
+        
+        # Si no se proporciona video_url, mantener el existente
+        if not video_url:
+            existing = supabase.table("negocios").select("video_url").eq("id", id_).execute()
+            if existing.data:
+                video_url = existing.data[0].get("video_url")
+        
+        supabase.table("negocios").update({
+            "nombre": nombre, 
+            "resena": resena, 
+            "google_maps_url": google_maps_url if google_maps_url else None,
+            "video_url": video_url if video_url else None,
+            "imagenes_url": imagenes_urls if imagenes_urls else []
+        }).eq("id", id_).execute()
         return True
-    except: return False
+    except Exception as e:
+        print(f"Error en update_negocio: {e}")
+        return False
 
 def delete_negocio(id_):
     try: supabase.table("negocios").delete().eq("id", id_).execute(); return True
@@ -1096,13 +1121,14 @@ elif st.session_state.selected_tab == 1:
             else:
                 st.info(f"No hay noticias de {categoria}")
 
-# --- NEGOCIOS (TAB 2) ---
+# --- NEGOCIOS (TAB 2) - ACTUALIZADO CON VIDEOS ---
 elif st.session_state.selected_tab == 2:
     st.title("📍 Donde ir - Donde comprar")
     negocios = get_negocios()
     if not negocios.empty:
         for idx, n in negocios.iterrows():
             with st.expander(f"🏪 {n['nombre']}"):
+                # Mostrar imágenes
                 if n.get('imagenes_url') and n['imagenes_url']:
                     if isinstance(n['imagenes_url'], list) and len(n['imagenes_url']) > 0:
                         mostrar_imagenes_en_fila(n['imagenes_url'], max_imagenes=3)
@@ -1110,11 +1136,21 @@ elif st.session_state.selected_tab == 2:
                         mostrar_imagen_segura(n['imagenes_url'], 300)
                 else:
                     st.caption("📷 Sin imágenes")
+                
                 st.write(f"**Reseña:** {n['resena']}")
+                
+                # Mostrar video de YouTube si existe
+                if n.get('video_url') and n['video_url']:
+                    st.markdown("#### 🎥 Video del negocio")
+                    mostrar_video_youtube(n['video_url'], width_percent=50)
+                
+                # Mostrar ubicación en Google Maps
                 if n.get('google_maps_url') and n['google_maps_url']:
                     st.markdown(f"📍 [Ver ubicación en Google Maps]({n['google_maps_url']})")
+                
                 st.markdown("---")
                 st.markdown("### 💬 Opiniones de este negocio")
+                
                 with st.form(f"opinion_form_{n['id']}"):
                     st.markdown("#### Deja tu opinión")
                     nombre_usuario = st.text_input("Tu nombre", key=f"nombre_{n['id']}")
@@ -1129,6 +1165,7 @@ elif st.session_state.selected_tab == 2:
                                 st.error("❌ Error al enviar opinión")
                         else:
                             st.error("❌ Nombre y comentario son obligatorios")
+                
                 opiniones = get_opiniones_negocio(n['id'])
                 if not opiniones.empty:
                     for idx2, op in opiniones.iterrows():
@@ -1678,7 +1715,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_noticia
                         st.rerun()
     
-    # --- NEGOCIOS ---
+    # --- NEGOCIOS (ADMIN) - ACTUALIZADO CON VIDEOS ---
     elif "🏪 Negocios" in admin_opt:
         st.subheader("🏪 Gestionar Negocios")
         
@@ -1687,12 +1724,23 @@ if st.session_state.get('es_admin', False):
                 nombre = st.text_input("Nombre del negocio *")
                 resena = st.text_area("Reseña *")
                 google_maps_url = st.text_input("Enlace Google Maps (opcional)", placeholder="https://maps.google.com/...")
+                video_url = st.text_input("Enlace YouTube (opcional)", placeholder="https://www.youtube.com/watch?v=XXXXX")
+                
+                # Mostrar vista previa del video si se ingresa una URL
+                if video_url and video_url.strip():
+                    video_id = extraer_video_id(video_url)
+                    if video_id:
+                        st.markdown("#### 📹 Vista previa del video")
+                        st.video(f"https://www.youtube.com/embed/{video_id}")
+                    else:
+                        st.warning("⚠️ URL de YouTube no válida. Debe ser como: https://www.youtube.com/watch?v=XXXXX")
+                
                 imagenes = st.file_uploader("Fotos (máximo 3)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
                 if len(imagenes) > 3:
                     st.error("Máximo 3 fotos por negocio")
                 elif st.form_submit_button("➕ Agregar Negocio"):
                     if nombre and resena:
-                        if add_negocio(nombre, resena, google_maps_url, imagenes):
+                        if add_negocio(nombre, resena, google_maps_url, video_url, imagenes):
                             st.success("✅ Negocio agregado correctamente")
                             st.rerun()
                         else:
@@ -1714,9 +1762,17 @@ if st.session_state.get('es_admin', False):
                             mostrar_imagen_segura(n['imagenes_url'], 200)
                     else:
                         st.caption("📷 Sin imágenes")
+                    
                     st.write(f"**Reseña:** {n['resena']}")
+                    
+                    # Mostrar video si existe
+                    if n.get('video_url') and n['video_url']:
+                        st.markdown("#### 🎥 Video actual")
+                        mostrar_video_youtube(n['video_url'], width_percent=30)
+                    
                     if n.get('google_maps_url') and n['google_maps_url']:
                         st.markdown(f"📍 [Ver en Google Maps]({n['google_maps_url']})")
+                    
                     st.markdown("---")
                     st.markdown("#### 💬 Opiniones del negocio")
                     opiniones_neg = get_opiniones_negocio(n['id'])
@@ -1732,6 +1788,7 @@ if st.session_state.get('es_admin', False):
                             st.divider()
                     else:
                         st.info("No hay opiniones para este negocio")
+                    
                     col1, col2 = st.columns(2)
                     with col1:
                         if st.button(f"✏️ MODIFICAR", key=f"edit_neg_{n['id']}_{idx}"):
@@ -1753,11 +1810,22 @@ if st.session_state.get('es_admin', False):
                 nuevo_nombre = st.text_input("Nombre", value=n['nombre'])
                 nueva_resena = st.text_area("Reseña", value=n['resena'])
                 nuevo_google_maps = st.text_input("Enlace Google Maps", value=n.get('google_maps_url', ''))
+                nuevo_video = st.text_input("Enlace YouTube", value=n.get('video_url', ''))
+                
+                # Mostrar vista previa del video si se ingresa una URL
+                if nuevo_video and nuevo_video.strip():
+                    video_id = extraer_video_id(nuevo_video)
+                    if video_id:
+                        st.markdown("#### 📹 Vista previa del video")
+                        st.video(f"https://www.youtube.com/embed/{video_id}")
+                    else:
+                        st.warning("⚠️ URL de YouTube no válida")
+                
                 nuevas_imagenes = st.file_uploader("Nuevas fotos (opcional, máximo 3)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
                 col1, col2 = st.columns(2)
                 with col1:
                     if st.form_submit_button("💾 Guardar cambios"):
-                        if update_negocio(n['id'], nuevo_nombre, nueva_resena, nuevo_google_maps, nuevas_imagenes):
+                        if update_negocio(n['id'], nuevo_nombre, nueva_resena, nuevo_google_maps, nuevo_video, nuevas_imagenes):
                             st.success("✅ Negocio actualizado")
                             del st.session_state.edit_negocio
                             st.rerun()
