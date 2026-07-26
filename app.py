@@ -874,31 +874,58 @@ input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !importa
 .stInfo, .stSuccess, .stWarning, .stError {{ background-color: rgba(0,0,0,0.8) !important; color: white !important; }}
 [data-testid="stMetricValue"] {{ color: #FFD700 !important; font-size: 1.5rem !important; }}
 
-/* Estilos para botones de la sección de salud */
-.health-btn-container {{
-    background: rgba(0, 40, 80, 0.4) !important;
+/* ============================================
+   ESTILOS PARA BOTONES DE SALUD
+   ============================================ */
+.health-container {{
+    background: rgba(0, 30, 60, 0.6) !important;
     border-radius: 15px !important;
-    padding: 12px !important;
-    border: 1px solid rgba(0, 180, 216, 0.2) !important;
+    padding: 15px !important;
+    margin: 5px 0 15px 0 !important;
+    border: 1px solid rgba(0, 180, 216, 0.3) !important;
 }}
-.health-btn {{
-    background: linear-gradient(135deg, #0a4b6e, #1a7a9e) !important;
-    border: 2px solid #00b4d8 !important;
-    color: white !important;
-    border-radius: 12px !important;
-    padding: 12px 20px !important;
-    font-size: 1.05em !important;
+
+div[data-testid="column"] .stButton > button {{
+    background: linear-gradient(135deg, #0a6b8a, #1a8aaa) !important;
+    color: #FFFFFF !important;
+    border: 2px solid #00d4ff !important;
+    border-radius: 14px !important;
+    padding: 14px 10px !important;
+    font-size: 1em !important;
     font-weight: bold !important;
-    box-shadow: 0 4px 15px rgba(0, 180, 216, 0.2) !important;
+    box-shadow: 0 4px 20px rgba(0, 180, 216, 0.3) !important;
     transition: all 0.3s ease !important;
     width: 100% !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
+}}
+
+div[data-testid="column"] .stButton > button:hover {{
+    background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 35px rgba(0, 180, 216, 0.6) !important;
+    border-color: #FFD700 !important;
+    color: #FFFFFF !important;
+}}
+
+div[data-testid="column"] .stButton > button:active {{
+    transform: translateY(0px) !important;
+    box-shadow: 0 2px 10px rgba(0, 180, 216, 0.2) !important;
+}}
+
+.health-title {{
+    color: #00d4ff !important;
+    font-size: 1.5em !important;
+    font-weight: bold !important;
+    text-shadow: 0 0 20px rgba(0, 180, 216, 0.3) !important;
+    margin-bottom: 10px !important;
     text-align: center !important;
 }}
-.health-btn:hover {{
-    background: linear-gradient(135deg, #00b4d8, #0077b6) !important;
-    transform: translateY(-4px) !important;
-    box-shadow: 0 8px 30px rgba(0, 180, 216, 0.5) !important;
-    border-color: #FFD700 !important;
+
+/* Asegurar que el texto sea visible siempre */
+div[data-testid="column"] .stButton > button p {{
+    color: #FFFFFF !important;
+    font-weight: bold !important;
+    margin: 0 !important;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -1083,15 +1110,16 @@ with col_linea3[3]:
 # ============================================
 # NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES
 # ============================================
-st.markdown("### 🩺 Hablando con tus doctores")
-
-# Contenedor con estilo para los botones
 st.markdown("""
-<div style="background: rgba(0, 40, 80, 0.3); border-radius: 15px; padding: 12px; margin-bottom: 10px; border: 1px solid rgba(0, 180, 216, 0.15);">
+<div style="background: rgba(0, 40, 80, 0.4); border-radius: 15px; padding: 15px; margin-bottom: 15px; border: 2px solid rgba(0, 180, 216, 0.3);">
+    <h3 style="color: #00d4ff; text-align: center; margin: 0; text-shadow: 0 0 20px rgba(0, 180, 216, 0.3);">
+        🩺 Hablando con tus doctores
+    </h3>
 </div>
 """, unsafe_allow_html=True)
 
 col_salud = st.columns(4)
+
 with col_salud[0]:
     if st.button("🩺 Evaluar Síntomas", use_container_width=True, key="tab_20"):
         st.session_state.selected_tab = 20
@@ -1111,8 +1139,9 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES EXISTENTES
+# CONTENIDO DE LAS SECCIONES
 # ============================================
+
 # --- PORTADA (TAB 0) ---
 if st.session_state.selected_tab == 0:
     col1, col2 = st.columns(2)
@@ -1637,7 +1666,7 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES
+# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20, 21, 22, 23)
 # ============================================
 
 # --- TAB 20: EVALUAR SÍNTOMAS ---
