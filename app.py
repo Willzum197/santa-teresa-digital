@@ -1037,6 +1037,23 @@ with col_linea3[2]:
 with col_linea3[3]:
     st.markdown(" ")
 
+# ============================================
+# NUEVA SECCIÓN: CONSULTA A TUS DOCTORES
+# ============================================
+st.markdown("### 🩺 Consulta a tus doctores")
+col_salud = st.columns(4)
+with col_salud[0]:
+    if st.button("🩺 Evaluar Síntomas", use_container_width=True, key="tab_20"):
+        st.session_state.selected_tab = 20
+with col_salud[1]:
+    if st.button("📍 Directorio Médico", use_container_width=True, key="tab_21"):
+        st.session_state.selected_tab = 21
+with col_salud[2]:
+    if st.button("📚 Guías de Salud", use_container_width=True, key="tab_22"):
+        st.session_state.selected_tab = 22
+with col_salud[3]:
+    st.markdown(" ")
+
 st.markdown("---")
 
 if 'selected_tab' not in st.session_state:
@@ -1571,6 +1588,524 @@ elif st.session_state.selected_tab == 10:
         st.markdown("**📅 Otras efemérides:**")
         for fecha, texto in efemerides_mundo.items():
             st.markdown(f"- **{fecha}:** {texto}")
+
+# ============================================
+# NUEVA SECCIÓN: CONSULTA A TUS DOCTORES (TAB 20)
+# ============================================
+
+# --- TAB 20: EVALUAR SÍNTOMAS ---
+elif st.session_state.selected_tab == 20:
+    st.title("🩺 Evaluación de Síntomas")
+    
+    # ADVERTENCIA IMPORTANTE
+    st.markdown("""
+    <div style="background: rgba(255, 0, 0, 0.15); border: 2px solid #FF6B6B; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-size: 2.5em;">⚠️</span>
+            <div>
+                <h3 style="color: #FF6B6B; margin: 0;">ADVERTENCIA IMPORTANTE</h3>
+                <p style="margin: 5px 0 0 0; color: #FFFFFF;">
+                    Esta herramienta es <strong>SOLO INFORMATIVA</strong> y NO reemplaza una consulta médica profesional.
+                    Los resultados son una guía preliminar basada en la información proporcionada.
+                    <br><br>
+                    <strong>SI TIENES UNA EMERGENCIA, LLAMA INMEDIATAMENTE AL 911 O ACUDE AL CENTRO DE SALUD MÁS CERCANO.</strong>
+                    <br>
+                    Siempre consulta con un médico calificado para cualquier problema de salud.
+                </p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    ### ¿Cómo funciona?
+    1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
+    2. Obtendrás un reporte con posibles causas y recomendaciones
+    3. El reporte te ayudará a saber cuándo debes consultar a un médico
+    """)
+    
+    # Inicializar el estado del cuestionario
+    if 'cuestionario_paso' not in st.session_state:
+        st.session_state.cuestionario_paso = 1
+    if 'respuestas' not in st.session_state:
+        st.session_state.respuestas = {}
+    if 'historial_consultas' not in st.session_state:
+        st.session_state.historial_consultas = []
+    
+    # --- PASO 1: Datos Personales ---
+    if st.session_state.cuestionario_paso == 1:
+        with st.form("paso_1_consulta"):
+            st.subheader("📋 Paso 1: Información Personal")
+            st.markdown("Estos datos ayudan a personalizar los resultados.")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                edad = st.number_input("Edad", min_value=1, max_value=120, value=30, step=1)
+            with col2:
+                sexo = st.selectbox("Sexo biológico", ["Masculino", "Femenino", "Prefiero no decir"])
+            
+            peso = st.number_input("Peso aproximado (kg) - Opcional", min_value=10, max_value=300, value=70, step=1)
+            altura = st.number_input("Altura aproximada (cm) - Opcional", min_value=50, max_value=250, value=170, step=1)
+            
+            condiciones = st.multiselect(
+                "¿Tienes alguna condición médica preexistente?",
+                ["Diabetes", "Hipertensión", "Asma", "Alergias", "Enfermedad cardíaca", "Ninguna", "Otra"]
+            )
+            
+            submitted = st.form_submit_button("Siguiente →", use_container_width=True)
+            if submitted:
+                st.session_state.respuestas['edad'] = edad
+                st.session_state.respuestas['sexo'] = sexo
+                st.session_state.respuestas['peso'] = peso
+                st.session_state.respuestas['altura'] = altura
+                st.session_state.respuestas['condiciones'] = condiciones
+                st.session_state.cuestionario_paso = 2
+                st.rerun()
+    
+    # --- PASO 2: Síntomas ---
+    elif st.session_state.cuestionario_paso == 2:
+        with st.form("paso_2_consulta"):
+            st.subheader("🩺 Paso 2: Cuéntanos tus síntomas")
+            st.markdown("Responde lo más detallado posible.")
+            
+            sintoma_principal = st.selectbox(
+                "¿Cuál es tu síntoma principal?",
+                ["Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal", 
+                 "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar", 
+                 "Dolor en el pecho", "Erupción cutánea", "Otro"]
+            )
+            
+            if sintoma_principal == "Otro":
+                sintoma_principal = st.text_input("Describe tu síntoma principal")
+            
+            duracion = st.selectbox(
+                "¿Cuánto tiempo llevas con este síntoma?",
+                ["Menos de 24 horas", "1-3 días", "4-7 días", "Más de una semana", "Más de un mes"]
+            )
+            
+            intensidad = st.slider(
+                "¿Cómo calificas la intensidad del síntoma? (1 = Leve, 10 = Insoportable)",
+                min_value=1, max_value=10, value=5
+            )
+            
+            sintomas_acompanantes = st.multiselect(
+                "¿Tienes otros síntomas acompañantes?",
+                ["Náuseas", "Vómitos", "Diarrea", "Estreñimiento", "Fatiga", "Fiebre", 
+                 "Escalofríos", "Sudoración", "Dificultad para respirar", "Palpitaciones", 
+                 "Mareos", "Dolor muscular", "Ninguno"]
+            )
+            
+            st.markdown("---")
+            st.markdown("**Información adicional:**")
+            
+            medicamentos = st.text_input("¿Estás tomando algún medicamento? (Opcional)")
+            alergias_med = st.text_input("¿Tienes alergias a medicamentos? (Opcional)")
+            
+            submitted = st.form_submit_button("Generar Reporte", use_container_width=True)
+            if submitted:
+                st.session_state.respuestas['sintoma_principal'] = sintoma_principal
+                st.session_state.respuestas['duracion'] = duracion
+                st.session_state.respuestas['intensidad'] = intensidad
+                st.session_state.respuestas['sintomas_acompanantes'] = sintomas_acompanantes
+                st.session_state.respuestas['medicamentos'] = medicamentos
+                st.session_state.respuestas['alergias_med'] = alergias_med
+                st.session_state.cuestionario_paso = 3
+                st.rerun()
+    
+    # --- PASO 3: Reporte ---
+    elif st.session_state.cuestionario_paso == 3:
+        st.subheader("📋 Tu Reporte Personalizado")
+        st.markdown("*Basado en la información que proporcionaste.*")
+        
+        # Obtener respuestas
+        resp = st.session_state.respuestas
+        sintoma = resp.get('sintoma_principal', 'No especificado')
+        duracion = resp.get('duracion', 'No especificada')
+        intensidad = resp.get('intensidad', 0)
+        acompanantes = resp.get('sintomas_acompanantes', [])
+        condiciones = resp.get('condiciones', [])
+        
+        # ============================================
+        # MOTOR DE SUGERENCIAS (LÓGICA DE REGLAS)
+        # ============================================
+        
+        reporte = {
+            "causas": [],
+            "recomendaciones": [],
+            "urgencia": "🟢 Baja - Puedes manejar esto en casa",
+            "color": "#4CAF50",
+            "accion": "Descanso y cuidado en casa"
+        }
+        
+        # --- LÓGICA PARA DOLOR DE CABEZA ---
+        if sintoma.lower() in ["dolor de cabeza", "cefalea", "migraña"]:
+            reporte["causas"] = [
+                "Tensión o estrés (muy común)",
+                "Deshidratación o falta de sueño",
+                "Migraña (si es pulsátil y con náuseas)",
+                "Sinusitis (si se acompaña de congestión nasal)"
+            ]
+            reporte["recomendaciones"] = [
+                "Descansa en un lugar tranquilo y oscuro",
+                "Bebe suficiente agua",
+                "Aplica compresas frías en la frente",
+                "Puedes tomar un analgésico de venta libre (como paracetamol) SI NO TIENES CONTRAINDICACIONES"
+            ]
+            
+            if intensidad >= 8:
+                reporte["urgencia"] = "🟡 Media - Consulta a un médico si es muy intenso"
+                reporte["color"] = "#FFC107"
+                reporte["accion"] = "Consulta médica recomendada"
+            
+            if duracion in ["Más de una semana", "Más de un mes"]:
+                reporte["urgencia"] = "🟡 Media - Consulta a un médico si persiste"
+                reporte["color"] = "#FFC107"
+                reporte["accion"] = "Consulta médica recomendada"
+        
+        # --- LÓGICA PARA FIEBRE ---
+        elif sintoma.lower() in ["fiebre", "temperatura"]:
+            reporte["causas"] = [
+                "Infección viral (como gripe o resfriado)",
+                "Infección bacteriana",
+                "Infección de garganta o vías respiratorias"
+            ]
+            reporte["recomendaciones"] = [
+                "Reposo absoluto",
+                "Bebe abundantes líquidos (agua, caldos)",
+                "Toma medicamentos para bajar la fiebre (paracetamol) SI NO TIENES CONTRAINDICACIONES",
+                "Controla tu temperatura cada 4 horas"
+            ]
+            
+            if intensidad >= 7:
+                reporte["urgencia"] = "🔴 Alta - Acude a un centro de salud si la fiebre es muy alta"
+                reporte["color"] = "#F44336"
+                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
+            
+            if duracion in ["Más de 3 días", "Más de una semana"]:
+                reporte["urgencia"] = "🔴 Alta - Fiebre prolongada requiere atención médica"
+                reporte["color"] = "#F44336"
+                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
+        
+        # --- LÓGICA PARA DOLOR DE GARGANTA ---
+        elif sintoma.lower() in ["dolor de garganta", "garganta"]:
+            reporte["causas"] = [
+                "Infección viral (resfriado común)",
+                "Infección bacteriana (faringitis estreptocócica)",
+                "Alergias",
+                "Irritación por aire seco o reflujo"
+            ]
+            reporte["recomendaciones"] = [
+                "Haz gárgaras con agua tibia y sal",
+                "Bebe líquidos calientes (té con miel y limón)",
+                "Descansa la voz",
+                "Puedes tomar un analgésico de venta libre para el dolor"
+            ]
+            
+            if "fiebre" in acompanantes or intensidad >= 7:
+                reporte["urgencia"] = "🟡 Media - Consulta a un médico si hay fiebre o es muy intenso"
+                reporte["color"] = "#FFC107"
+                reporte["accion"] = "Consulta médica recomendada"
+        
+        # --- LÓGICA PARA DOLOR ABDOMINAL ---
+        elif sintoma.lower() in ["dolor abdominal", "dolor de estómago", "estómago"]:
+            reporte["causas"] = [
+                "Indigestión o gastritis",
+                "Estreñimiento",
+                "Infección gastrointestinal",
+                "Apéndice (si es dolor en lado derecho inferior)"
+            ]
+            reporte["recomendaciones"] = [
+                "Reposo",
+                "Dieta blanda (arroz, manzana, plátano)",
+                "Evita alimentos grasos o muy condimentados",
+                "Bebe agua pequeñas cantidades"
+            ]
+            
+            if "vómitos" in acompanantes or "diarrea" in acompanantes:
+                reporte["urgencia"] = "🟡 Media - Consulta a un médico si hay vómitos o diarrea persistente"
+                reporte["color"] = "#FFC107"
+                reporte["accion"] = "Consulta médica recomendada"
+            
+            if intensidad >= 8:
+                reporte["urgencia"] = "🔴 Alta - Dolor abdominal intenso requiere atención médica inmediata"
+                reporte["color"] = "#F44336"
+                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
+        
+        # --- LÓGICA PARA DIFICULTAD PARA RESPIRAR ---
+        elif "respir" in sintoma.lower() or "dificultad" in sintoma.lower():
+            reporte["causas"] = [
+                "Asma",
+                "Infección respiratoria",
+                "Alergia severa",
+                "Ansiedad"
+            ]
+            reporte["recomendaciones"] = [
+                "Siéntate en posición recta para facilitar la respiración",
+                "Usa un humidificador si está disponible",
+                "Mantén la calma y respira lentamente"
+            ]
+            reporte["urgencia"] = "🔴 ALTA - La dificultad para respirar requiere atención médica URGENTE"
+            reporte["color"] = "#F44336"
+            reporte["accion"] = "ACUDE AL MÉDICO O LLAMA AL 911 INMEDIATAMENTE"
+        
+        # --- LÓGICA PARA DOLOR EN EL PECHO ---
+        elif "pecho" in sintoma.lower() or "corazón" in sintoma.lower():
+            reporte["causas"] = [
+                "Problemas cardíacos (requiere atención URGENTE)",
+                "Ansiedad o ataque de pánico",
+                "Reflujo gastroesofágico",
+                "Dolor muscular"
+            ]
+            reporte["recomendaciones"] = [
+                "Siéntate en una posición cómoda y mantén la calma",
+                "Si el dolor es intenso o se irradia al brazo, llama al 911 INMEDIATAMENTE",
+                "No tomes medicamentos sin prescripción médica"
+            ]
+            reporte["urgencia"] = "🔴 ALTA - El dolor en el pecho requiere atención médica URGENTE"
+            reporte["color"] = "#F44336"
+            reporte["accion"] = "LLAMA AL 911 O ACUDE A URGENCIAS INMEDIATAMENTE"
+        
+        # --- CASO GENERAL (SIN COINCIDENCIA ESPECÍFICA) ---
+        else:
+            reporte["causas"] = [
+                "Podría tratarse de una condición común",
+                "Es importante consultar a un médico para un diagnóstico preciso"
+            ]
+            reporte["recomendaciones"] = [
+                "Monitorea tus síntomas",
+                "Descansa y mantente hidratado",
+                "Si los síntomas empeoran, consulta a un médico",
+                "Lleva esta información a tu médico para que la revise"
+            ]
+            reporte["urgencia"] = "🟡 Media - Se recomienda consulta médica para evaluación"
+            reporte["color"] = "#FFC107"
+            reporte["accion"] = "Consulta médica recomendada"
+        
+        # --- CONDICIONES PREEXISTENTES (FACTOR DE RIESGO) ---
+        if condiciones and "Ninguna" not in condiciones:
+            reporte["recomendaciones"].append("⚠️ Tienes condiciones preexistentes. Consulta con tu médico de confianza.")
+            reporte["urgencia"] = reporte["urgencia"].replace("Baja", "Media").replace("🟢", "🟡")
+        
+        # --- MOSTRAR REPORTE ---
+        st.markdown(f"""
+        <div style="background: {reporte['color']}20; border-left: 8px solid {reporte['color']}; border-radius: 10px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: {reporte['color']};">{reporte['urgencia']}</h3>
+            <p style="font-size: 1.2em;"><strong>Acción recomendada:</strong> {reporte['accion']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("**📋 Resumen de tus síntomas:**")
+        st.markdown(f"- **Síntoma principal:** {sintoma}")
+        st.markdown(f"- **Duración:** {duracion}")
+        st.markdown(f"- **Intensidad:** {intensidad}/10")
+        if acompanantes:
+            st.markdown(f"- **Síntomas acompañantes:** {', '.join(acompanantes)}")
+        
+        st.markdown("---")
+        st.markdown("### 🔍 Posibles causas")
+        for causa in reporte["causas"]:
+            st.markdown(f"- {causa}")
+        
+        st.markdown("### 💡 Recomendaciones")
+        for reco in reporte["recomendaciones"]:
+            st.markdown(f"- {reco}")
+        
+        st.markdown("---")
+        st.markdown("### 📋 Resumen para tu médico")
+        st.info("""
+        **Lleva esta información a tu consulta médica:**
+        - Síntoma principal y duración
+        - Intensidad del síntoma (escala 1-10)
+        - Síntomas acompañantes
+        - Medicamentos que estás tomando
+        - Condiciones preexistentes
+        """)
+        
+        st.markdown("""
+        <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #FFD700; border-radius: 10px; padding: 15px; margin: 20px 0;">
+            <p style="text-align: center; margin: 0;">
+                <strong>⚠️ RECUERDA:</strong> Esta herramienta es solo informativa. 
+                Siempre consulta con un médico calificado para cualquier problema de salud.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        # Guardar en historial
+        consulta = {
+            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+            "sintoma": sintoma,
+            "duracion": duracion,
+            "urgencia": reporte['urgencia']
+        }
+        st.session_state.historial_consultas.append(consulta)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📥 Descargar Reporte", use_container_width=True):
+                st.info("Funcionalidad de descarga en desarrollo")
+        with col2:
+            if st.button("🔄 Nueva Consulta", use_container_width=True):
+                st.session_state.cuestionario_paso = 1
+                st.session_state.respuestas = {}
+                st.rerun()
+        with col3:
+            if st.button("📋 Ver Mi Historial", use_container_width=True):
+                st.session_state.ver_historial = True
+                st.rerun()
+        
+        if st.session_state.get('ver_historial', False):
+            st.markdown("---")
+            st.markdown("### 📋 Tu Historial de Consultas")
+            if st.session_state.historial_consultas:
+                for h in st.session_state.historial_consultas:
+                    st.markdown(f"- **{h['fecha']}** - {h['sintoma']} ({h['urgencia']})")
+            else:
+                st.info("No tienes consultas guardadas")
+            if st.button("Ocultar Historial"):
+                st.session_state.ver_historial = False
+                st.rerun()
+
+# --- TAB 21: DIRECTORIO MÉDICO ---
+elif st.session_state.selected_tab == 21:
+    st.title("📍 Directorio Médico de Santa Teresa del Tuy")
+    st.markdown("### Centros de salud, farmacias y especialistas locales")
+    
+    st.info("""
+    ℹ️ **Información importante:**
+    - Este directorio es colaborativo y se actualiza constantemente
+    - Si conoces un centro de salud que no está listado, ¡puedes sugerirlo!
+    - Los horarios y servicios pueden cambiar, verifica con el establecimiento
+    """)
+    
+    # Datos de ejemplo - En producción vendrían de Supabase
+    centros = [
+        {"nombre": "Hospital General de Santa Teresa", "tipo": "Hospital", 
+         "direccion": "Av. Principal, Santa Teresa", "telefono": "0212-XXX-XXXX", 
+         "servicios": ["Emergencias 24h", "Consulta Externa", "Hospitalización"]},
+        {"nombre": "Ambulatorio Urbano I", "tipo": "Ambulatorio", 
+         "direccion": "Barrio El Centro, Santa Teresa", "telefono": "0212-XXX-XXXX",
+         "servicios": ["Medicina General", "Pediatría", "Odontología"]},
+        {"nombre": "Farmacia Santa Teresa 24h", "tipo": "Farmacia", 
+         "direccion": "Esquina Bolívar, Santa Teresa", "telefono": "0212-XXX-XXXX",
+         "servicios": ["Venta de medicamentos", "Delivery 24h"]},
+        {"nombre": "Clínica San José", "tipo": "Clínica Privada", 
+         "direccion": "Calle 5, Santa Teresa", "telefono": "0212-XXX-XXXX",
+         "servicios": ["Consultas Especializadas", "Laboratorio", "Imagenología"]},
+    ]
+    
+    for centro in centros:
+        with st.expander(f"{centro['tipo']}: {centro['nombre']}"):
+            st.markdown(f"**Dirección:** {centro['direccion']}")
+            st.markdown(f"**Teléfono:** {centro['telefono']}")
+            st.markdown(f"**Servicios:** {', '.join(centro['servicios'])}")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.button("📍 Ver en Mapa", key=f"mapa_{centro['nombre']}")
+            with col2:
+                st.button("📞 Llamar", key=f"llamar_{centro['nombre']}")
+    
+    st.markdown("---")
+    st.markdown("### ➕ Sugerir un centro de salud")
+    with st.form("sugerir_centro"):
+        nombre_sug = st.text_input("Nombre del centro *")
+        tipo_sug = st.selectbox("Tipo", ["Hospital", "Ambulatorio", "Farmacia", "Clínica Privada", "Especialista"])
+        direccion_sug = st.text_area("Dirección *")
+        telefono_sug = st.text_input("Teléfono")
+        servicios_sug = st.text_input("Servicios que ofrece")
+        
+        submitted = st.form_submit_button("Enviar Sugerencia")
+        if submitted:
+            if nombre_sug and direccion_sug:
+                st.success("✅ ¡Gracias! Tu sugerencia será revisada por el administrador.")
+                st.balloons()
+            else:
+                st.error("❌ El nombre y la dirección son obligatorios")
+
+# --- TAB 22: GUÍAS DE SALUD ---
+elif st.session_state.selected_tab == 22:
+    st.title("📚 Guías de Salud")
+    st.markdown("### Información útil para el cuidado de tu salud")
+    
+    st.info("""
+    ℹ️ **Nota importante:** Estas guías son educativas y no reemplazan el consejo médico profesional.
+    """)
+    
+    guias = {
+        "Primeros Auxilios Básicos": {
+            "descripcion": "Qué hacer en situaciones de emergencia comunes",
+            "contenido": """
+            **🩹 Heridas y cortes:**
+            1. Lava el área con agua y jabón
+            2. Aplica presión con una gasa limpia para detener el sangrado
+            3. Cubre con un vendaje limpio
+            
+            **🔥 Quemaduras:**
+            1. Enfría la quemadura con agua fría (no hielo) por 10-15 minutos
+            2. No apliques cremas, manteca o remedios caseros
+            3. Cubre con un paño limpio y húmedo
+            
+            **🦴 Fracturas:**
+            1. Inmoviliza el área afectada
+            2. Aplica hielo envuelto en un paño
+            3. Busca atención médica inmediata
+            """
+        },
+        "Fiebre en Adultos": {
+            "descripcion": "Cómo manejar la fiebre y cuándo preocuparse",
+            "contenido": """
+            **¿Qué es fiebre?**
+            - Temperatura mayor a 38°C (100.4°F)
+            - Es un mecanismo de defensa del cuerpo
+            
+            **Cuándo consultar al médico:**
+            - Fiebre de más de 39.5°C (103°F)
+            - Fiebre que dura más de 3 días
+            - Acompañada de dolor de cabeza intenso, dificultad para respirar o confusión
+            - En niños menores de 3 meses: cualquier fiebre requiere atención médica
+            
+            **Recomendaciones:**
+            - Descansa y mantente hidratado
+            - Toma medicamentos para bajar la fiebre (paracetamol) según indicaciones
+            - No te automediques con antibióticos
+            """
+        },
+        "Prevención de Enfermedades": {
+            "descripcion": "Consejos para mantenerte saludable",
+            "contenido": """
+            **💧 Hidratación:**
+            - Bebe al menos 2 litros de agua al día
+            - Aumenta la ingesta en clima caliente o con actividad física
+            
+            **🍎 Alimentación saludable:**
+            - Come frutas y verduras diariamente
+            - Reduce el consumo de azúcar y grasas saturadas
+            - Incluye proteínas magras en tu dieta
+            
+            **🏃 Actividad física:**
+            - Realiza al menos 30 minutos de ejercicio moderado al día
+            - Camina, trota o práctica deporte regularmente
+            
+            **💤 Descanso:**
+            - Duerme entre 7-8 horas diarias
+            - Mantén horarios regulares de sueño
+            """
+        }
+    }
+    
+    for titulo, info in guias.items():
+        with st.expander(f"📖 {titulo}"):
+            st.markdown(f"**{info['descripcion']}**")
+            st.markdown("---")
+            st.markdown(info['contenido'])
+    
+    st.markdown("---")
+    st.markdown("### 🏥 Recursos de Emergencia")
+    st.markdown("""
+    - **🚑 Emergencias Médicas:** 911
+    - **🚒 Bomberos:** 0800-BOMBEROS (0800-266-2376)
+    - **🚨 Policía:** 911
+    - **Hospital General de Santa Teresa:** 0212-XXX-XXXX
+    """)
 
 # ============================================
 # PANEL ADMIN (COMPLETO)
