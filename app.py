@@ -820,7 +820,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON FONDO DE IMAGEN Y EFECTOS HOVER PARA BOTONES
+# ESTILOS - CON FONDO DE IMAGEN
 # ============================================
 st.markdown(f"""
 <style>
@@ -852,45 +852,11 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] {{ background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important; border-right: 3px solid #FFD700 !important; }}
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !important; border: 2px solid #FFD700 !important; border-radius: 12px !important; }}
-.stButton > button {{ 
-    background: linear-gradient(135deg, #FFD700, #CF142B) !important; 
-    color: white !important; 
-    border-radius: 25px !important;
-    transition: all 0.3s ease !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-}}
-.stButton > button:hover {{
-    transform: translateY(-3px) !important;
-    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4) !important;
-    background: linear-gradient(135deg, #FFE44D, #E01830) !important;
-}}
-.stButton > button:active {{
-    transform: translateY(0px) !important;
-    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2) !important;
-}}
+.stButton > button {{ background: linear-gradient(135deg, #FFD700, #CF142B) !important; color: white !important; border-radius: 25px !important; }}
 .bronze-footer {{ background: linear-gradient(145deg, #8c6a31, #5d431a) !important; border: 5px solid #d4af37 !important; padding: 35px 25px !important; border-radius: 20px !important; text-align: center !important; margin-top: 50px !important; }}
 .bronze-footer p {{ color: #ffd700 !important; }}
 .stInfo, .stSuccess, .stWarning, .stError {{ background-color: rgba(0,0,0,0.8) !important; color: white !important; }}
 [data-testid="stMetricValue"] {{ color: #FFD700 !important; font-size: 1.5rem !important; }}
-
-/* Estilos para los botones del menú de salud con efecto hover */
-.menu-button {{
-    background: linear-gradient(135deg, #1a1a1a, #2a2a2a) !important;
-    border: 2px solid #FFD700 !important;
-    color: white !important;
-    border-radius: 12px !important;
-    padding: 10px 15px !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    font-weight: bold !important;
-}}
-.menu-button:hover {{
-    background: linear-gradient(135deg, #FFD700, #CF142B) !important;
-    transform: translateY(-3px) !important;
-    box-shadow: 0 8px 25px rgba(255, 215, 0, 0.5) !important;
-    border-color: #FFE44D !important;
-}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -906,10 +872,10 @@ if logo:
 # ============================================
 st.markdown(f"""
 <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
-    <a href="https://api.whatsapp.com/send?text=Santa Teresa al Dia - {APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #25D366; transition: all 0.3s ease;">📱 WhatsApp</a>
-    <a href="https://www.facebook.com/sharer/sharer.php?u={APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #1877F2; transition: all 0.3s ease;">📘 Facebook</a>
-    <a href="https://www.instagram.com/" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: linear-gradient(45deg, #f09433, #d62976); transition: all 0.3s ease;">📸 Instagram</a>
-    <button id="copyButton" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #3498db; border: none; cursor: pointer; transition: all 0.3s ease;">📋 Copiar</button>
+    <a href="https://api.whatsapp.com/send?text=Santa Teresa al Dia - {APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #25D366;">📱 WhatsApp</a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u={APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #1877F2;">📘 Facebook</a>
+    <a href="https://www.instagram.com/" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: linear-gradient(45deg, #f09433, #d62976);">📸 Instagram</a>
+    <button id="copyButton" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #3498db; border: none; cursor: pointer;">📋 Copiar</button>
 </div>
 <script>
 document.getElementById('copyButton').addEventListener('click', function() {{
@@ -1071,583 +1037,540 @@ with col_linea3[2]:
 with col_linea3[3]:
     st.markdown(" ")
 
-# ============================================
-# NUEVA SECCIÓN: CONSULTA A TUS DOCTORES (CON EFECTO HOVER)
-# ============================================
-st.markdown("### 🩺 Consulta a tus doctores")
-col_salud = st.columns(4)
-
-# Estilo personalizado para los botones de salud
-st.markdown("""
-<style>
-.health-button {
-    background: linear-gradient(135deg, #1a3a5c, #2a5a7c) !important;
-    border: 2px solid #00b4d8 !important;
-    color: white !important;
-    border-radius: 12px !important;
-    padding: 12px 20px !important;
-    transition: all 0.3s ease !important;
-    cursor: pointer !important;
-    text-align: center !important;
-    font-weight: bold !important;
-    width: 100% !important;
-    font-size: 1em !important;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
-}
-.health-button:hover {
-    background: linear-gradient(135deg, #00b4d8, #0077b6) !important;
-    transform: translateY(-4px) !important;
-    box-shadow: 0 8px 25px rgba(0, 180, 216, 0.5) !important;
-    border-color: #FFD700 !important;
-}
-.health-button:active {
-    transform: translateY(0px) !important;
-    box-shadow: 0 2px 10px rgba(0, 180, 216, 0.2) !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
-with col_salud[0]:
-    if st.button("🩺 Evaluar Síntomas", use_container_width=True, key="tab_20"):
-        st.session_state.selected_tab = 20
-with col_salud[1]:
-    if st.button("📍 Directorio Médico", use_container_width=True, key="tab_21"):
-        st.session_state.selected_tab = 21
-with col_salud[2]:
-    if st.button("📚 Guías de Salud", use_container_width=True, key="tab_22"):
-        st.session_state.selected_tab = 22
-with col_salud[3]:
-    st.markdown(" ")
-
 st.markdown("---")
 
 if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES EXISTENTES (TAB 0 - 10)
-# ============================================
-# [Todas tus secciones existentes van aquí - TAB 0 a TAB 10]
-# Para no repetir todo el código, asumimos que aquí están todas tus secciones originales
-# (Portada, Noticias, Negocios, Reflexiones, Crónicas, Multimedia, Denuncias, Opiniones, Personajes, Crimen, Efemérides)
-
-# ============================================
-# NUEVA SECCIÓN: CONSULTA A TUS DOCTORES (TAB 20, 21, 22)
+# CONTENIDO DE LAS SECCIONES
 # ============================================
 
-# --- TAB 20: EVALUAR SÍNTOMAS ---
-elif st.session_state.selected_tab == 20:
-    st.title("🩺 Evaluación de Síntomas")
-    
-    # ADVERTENCIA IMPORTANTE
-    st.markdown("""
-    <div style="background: rgba(255, 0, 0, 0.15); border: 2px solid #FF6B6B; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <span style="font-size: 2.5em;">⚠️</span>
-            <div>
-                <h3 style="color: #FF6B6B; margin: 0;">ADVERTENCIA IMPORTANTE</h3>
-                <p style="margin: 5px 0 0 0; color: #FFFFFF;">
-                    Esta herramienta es <strong>SOLO INFORMATIVA</strong> y NO reemplaza una consulta médica profesional.
-                    Los resultados son una guía preliminar basada en la información proporcionada.
-                    <br><br>
-                    <strong>SI TIENES UNA EMERGENCIA, LLAMA INMEDIATAMENTE AL 911 O ACUDE AL CENTRO DE SALUD MÁS CERCANO.</strong>
-                    <br>
-                    Siempre consulta con un médico calificado para cualquier problema de salud.
-                </p>
-            </div>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    st.markdown("""
-    ### ¿Cómo funciona?
-    1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
-    2. Obtendrás un reporte con posibles causas y recomendaciones
-    3. El reporte te ayudará a saber cuándo debes consultar a un médico
-    """)
-    
-    # Inicializar el estado del cuestionario
-    if 'cuestionario_paso' not in st.session_state:
-        st.session_state.cuestionario_paso = 1
-    if 'respuestas' not in st.session_state:
-        st.session_state.respuestas = {}
-    if 'historial_consultas' not in st.session_state:
-        st.session_state.historial_consultas = []
-    
-    # --- PASO 1: Datos Personales ---
-    if st.session_state.cuestionario_paso == 1:
-        with st.form("paso_1_consulta"):
-            st.subheader("📋 Paso 1: Información Personal")
-            st.markdown("Estos datos ayudan a personalizar los resultados.")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                edad = st.number_input("Edad", min_value=1, max_value=120, value=30, step=1)
-            with col2:
-                sexo = st.selectbox("Sexo biológico", ["Masculino", "Femenino", "Prefiero no decir"])
-            
-            peso = st.number_input("Peso aproximado (kg) - Opcional", min_value=10, max_value=300, value=70, step=1)
-            altura = st.number_input("Altura aproximada (cm) - Opcional", min_value=50, max_value=250, value=170, step=1)
-            
-            condiciones = st.multiselect(
-                "¿Tienes alguna condición médica preexistente?",
-                ["Diabetes", "Hipertensión", "Asma", "Alergias", "Enfermedad cardíaca", "Ninguna", "Otra"]
-            )
-            
-            submitted = st.form_submit_button("Siguiente →", use_container_width=True)
-            if submitted:
-                st.session_state.respuestas['edad'] = edad
-                st.session_state.respuestas['sexo'] = sexo
-                st.session_state.respuestas['peso'] = peso
-                st.session_state.respuestas['altura'] = altura
-                st.session_state.respuestas['condiciones'] = condiciones
-                st.session_state.cuestionario_paso = 2
-                st.rerun()
-    
-    # --- PASO 2: Síntomas ---
-    elif st.session_state.cuestionario_paso == 2:
-        with st.form("paso_2_consulta"):
-            st.subheader("🩺 Paso 2: Cuéntanos tus síntomas")
-            st.markdown("Responde lo más detallado posible.")
-            
-            sintoma_principal = st.selectbox(
-                "¿Cuál es tu síntoma principal?",
-                ["Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal", 
-                 "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar", 
-                 "Dolor en el pecho", "Erupción cutánea", "Otro"]
-            )
-            
-            if sintoma_principal == "Otro":
-                sintoma_principal = st.text_input("Describe tu síntoma principal")
-            
-            duracion = st.selectbox(
-                "¿Cuánto tiempo llevas con este síntoma?",
-                ["Menos de 24 horas", "1-3 días", "4-7 días", "Más de una semana", "Más de un mes"]
-            )
-            
-            intensidad = st.slider(
-                "¿Cómo calificas la intensidad del síntoma? (1 = Leve, 10 = Insoportable)",
-                min_value=1, max_value=10, value=5
-            )
-            
-            sintomas_acompanantes = st.multiselect(
-                "¿Tienes otros síntomas acompañantes?",
-                ["Náuseas", "Vómitos", "Diarrea", "Estreñimiento", "Fatiga", "Fiebre", 
-                 "Escalofríos", "Sudoración", "Dificultad para respirar", "Palpitaciones", 
-                 "Mareos", "Dolor muscular", "Ninguno"]
-            )
-            
-            st.markdown("---")
-            st.markdown("**Información adicional:**")
-            
-            medicamentos = st.text_input("¿Estás tomando algún medicamento? (Opcional)")
-            alergias_med = st.text_input("¿Tienes alergias a medicamentos? (Opcional)")
-            
-            submitted = st.form_submit_button("Generar Reporte", use_container_width=True)
-            if submitted:
-                st.session_state.respuestas['sintoma_principal'] = sintoma_principal
-                st.session_state.respuestas['duracion'] = duracion
-                st.session_state.respuestas['intensidad'] = intensidad
-                st.session_state.respuestas['sintomas_acompanantes'] = sintomas_acompanantes
-                st.session_state.respuestas['medicamentos'] = medicamentos
-                st.session_state.respuestas['alergias_med'] = alergias_med
-                st.session_state.cuestionario_paso = 3
-                st.rerun()
-    
-    # --- PASO 3: Reporte ---
-    elif st.session_state.cuestionario_paso == 3:
-        st.subheader("📋 Tu Reporte Personalizado")
-        st.markdown("*Basado en la información que proporcionaste.*")
-        
-        # Obtener respuestas
-        resp = st.session_state.respuestas
-        sintoma = resp.get('sintoma_principal', 'No especificado')
-        duracion = resp.get('duracion', 'No especificada')
-        intensidad = resp.get('intensidad', 0)
-        acompanantes = resp.get('sintomas_acompanantes', [])
-        condiciones = resp.get('condiciones', [])
-        
-        # ============================================
-        # MOTOR DE SUGERENCIAS (LÓGICA DE REGLAS)
-        # ============================================
-        
-        reporte = {
-            "causas": [],
-            "recomendaciones": [],
-            "urgencia": "🟢 Baja - Puedes manejar esto en casa",
-            "color": "#4CAF50",
-            "accion": "Descanso y cuidado en casa"
-        }
-        
-        # --- LÓGICA PARA DOLOR DE CABEZA ---
-        if sintoma.lower() in ["dolor de cabeza", "cefalea", "migraña"]:
-            reporte["causas"] = [
-                "Tensión o estrés (muy común)",
-                "Deshidratación o falta de sueño",
-                "Migraña (si es pulsátil y con náuseas)",
-                "Sinusitis (si se acompaña de congestión nasal)"
-            ]
-            reporte["recomendaciones"] = [
-                "Descansa en un lugar tranquilo y oscuro",
-                "Bebe suficiente agua",
-                "Aplica compresas frías en la frente",
-                "Puedes tomar un analgésico de venta libre (como paracetamol) SI NO TIENES CONTRAINDICACIONES"
-            ]
-            
-            if intensidad >= 8:
-                reporte["urgencia"] = "🟡 Media - Consulta a un médico si es muy intenso"
-                reporte["color"] = "#FFC107"
-                reporte["accion"] = "Consulta médica recomendada"
-            
-            if duracion in ["Más de una semana", "Más de un mes"]:
-                reporte["urgencia"] = "🟡 Media - Consulta a un médico si persiste"
-                reporte["color"] = "#FFC107"
-                reporte["accion"] = "Consulta médica recomendada"
-        
-        # --- LÓGICA PARA FIEBRE ---
-        elif sintoma.lower() in ["fiebre", "temperatura"]:
-            reporte["causas"] = [
-                "Infección viral (como gripe o resfriado)",
-                "Infección bacteriana",
-                "Infección de garganta o vías respiratorias"
-            ]
-            reporte["recomendaciones"] = [
-                "Reposo absoluto",
-                "Bebe abundantes líquidos (agua, caldos)",
-                "Toma medicamentos para bajar la fiebre (paracetamol) SI NO TIENES CONTRAINDICACIONES",
-                "Controla tu temperatura cada 4 horas"
-            ]
-            
-            if intensidad >= 7:
-                reporte["urgencia"] = "🔴 Alta - Acude a un centro de salud si la fiebre es muy alta"
-                reporte["color"] = "#F44336"
-                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
-            
-            if duracion in ["Más de 3 días", "Más de una semana"]:
-                reporte["urgencia"] = "🔴 Alta - Fiebre prolongada requiere atención médica"
-                reporte["color"] = "#F44336"
-                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
-        
-        # --- LÓGICA PARA DOLOR DE GARGANTA ---
-        elif sintoma.lower() in ["dolor de garganta", "garganta"]:
-            reporte["causas"] = [
-                "Infección viral (resfriado común)",
-                "Infección bacteriana (faringitis estreptocócica)",
-                "Alergias",
-                "Irritación por aire seco o reflujo"
-            ]
-            reporte["recomendaciones"] = [
-                "Haz gárgaras con agua tibia y sal",
-                "Bebe líquidos calientes (té con miel y limón)",
-                "Descansa la voz",
-                "Puedes tomar un analgésico de venta libre para el dolor"
-            ]
-            
-            if "fiebre" in acompanantes or intensidad >= 7:
-                reporte["urgencia"] = "🟡 Media - Consulta a un médico si hay fiebre o es muy intenso"
-                reporte["color"] = "#FFC107"
-                reporte["accion"] = "Consulta médica recomendada"
-        
-        # --- LÓGICA PARA DOLOR ABDOMINAL ---
-        elif sintoma.lower() in ["dolor abdominal", "dolor de estómago", "estómago"]:
-            reporte["causas"] = [
-                "Indigestión o gastritis",
-                "Estreñimiento",
-                "Infección gastrointestinal",
-                "Apéndice (si es dolor en lado derecho inferior)"
-            ]
-            reporte["recomendaciones"] = [
-                "Reposo",
-                "Dieta blanda (arroz, manzana, plátano)",
-                "Evita alimentos grasos o muy condimentados",
-                "Bebe agua pequeñas cantidades"
-            ]
-            
-            if "vómitos" in acompanantes or "diarrea" in acompanantes:
-                reporte["urgencia"] = "🟡 Media - Consulta a un médico si hay vómitos o diarrea persistente"
-                reporte["color"] = "#FFC107"
-                reporte["accion"] = "Consulta médica recomendada"
-            
-            if intensidad >= 8:
-                reporte["urgencia"] = "🔴 Alta - Dolor abdominal intenso requiere atención médica inmediata"
-                reporte["color"] = "#F44336"
-                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
-        
-        # --- LÓGICA PARA DIFICULTAD PARA RESPIRAR ---
-        elif "respir" in sintoma.lower() or "dificultad" in sintoma.lower():
-            reporte["causas"] = [
-                "Asma",
-                "Infección respiratoria",
-                "Alergia severa",
-                "Ansiedad"
-            ]
-            reporte["recomendaciones"] = [
-                "Siéntate en posición recta para facilitar la respiración",
-                "Usa un humidificador si está disponible",
-                "Mantén la calma y respira lentamente"
-            ]
-            reporte["urgencia"] = "🔴 ALTA - La dificultad para respirar requiere atención médica URGENTE"
-            reporte["color"] = "#F44336"
-            reporte["accion"] = "ACUDE AL MÉDICO O LLAMA AL 911 INMEDIATAMENTE"
-        
-        # --- LÓGICA PARA DOLOR EN EL PECHO ---
-        elif "pecho" in sintoma.lower() or "corazón" in sintoma.lower():
-            reporte["causas"] = [
-                "Problemas cardíacos (requiere atención URGENTE)",
-                "Ansiedad o ataque de pánico",
-                "Reflujo gastroesofágico",
-                "Dolor muscular"
-            ]
-            reporte["recomendaciones"] = [
-                "Siéntate en una posición cómoda y mantén la calma",
-                "Si el dolor es intenso o se irradia al brazo, llama al 911 INMEDIATAMENTE",
-                "No tomes medicamentos sin prescripción médica"
-            ]
-            reporte["urgencia"] = "🔴 ALTA - El dolor en el pecho requiere atención médica URGENTE"
-            reporte["color"] = "#F44336"
-            reporte["accion"] = "LLAMA AL 911 O ACUDE A URGENCIAS INMEDIATAMENTE"
-        
-        # --- CASO GENERAL (SIN COINCIDENCIA ESPECÍFICA) ---
+# --- PORTADA (TAB 0) ---
+if st.session_state.selected_tab == 0:
+    col1, col2 = st.columns(2)
+    with col1:
+        st.markdown("### 📰 Últimas Noticias")
+        noticias = get_noticias()
+        if not noticias.empty:
+            for idx, n in noticias.head(5).iterrows():
+                with st.expander(f"📰 {n['titulo']} - {n['categoria']} ({n['fecha']})"):
+                    mostrar_imagen_segura(n.get('imagen_url'), 300)
+                    st.write(n['contenido'])
+                    mostrar_seccion_comentarios("noticia", n['id'], n['titulo'], es_admin)
         else:
-            reporte["causas"] = [
-                "Podría tratarse de una condición común",
-                "Es importante consultar a un médico para un diagnóstico preciso"
-            ]
-            reporte["recomendaciones"] = [
-                "Monitorea tus síntomas",
-                "Descansa y mantente hidratado",
-                "Si los síntomas empeoran, consulta a un médico",
-                "Lleva esta información a tu médico para que la revise"
-            ]
-            reporte["urgencia"] = "🟡 Media - Se recomienda consulta médica para evaluación"
-            reporte["color"] = "#FFC107"
-            reporte["accion"] = "Consulta médica recomendada"
+            st.info("No hay noticias disponibles")
         
-        # --- CONDICIONES PREEXISTENTES (FACTOR DE RIESGO) ---
-        if condiciones and "Ninguna" not in condiciones:
-            reporte["recomendaciones"].append("⚠️ Tienes condiciones preexistentes. Consulta con tu médico de confianza.")
-            reporte["urgencia"] = reporte["urgencia"].replace("Baja", "Media").replace("🟢", "🟡")
-        
-        # --- MOSTRAR REPORTE ---
-        st.markdown(f"""
-        <div style="background: {reporte['color']}20; border-left: 8px solid {reporte['color']}; border-radius: 10px; padding: 20px; margin: 20px 0;">
-            <h3 style="color: {reporte['color']};">{reporte['urgencia']}</h3>
-            <p style="font-size: 1.2em;"><strong>Acción recomendada:</strong> {reporte['accion']}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("**📋 Resumen de tus síntomas:**")
-        st.markdown(f"- **Síntoma principal:** {sintoma}")
-        st.markdown(f"- **Duración:** {duracion}")
-        st.markdown(f"- **Intensidad:** {intensidad}/10")
-        if acompanantes:
-            st.markdown(f"- **Síntomas acompañantes:** {', '.join(acompanantes)}")
+        st.markdown("### 📽️ Últimos Reportajes")
+        reportajes = get_noticias(categoria="Reportajes")
+        if not reportajes.empty:
+            for idx, r in reportajes.head(3).iterrows():
+                with st.expander(f"📽️ {r['titulo']} - {r['fecha']}"):
+                    mostrar_imagen_segura(r.get('imagen_url'), 300)
+                    st.write(r['contenido'])
+                    mostrar_seccion_comentarios("reportaje", r['id'], r['titulo'], es_admin)
+        else:
+            st.info("No hay reportajes disponibles")
+    
+    with col2:
+        st.markdown("### ✝️ Reflexión del Día")
+        ref = get_reflexion_activa()
+        if ref:
+            with st.expander(f"✨ {ref['titulo']}", expanded=True):
+                st.write(ref['contenido'])
+                if ref.get('versiculo'):
+                    st.caption(f"📖 {ref['versiculo']}")
+                mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'], es_admin)
+        else:
+            st.info("No hay reflexión activa")
         
         st.markdown("---")
-        st.markdown("### 🔍 Posibles causas")
-        for causa in reporte["causas"]:
-            st.markdown(f"- {causa}")
+        st.markdown("### 💬 Opiniones de la Comunidad")
         
-        st.markdown("### 💡 Recomendaciones")
-        for reco in reporte["recomendaciones"]:
-            st.markdown(f"- {reco}")
+        opiniones_portada = get_opiniones(aprobadas=True)
         
-        st.markdown("---")
-        st.markdown("### 📋 Resumen para tu médico")
-        st.info("""
-        **Lleva esta información a tu consulta médica:**
-        - Síntoma principal y duración
-        - Intensidad del síntoma (escala 1-10)
-        - Síntomas acompañantes
-        - Medicamentos que estás tomando
-        - Condiciones preexistentes
-        """)
-        
-        st.markdown("""
-        <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #FFD700; border-radius: 10px; padding: 15px; margin: 20px 0;">
-            <p style="text-align: center; margin: 0;">
-                <strong>⚠️ RECUERDA:</strong> Esta herramienta es solo informativa. 
-                Siempre consulta con un médico calificado para cualquier problema de salud.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        # Guardar en historial
-        consulta = {
-            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
-            "sintoma": sintoma,
-            "duracion": duracion,
-            "urgencia": reporte['urgencia']
-        }
-        st.session_state.historial_consultas.append(consulta)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("📥 Descargar Reporte", use_container_width=True):
-                st.info("Funcionalidad de descarga en desarrollo")
-        with col2:
-            if st.button("🔄 Nueva Consulta", use_container_width=True):
-                st.session_state.cuestionario_paso = 1
-                st.session_state.respuestas = {}
-                st.rerun()
-        with col3:
-            if st.button("📋 Ver Mi Historial", use_container_width=True):
-                st.session_state.ver_historial = True
-                st.rerun()
-        
-        if st.session_state.get('ver_historial', False):
-            st.markdown("---")
-            st.markdown("### 📋 Tu Historial de Consultas")
-            if st.session_state.historial_consultas:
-                for h in st.session_state.historial_consultas:
-                    st.markdown(f"- **{h['fecha']}** - {h['sintoma']} ({h['urgencia']})")
-            else:
-                st.info("No tienes consultas guardadas")
-            if st.button("Ocultar Historial"):
-                st.session_state.ver_historial = False
-                st.rerun()
+        if not opiniones_portada.empty:
+            for idx, op in opiniones_portada.head(5).iterrows():
+                stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
+                with st.container():
+                    st.markdown(f"**👤 {op['usuario']}** {stars}")
+                    st.markdown(f"\"{op['comentario']}\"")
+                    st.caption(f"📅 {op['fecha']}")
+                    st.divider()
+            
+            if len(opiniones_portada) > 5:
+                st.caption(f"📌 Mostrando 5 de {len(opiniones_portada)} opiniones. Ve a la sección 'Opiniones' para ver todas.")
+        else:
+            st.info("💬 No hay opiniones aún. ¡Sé el primero en opinar!")
 
-# --- TAB 21: DIRECTORIO MÉDICO ---
-elif st.session_state.selected_tab == 21:
-    st.title("📍 Directorio Médico de Santa Teresa del Tuy")
-    st.markdown("### Centros de salud, farmacias y especialistas locales")
+# --- NOTICIAS (TAB 1) ---
+elif st.session_state.selected_tab == 1:
+    st.title("📰 Noticias")
+    tab_nac, tab_inter, tab_dep, tab_suc, tab_far, tab_rep = st.tabs(["🇻🇪 Nacionales", "🌎 Internacionales", "⚽ Deportes", "🚨 Sucesos", "🎭 Farándula", "📽️ Reportajes"])
     
-    st.info("""
-    ℹ️ **Información importante:**
-    - Este directorio es colaborativo y se actualiza constantemente
-    - Si conoces un centro de salud que no está listado, ¡puedes sugerirlo!
-    - Los horarios y servicios pueden cambiar, verifica con el establecimiento
-    """)
+    for tab, categoria in zip([tab_nac, tab_inter, tab_dep, tab_suc, tab_far, tab_rep], 
+                               ["Nacional", "Internacional", "Deportes", "Sucesos", "Farándula", "Reportajes"]):
+        with tab:
+            noticias_cat = get_noticias(categoria=categoria)
+            if not noticias_cat.empty:
+                for idx, n in noticias_cat.iterrows():
+                    with st.expander(f"📰 {n['titulo']} - {n['fecha']}"):
+                        mostrar_imagen_segura(n.get('imagen_url'), 300)
+                        st.write(n['contenido'])
+                        mostrar_seccion_comentarios("noticia" if categoria != "Reportajes" else "reportaje", n['id'], n['titulo'], es_admin)
+            else:
+                st.info(f"No hay noticias de {categoria}")
+
+# --- NEGOCIOS (TAB 2) - ACTUALIZADO CON VIDEOS ---
+elif st.session_state.selected_tab == 2:
+    st.title("📍 Donde ir - Donde comprar")
+    negocios = get_negocios()
+    if not negocios.empty:
+        for idx, n in negocios.iterrows():
+            with st.expander(f"🏪 {n['nombre']}"):
+                # Mostrar imágenes
+                if n.get('imagenes_url') and n['imagenes_url']:
+                    if isinstance(n['imagenes_url'], list) and len(n['imagenes_url']) > 0:
+                        mostrar_imagenes_en_fila(n['imagenes_url'], max_imagenes=3)
+                    elif isinstance(n['imagenes_url'], str):
+                        mostrar_imagen_segura(n['imagenes_url'], 300)
+                else:
+                    st.caption("📷 Sin imágenes")
+                
+                st.write(f"**Reseña:** {n['resena']}")
+                
+                # Mostrar video de YouTube si existe
+                if n.get('video_url') and n['video_url']:
+                    st.markdown("#### 🎥 Video del negocio")
+                    mostrar_video_youtube(n['video_url'], width_percent=50)
+                
+                # Mostrar ubicación en Google Maps
+                if n.get('google_maps_url') and n['google_maps_url']:
+                    st.markdown(f"📍 [Ver ubicación en Google Maps]({n['google_maps_url']})")
+                
+                st.markdown("---")
+                st.markdown("### 💬 Opiniones de este negocio")
+                
+                with st.form(f"opinion_form_{n['id']}"):
+                    st.markdown("#### Deja tu opinión")
+                    nombre_usuario = st.text_input("Tu nombre", key=f"nombre_{n['id']}")
+                    comentario = st.text_area("Comentario", key=f"comentario_{n['id']}")
+                    calificacion = st.slider("Calificación", 1, 5, 5, key=f"calif_{n['id']}")
+                    if st.form_submit_button("Enviar Opinión"):
+                        if nombre_usuario and comentario:
+                            if add_opinion_negocio(n['id'], nombre_usuario, comentario, calificacion):
+                                st.success("✅ Opinión enviada")
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al enviar opinión")
+                        else:
+                            st.error("❌ Nombre y comentario son obligatorios")
+                
+                opiniones = get_opiniones_negocio(n['id'])
+                if not opiniones.empty:
+                    for idx2, op in opiniones.iterrows():
+                        stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
+                        st.markdown(f"**👤 {op['usuario']}** {stars}")
+                        st.write(f"\"{op['comentario']}\"")
+                        st.caption(f"📅 {op['fecha']}")
+                        st.divider()
+                else:
+                    st.info("No hay opiniones para este negocio")
+    else:
+        st.info("No hay negocios agregados aún")
+
+# --- REFLEXIONES (TAB 3) ---
+elif st.session_state.selected_tab == 3:
+    st.title("💭 Reflexiones")
     
-    # Datos de ejemplo - En producción vendrían de Supabase
-    centros = [
-        {"nombre": "Hospital General de Santa Teresa", "tipo": "Hospital", 
-         "direccion": "Av. Principal, Santa Teresa", "telefono": "0212-XXX-XXXX", 
-         "servicios": ["Emergencias 24h", "Consulta Externa", "Hospitalización"]},
-        {"nombre": "Ambulatorio Urbano I", "tipo": "Ambulatorio", 
-         "direccion": "Barrio El Centro, Santa Teresa", "telefono": "0212-XXX-XXXX",
-         "servicios": ["Medicina General", "Pediatría", "Odontología"]},
-        {"nombre": "Farmacia Santa Teresa 24h", "tipo": "Farmacia", 
-         "direccion": "Esquina Bolívar, Santa Teresa", "telefono": "0212-XXX-XXXX",
-         "servicios": ["Venta de medicamentos", "Delivery 24h"]},
-        {"nombre": "Clínica San José", "tipo": "Clínica Privada", 
-         "direccion": "Calle 5, Santa Teresa", "telefono": "0212-XXX-XXXX",
-         "servicios": ["Consultas Especializadas", "Laboratorio", "Imagenología"]},
-    ]
+    ref = get_reflexion_activa()
+    if ref:
+        with st.expander(f"✨ ACTUAL: {ref['titulo']}", expanded=True):
+            st.write(ref['contenido'])
+            if ref.get('versiculo'):
+                st.caption(f"📖 {ref['versiculo']}")
+            st.caption(f"📅 {ref['fecha']}")
+            mostrar_seccion_comentarios("reflexion", ref['id'], ref['titulo'], es_admin)
+    else:
+        st.info("No hay reflexión activa")
     
-    for centro in centros:
-        with st.expander(f"{centro['tipo']}: {centro['nombre']}"):
-            st.markdown(f"**Dirección:** {centro['direccion']}")
-            st.markdown(f"**Teléfono:** {centro['telefono']}")
-            st.markdown(f"**Servicios:** {', '.join(centro['servicios'])}")
+    st.markdown("---")
+    
+    if es_admin:
+        st.markdown("### ✏️ Crear Nueva Reflexión")
+        with st.form("nueva_reflexion_form"):
+            nuevo_titulo = st.text_input("Título de la reflexión *")
+            nuevo_versiculo = st.text_input("Versículo (opcional)")
+            nuevo_contenido = st.text_area("Contenido de la reflexión *", height=150)
+            
             col1, col2 = st.columns(2)
             with col1:
-                st.button("📍 Ver en Mapa", key=f"mapa_{centro['nombre']}")
+                if st.form_submit_button("💾 Guardar como activa", use_container_width=True):
+                    if nuevo_titulo and nuevo_contenido:
+                        if add_reflexion(nuevo_titulo, nuevo_contenido, nuevo_versiculo):
+                            st.success("✅ Reflexión guardada correctamente")
+                            st.balloons()
+                            st.rerun()
+                        else:
+                            st.error("❌ Error al guardar la reflexión")
+                    else:
+                        st.error("❌ Título y contenido son obligatorios")
             with col2:
-                st.button("📞 Llamar", key=f"llamar_{centro['nombre']}")
-    
-    st.markdown("---")
-    st.markdown("### ➕ Sugerir un centro de salud")
-    with st.form("sugerir_centro"):
-        nombre_sug = st.text_input("Nombre del centro *")
-        tipo_sug = st.selectbox("Tipo", ["Hospital", "Ambulatorio", "Farmacia", "Clínica Privada", "Especialista"])
-        direccion_sug = st.text_area("Dirección *")
-        telefono_sug = st.text_input("Teléfono")
-        servicios_sug = st.text_input("Servicios que ofrece")
+                if st.form_submit_button("❌ Limpiar", use_container_width=True):
+                    st.rerun()
         
-        submitted = st.form_submit_button("Enviar Sugerencia")
-        if submitted:
-            if nombre_sug and direccion_sug:
-                st.success("✅ ¡Gracias! Tu sugerencia será revisada por el administrador.")
-                st.balloons()
-            else:
-                st.error("❌ El nombre y la dirección son obligatorios")
+        st.markdown("---")
+    
+    st.markdown("### 📜 Reflexiones Anteriores")
+    reflexiones = get_reflexiones()
+    if not reflexiones.empty:
+        for idx, r in reflexiones.iterrows():
+            if ref is None or r['id'] != ref['id']:
+                with st.expander(f"📖 {r['titulo']} - {r['fecha']}"):
+                    st.write(r['contenido'])
+                    if r.get('versiculo'):
+                        st.caption(f"📖 {r['versiculo']}")
+                    
+                    if es_admin:
+                        st.markdown("---")
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.button(f"✏️ MODIFICAR", key=f"edit_ref_{r['id']}_{idx}"):
+                                st.session_state.edit_reflexion = r.to_dict()
+                                st.rerun()
+                        with col2:
+                            if st.button(f"🗑️ ELIMINAR", key=f"del_ref_{r['id']}_{idx}"):
+                                if delete_reflexion(r['id']):
+                                    st.success("✅ Reflexión eliminada")
+                                    st.rerun()
+                    
+                    mostrar_seccion_comentarios("reflexion", r['id'], r['titulo'], es_admin)
+    else:
+        st.info("No hay reflexiones anteriores")
+    
+    if st.session_state.get('edit_reflexion'):
+        r = st.session_state.edit_reflexion
+        st.markdown("---")
+        st.subheader(f"✏️ Modificando: {r['titulo']}")
+        with st.form("edit_reflexion_form"):
+            nuevo_titulo = st.text_input("Título", value=r['titulo'])
+            nuevo_versiculo = st.text_input("Versículo", value=r.get('versiculo', ''))
+            nuevo_contenido = st.text_area("Contenido", value=r['contenido'])
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Guardar cambios"):
+                    if update_reflexion(r['id'], nuevo_titulo, nuevo_contenido, nuevo_versiculo):
+                        st.success("✅ Reflexión actualizada")
+                        del st.session_state.edit_reflexion
+                        st.rerun()
+            with col2:
+                if st.form_submit_button("❌ Cancelar"):
+                    del st.session_state.edit_reflexion
+                    st.rerun()
 
-# --- TAB 22: GUÍAS DE SALUD ---
-elif st.session_state.selected_tab == 22:
-    st.title("📚 Guías de Salud")
-    st.markdown("### Información útil para el cuidado de tu salud")
+# --- CRÓNICAS (TAB 4) ---
+elif st.session_state.selected_tab == 4:
+    st.title("📜 Crónicas")
+    estados = ["Todos", "Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"]
+    estado_filtro = st.selectbox("Filtrar por estado:", estados)
+    cronicas = get_cronicas(estado_filtro if estado_filtro != "Todos" else None)
+    if not cronicas.empty:
+        for idx, c in cronicas.iterrows():
+            with st.expander(f"📖 {c['titulo']} - {c['lugar']}, {c['estado']}"):
+                if c.get('imagenes_url') and c['imagenes_url']:
+                    if isinstance(c['imagenes_url'], list) and len(c['imagenes_url']) > 0:
+                        mostrar_imagenes_en_fila(c['imagenes_url'], max_imagenes=3)
+                    elif isinstance(c['imagenes_url'], str):
+                        mostrar_imagen_segura(c['imagenes_url'], 200)
+                st.write(c['contenido'])
+                st.caption(f"📅 {c['fecha']}")
+                mostrar_seccion_comentarios("cronica", c['id'], c['titulo'], es_admin)
+                
+                if es_admin:
+                    st.markdown("---")
+                    st.markdown("### 🔧 Administrar esta crónica")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button(f"✏️ MODIFICAR CRÓNICA", key=f"edit_cron_{c['id']}_{idx}"):
+                            st.session_state.edit_cronica = c.to_dict()
+                            st.rerun()
+                    with col2:
+                        if st.button(f"🗑️ ELIMINAR CRÓNICA", key=f"del_cron_{c['id']}_{idx}"):
+                            if delete_cronica(c['id']):
+                                st.success("✅ Crónica eliminada")
+                                st.rerun()
+    else:
+        st.info("No hay crónicas disponibles")
     
-    st.info("""
-    ℹ️ **Nota importante:** Estas guías son educativas y no reemplazan el consejo médico profesional.
-    """)
+    if 'edit_cronica' in st.session_state:
+        c = st.session_state.edit_cronica
+        st.markdown("---")
+        st.subheader(f"✏️ Modificando: {c['titulo']}")
+        with st.form("edit_cronica_form"):
+            nuevo_titulo = st.text_input("Título", value=c['titulo'])
+            nuevo_lugar = st.text_input("Lugar", value=c['lugar'])
+            nuevo_estado = st.selectbox("Estado", ["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"], index=["Miranda", "Carabobo", "Distrito Capital", "Zulia", "Lara", "Aragua", "Bolivar", "Anzoategui", "Merida", "Tachira", "Nueva Esparta", "Sucre", "Falcon", "Barinas", "Portuguesa", "Guarico", "Cojedes", "Trujillo", "Yaracuy", "Apure", "Amazonas", "Delta Amacuro", "Vargas"].index(c['estado']))
+            nuevo_contenido = st.text_area("Contenido", value=c['contenido'])
+            nuevas_imagenes = st.file_uploader("Nuevas fotos (opcional)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.form_submit_button("💾 Guardar cambios"):
+                    if update_cronica(c['id'], nuevo_titulo, nuevo_contenido, nuevo_lugar, nuevo_estado, nuevas_imagenes):
+                        st.success("✅ Crónica actualizada")
+                        del st.session_state.edit_cronica
+                        st.rerun()
+            with col2:
+                if st.form_submit_button("❌ Cancelar"):
+                    del st.session_state.edit_cronica
+                    st.rerun()
+
+# --- MULTIMEDIA (TAB 5) ---
+elif st.session_state.selected_tab == 5:
+    st.title("🎬 Multimedia")
+    tab_vid, tab_tik, tab_mus, tab_rad = st.tabs(["🎥 YouTube", "📱 TikTok", "🎵 Música", "📻 Radio"])
     
-    guias = {
-        "Primeros Auxilios Básicos": {
-            "descripcion": "Qué hacer en situaciones de emergencia comunes",
-            "contenido": """
-            **🩹 Heridas y cortes:**
-            1. Lava el área con agua y jabón
-            2. Aplica presión con una gasa limpia para detener el sangrado
-            3. Cubre con un vendaje limpio
-            
-            **🔥 Quemaduras:**
-            1. Enfría la quemadura con agua fría (no hielo) por 10-15 minutos
-            2. No apliques cremas, manteca o remedios caseros
-            3. Cubre con un paño limpio y húmedo
-            
-            **🦴 Fracturas:**
-            1. Inmoviliza el área afectada
-            2. Aplica hielo envuelto en un paño
-            3. Busca atención médica inmediata
-            """
-        },
-        "Fiebre en Adultos": {
-            "descripcion": "Cómo manejar la fiebre y cuándo preocuparse",
-            "contenido": """
-            **¿Qué es fiebre?**
-            - Temperatura mayor a 38°C (100.4°F)
-            - Es un mecanismo de defensa del cuerpo
-            
-            **Cuándo consultar al médico:**
-            - Fiebre de más de 39.5°C (103°F)
-            - Fiebre que dura más de 3 días
-            - Acompañada de dolor de cabeza intenso, dificultad para respirar o confusión
-            - En niños menores de 3 meses: cualquier fiebre requiere atención médica
-            
-            **Recomendaciones:**
-            - Descansa y mantente hidratado
-            - Toma medicamentos para bajar la fiebre (paracetamol) según indicaciones
-            - No te automediques con antibióticos
-            """
-        },
-        "Prevención de Enfermedades": {
-            "descripcion": "Consejos para mantenerte saludable",
-            "contenido": """
-            **💧 Hidratación:**
-            - Bebe al menos 2 litros de agua al día
-            - Aumenta la ingesta en clima caliente o con actividad física
-            
-            **🍎 Alimentación saludable:**
-            - Come frutas y verduras diariamente
-            - Reduce el consumo de azúcar y grasas saturadas
-            - Incluye proteínas magras en tu dieta
-            
-            **🏃 Actividad física:**
-            - Realiza al menos 30 minutos de ejercicio moderado al día
-            - Camina, trota o práctica deporte regularmente
-            
-            **💤 Descanso:**
-            - Duerme entre 7-8 horas diarias
-            - Mantén horarios regulares de sueño
-            """
-        }
-    }
+    with tab_vid:
+        st.markdown("### 🎥 Videos de YouTube")
+        videos = get_videos()
+        if not videos.empty:
+            for idx, v in videos.iterrows():
+                with st.expander(f"🎬 {v['titulo']}"):
+                    mostrar_video_youtube(v['video_url'], width_percent=50)
+                    st.caption(f"📅 {v['fecha']}")
+                    mostrar_seccion_comentarios("video", v['id'], v['titulo'], es_admin)
+        else:
+            st.info("No hay videos disponibles")
     
-    for titulo, info in guias.items():
-        with st.expander(f"📖 {titulo}"):
-            st.markdown(f"**{info['descripcion']}**")
+    with tab_tik:
+        st.markdown("### 📱 Videos de TikTok")
+        tiktoks = get_tiktoks()
+        if not tiktoks.empty:
+            for idx, t in tiktoks.iterrows():
+                with st.expander(f"📱 {t['titulo']}"):
+                    mostrar_tiktok(t['tiktok_url'], width_percent=50)
+                    st.caption(f"📅 {t['fecha']}")
+                    mostrar_seccion_comentarios("tiktok", t['id'], t['titulo'], es_admin)
+        else:
+            st.info("No hay videos de TikTok disponibles")
+    
+    with tab_mus:
+        st.markdown("### 🎵 Lista de Música")
+        musicas = get_musicas()
+        if not musicas.empty:
+            for idx, m in musicas.iterrows():
+                with st.expander(f"🎵 {m['titulo']}"):
+                    if m.get('audio_url') and m['audio_url']:
+                        st.audio(m['audio_url'], format="audio/mp3")
+                        st.caption(f"📅 {m['fecha']}")
+                    else:
+                        st.warning("No hay URL de audio disponible")
+                    mostrar_seccion_comentarios("musica", m['id'], m['titulo'], es_admin)
+        else:
+            st.info("No hay música disponible")
+    
+    with tab_rad:
+        st.markdown("### 📻 Radio Online")
+        st.markdown("#### 🎵 Estaciones de Radio")
+        
+        radio_opcion = st.selectbox("Selecciona una emisora:", [
+            "🎵 80s Forever (Inglés)",
+            "💕 Baladas Románticas (Inglés)",
+            "🕺 Disco Hits 70s 80s",
+            "🎺 Salsa Clásica"
+        ])
+        
+        if radio_opcion == "🎵 80s Forever (Inglés)":
+            st.audio("https://stream.zeno.fm/fsx7rzc2x1zuv", format="audio/mp3")
+            st.caption("🎶 Madonna, Michael Jackson, Whitney Houston, Prince")
+        elif radio_opcion == "💕 Baladas Románticas (Inglés)":
+            st.audio("https://stream.zeno.fm/08f62gs7mg0uv", format="audio/mp3")
+            st.caption("🎶 Air Supply, Chicago, Foreigner, Journey")
+        elif radio_opcion == "🕺 Disco Hits 70s 80s":
+            st.audio("https://stream.zeno.fm/76pz71spy7zuv", format="audio/mp3")
+            st.caption("🎶 Bee Gees, ABBA, Donna Summer")
+        elif radio_opcion == "🎺 Salsa Clásica":
+            st.audio("https://stream.zeno.fm/cf6uxm5sd6quv", format="audio/mp3")
+            st.caption("🎺 Héctor Lavoe, Celia Cruz, Rubén Blades")
+
+# --- DENUNCIAS (TAB 6) ---
+elif st.session_state.selected_tab == 6:
+    st.title("⚠️ Denuncias Ciudadanas")
+    
+    tab_den, tab_ver = st.tabs(["📝 Hacer Denuncia", "👁️ Ver Denuncias"])
+    
+    with tab_den:
+        st.markdown("### Formulario de Denuncia")
+        st.info("Tu identidad se mantendrá en el anonimato si así lo deseas.")
+        
+        with st.form("form_denuncia"):
+            nombre = st.text_input("Nombre (opcional - puede ser anónimo)")
+            titulo = st.text_input("Título de la denuncia *")
+            descripcion = st.text_area("Descripción detallada de los hechos *", height=150)
+            ubicacion = st.text_input("Ubicación (sector, calle, dirección)")
+            
             st.markdown("---")
-            st.markdown(info['contenido'])
+            submitted = st.form_submit_button("📤 Enviar Denuncia", use_container_width=True)
+            
+            if submitted:
+                if titulo and descripcion:
+                    if add_denuncia(nombre, titulo, descripcion, ubicacion):
+                        st.success("✅ ¡Denuncia enviada correctamente!")
+                        st.balloons()
+                        st.rerun()
+                    else:
+                        st.error("❌ Error al enviar la denuncia. Intenta nuevamente.")
+                else:
+                    st.error("❌ El título y la descripción son obligatorios.")
     
-    st.markdown("---")
-    st.markdown("### 🏥 Recursos de Emergencia")
-    st.markdown("""
-    - **🚑 Emergencias Médicas:** 911
-    - **🚒 Bomberos:** 0800-BOMBEROS (0800-266-2376)
-    - **🚨 Policía:** 911
-    - **Hospital General de Santa Teresa:** 0212-XXX-XXXX
-    """)
+    with tab_ver:
+        st.markdown("### Listado de Denuncias")
+        denuncias = get_denuncias()
+        
+        if not denuncias.empty:
+            for idx, d in denuncias.iterrows():
+                with st.expander(f"📌 {d['titulo']}"):
+                    st.write(f"**Denunciante:** {d['denunciante']}")
+                    st.write(f"**Descripción:** {d['descripcion']}")
+                    if d.get('ubicacion') and d['ubicacion'] != "No especificada":
+                        st.write(f"**Ubicación:** {d['ubicacion']}")
+                    
+                    if d['estatus'] == "Pendiente":
+                        st.warning(f"**Estado:** {d['estatus']}")
+                    elif d['estatus'] == "En revisión":
+                        st.info(f"**Estado:** {d['estatus']}")
+                    elif d['estatus'] == "Resuelta":
+                        st.success(f"**Estado:** {d['estatus']}")
+                    else:
+                        st.error(f"**Estado:** {d['estatus']}")
+                    st.caption(f"📅 Fecha: {d['fecha']}")
+        else:
+            st.info("No hay denuncias registradas aún.")
+
+# --- OPINIONES (TAB 7) ---
+elif st.session_state.selected_tab == 7:
+    st.title("💬 Opiniones de la Comunidad")
+    
+    tab_op, tab_ver_op = st.tabs(["✍️ Dar Opinión", "👁️ Todas las Opiniones Aprobadas"])
+    
+    with tab_op:
+        st.markdown("### Comparte tu opinión sobre Santa Teresa al Día")
+        st.caption("Tu opinión será revisada por un administrador antes de ser publicada.")
+        
+        with st.form("form_opinion"):
+            nombre = st.text_input("Nombre o apodo *")
+            comentario = st.text_area("Tu comentario u opinión *", height=120)
+            calificacion = st.slider("Calificación (1 a 5 estrellas)", 1, 5, 5)
+            
+            st.markdown("---")
+            submitted = st.form_submit_button("📤 Enviar Opinión", use_container_width=True)
+            
+            if submitted:
+                if nombre and comentario:
+                    if add_opinion(nombre, comentario, calificacion):
+                        st.success("✅ ¡Opinión enviada! Será revisada por el administrador.")
+                        st.balloons()
+                        st.rerun()
+                    else:
+                        st.error("❌ Error al enviar la opinión. Intenta nuevamente.")
+                else:
+                    st.error("❌ El nombre y el comentario son obligatorios.")
+    
+    with tab_ver_op:
+        st.markdown("### Todas las Opiniones Aprobadas")
+        opiniones = get_opiniones(aprobadas=True)
+        
+        if not opiniones.empty:
+            for idx, op in opiniones.iterrows():
+                stars = "⭐" * int(op['calificacion']) + "☆" * (5 - int(op['calificacion']))
+                st.markdown(f"**👤 {op['usuario']}** {stars}")
+                st.write(f"\"{op['comentario']}\"")
+                st.caption(f"📅 {op['fecha']}")
+                st.divider()
+        else:
+            st.info("No hay opiniones aprobadas aún. ¡Sé el primero en dar tu opinión!")
+
+# --- PERSONAJES (TAB 8) ---
+elif st.session_state.selected_tab == 8:
+    st.title("👥 Personajes que hicieron historia")
+    st.markdown("### 📋 Personajes Registrados")
+    personajes = get_personajes()
+    if not personajes.empty:
+        for idx, p in personajes.iterrows():
+            with st.expander(f"👤 {p['nombre']} - {p['fecha']}"):
+                mostrar_imagen_segura(p.get('imagen_url'), 200)
+                st.write(f"**Biografía:** {p['descripcion']}")
+                mostrar_seccion_comentarios("personaje", p['id'], p['nombre'], es_admin)
+    else:
+        st.info("No hay personajes registrados")
+
+# --- EL CRIMEN NO PAGA (TAB 9) ---
+elif st.session_state.selected_tab == 9:
+    st.title("⚖️ El Crimen No Paga")
+    st.markdown("### Casos y noticias sobre justicia")
+    crimenes = get_crimen_no_paga()
+    if not crimenes.empty:
+        for idx, c in crimenes.iterrows():
+            with st.expander(f"⚖️ {c['titulo']} - {c['fecha']}"):
+                if c.get('imagenes_url') and c['imagenes_url']:
+                    if isinstance(c['imagenes_url'], list) and len(c['imagenes_url']) > 0:
+                        mostrar_imagenes_en_fila(c['imagenes_url'], max_imagenes=3)
+                    elif isinstance(c['imagenes_url'], str):
+                        mostrar_imagen_segura(c['imagenes_url'], 200)
+                st.write(f"**Descripción:** {c['descripcion']}")
+                st.caption(f"📅 Publicado: {c['fecha']}")
+                mostrar_seccion_comentarios("crimen", c['id'], c['titulo'], es_admin)
+    else:
+        st.info("No hay casos registrados")
+
+# --- EFEMÉRIDES MÉDICAS (TAB 10) ---
+elif st.session_state.selected_tab == 10:
+    st.title("📅 Efemérides Médicas")
+    fecha_actual_str = f"{ahora.day} de {meses[ahora.month-1]}"
+    st.markdown(f"### 📌 {dias[ahora.weekday()]}, {fecha_actual_str} de {ahora.year}")
+    col_ven, col_mundo = st.columns(2)
+    with col_ven:
+        st.markdown("#### 🇻🇪 Venezuela")
+        efemerides_venezuela = {
+            "24 de Junio": "Día del Médico Venezolano",
+            "3 de Diciembre": "Día del Odontólogo Venezolano",
+            "13 de Octubre": "Día del Trabajador de la Salud",
+            "10 de Diciembre": "Día de la Enfermera Venezolana"
+        }
+        hoy_ven = None
+        for fecha, texto in efemerides_venezuela.items():
+            if fecha == fecha_actual_str:
+                hoy_ven = texto
+                break
+        if hoy_ven:
+            st.success(f"🎉 **¡HOY!** {fecha_actual_str}: {hoy_ven}")
+        else:
+            st.info(f"📌 Para hoy ({fecha_actual_str}) no hay efeméride médica registrada")
+        st.markdown("**📅 Otras efemérides:**")
+        for fecha, texto in efemerides_venezuela.items():
+            st.markdown(f"- **{fecha}:** {texto}")
+    with col_mundo:
+        st.markdown("#### 🌎 Mundo")
+        efemerides_mundo = {
+            "12 de Mayo": "Día Internacional de la Enfermería",
+            "7 de Abril": "Día Mundial de la Salud",
+            "31 de Mayo": "Día Mundial sin Tabaco",
+            "14 de Junio": "Día Mundial del Donante de Sangre",
+            "10 de Octubre": "Día Mundial de la Salud Mental",
+            "14 de Noviembre": "Día Mundial de la Diabetes"
+        }
+        hoy_mundo = None
+        for fecha, texto in efemerides_mundo.items():
+            if fecha == fecha_actual_str:
+                hoy_mundo = texto
+                break
+        if hoy_mundo:
+            st.success(f"🎉 **¡HOY!** {fecha_actual_str}: {hoy_mundo}")
+        else:
+            st.info(f"📌 Para hoy ({fecha_actual_str}) no hay efeméride médica mundial")
+        st.markdown("**📅 Otras efemérides:**")
+        for fecha, texto in efemerides_mundo.items():
+            st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
 # PANEL ADMIN (COMPLETO)
