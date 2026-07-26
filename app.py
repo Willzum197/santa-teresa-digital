@@ -820,7 +820,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON FONDO DE IMAGEN Y EFECTOS HOVER
+# ESTILOS - CON FONDO DE IMAGEN Y TEXTO VISIBLE
 # ============================================
 st.markdown(f"""
 <style>
@@ -851,7 +851,68 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 .streamlit-expanderHeader {{ background-color: #1a1a1a !important; border-left: 4px solid #FFD700 !important; color: #FFD700 !important; }}
 [data-testid="stSidebar"] {{ background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important; border-right: 3px solid #FFD700 !important; }}
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
-input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !important; border: 2px solid #FFD700 !important; border-radius: 12px !important; }}
+
+/* CORRECCIÓN: Inputs, textareas y select con texto visible */
+input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > textarea {{
+    background-color: #f0f0f0 !important;
+    color: #000000 !important;
+    border: 2px solid #FFD700 !important;
+    border-radius: 12px !important;
+}}
+
+/* CORRECCIÓN: Select boxes y multiselect */
+.stSelectbox > div > div, .stMultiSelect > div > div {{
+    background-color: #f0f0f0 !important;
+    color: #000000 !important;
+}}
+.stSelectbox > div > div > div, .stMultiSelect > div > div > div {{
+    color: #000000 !important;
+}}
+.stSelectbox label, .stMultiSelect label {{
+    color: #FFFFFF !important;
+}}
+.stMultiSelect [data-baseweb="tag"] {{
+    background-color: #FFD700 !important;
+    color: #000000 !important;
+}}
+.stMultiSelect [data-baseweb="tag"] span {{
+    color: #000000 !important;
+}}
+.stMultiSelect [data-baseweb="select"] {{
+    color: #000000 !important;
+}}
+
+/* CORRECCIÓN: Opciones de los selects */
+ul[role="listbox"] li {{
+    color: #000000 !important;
+    background-color: #ffffff !important;
+}}
+ul[role="listbox"] li:hover {{
+    background-color: #FFD700 !important;
+    color: #000000 !important;
+}}
+ul[role="listbox"] li[aria-selected="true"] {{
+    background-color: #FFD700 !important;
+    color: #000000 !important;
+}}
+
+/* CORRECCIÓN: Number inputs */
+input[type="number"] {{
+    background-color: #f0f0f0 !important;
+    color: #000000 !important;
+    border: 2px solid #FFD700 !important;
+    border-radius: 12px !important;
+}}
+
+/* CORRECCIÓN: Slider */
+.stSlider > div > div > div {{
+    color: #FFFFFF !important;
+}}
+.stSlider label {{
+    color: #FFFFFF !important;
+}}
+
+/* CORRECCIÓN: Botones */
 .stButton > button {{ 
     background: linear-gradient(135deg, #FFD700, #CF142B) !important; 
     color: white !important; 
@@ -869,13 +930,14 @@ input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !importa
     transform: translateY(0px) !important;
     box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2) !important;
 }}
+
 .bronze-footer {{ background: linear-gradient(145deg, #8c6a31, #5d431a) !important; border: 5px solid #d4af37 !important; padding: 35px 25px !important; border-radius: 20px !important; text-align: center !important; margin-top: 50px !important; }}
 .bronze-footer p {{ color: #ffd700 !important; }}
 .stInfo, .stSuccess, .stWarning, .stError {{ background-color: rgba(0,0,0,0.8) !important; color: white !important; }}
 [data-testid="stMetricValue"] {{ color: #FFD700 !important; font-size: 1.5rem !important; }}
 
 /* Estilos para botones de la sección de salud */
-div[data-testid="column"]:has(.stButton) .stButton > button {{
+div[data-testid="column"] .stButton > button {{
     background: linear-gradient(135deg, #0a6b8a, #1a8aaa) !important;
     color: #FFFFFF !important;
     border: 2px solid #00d4ff !important;
@@ -888,21 +950,49 @@ div[data-testid="column"]:has(.stButton) .stButton > button {{
     width: 100% !important;
     text-shadow: 0 1px 2px rgba(0,0,0,0.3) !important;
 }}
-div[data-testid="column"]:has(.stButton) .stButton > button:hover {{
+div[data-testid="column"] .stButton > button:hover {{
     background: linear-gradient(135deg, #00d4ff, #0099cc) !important;
     transform: translateY(-4px) !important;
     box-shadow: 0 8px 35px rgba(0, 180, 216, 0.6) !important;
     border-color: #FFD700 !important;
     color: #FFFFFF !important;
 }}
-div[data-testid="column"]:has(.stButton) .stButton > button:active {{
+div[data-testid="column"] .stButton > button:active {{
     transform: translateY(0px) !important;
     box-shadow: 0 2px 10px rgba(0, 180, 216, 0.2) !important;
 }}
-div[data-testid="column"]:has(.stButton) .stButton > button p {{
+div[data-testid="column"] .stButton > button p {{
     color: #FFFFFF !important;
     font-weight: bold !important;
     margin: 0 !important;
+}}
+
+/* CORRECCIÓN: Checkbox y Radio */
+.stCheckbox label, .stRadio label {{
+    color: #FFFFFF !important;
+}}
+.stCheckbox label span, .stRadio label span {{
+    color: #FFFFFF !important;
+}}
+
+/* CORRECCIÓN: Expanders */
+.streamlit-expanderHeader {{
+    background-color: #1a1a1a !important;
+    border-left: 4px solid #FFD700 !important;
+    color: #FFD700 !important;
+}}
+.streamlit-expanderContent {{
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    color: #FFFFFF !important;
+}}
+
+/* CORRECCIÓN: Alertas y mensajes */
+.stAlert {{
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    color: #FFFFFF !important;
+}}
+.stAlert p {{
+    color: #FFFFFF !important;
 }}
 </style>
 """, unsafe_allow_html=True)
@@ -1089,7 +1179,6 @@ with col_linea3[3]:
 # ============================================
 st.markdown("### 🩺 Hablando con tus doctores")
 
-# Usar botones normales sin estilos especiales para que funcionen igual que el resto
 col_salud = st.columns(4)
 with col_salud[0]:
     if st.button("🩺 Evaluar Síntomas", use_container_width=True, key="tab_20"):
@@ -1114,7 +1203,10 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES EXISTENTES
+# CONTENIDO DE LAS SECCIONES EXISTENTES (TAB 0 - 10)
+# ============================================
+# [Todas tus secciones existentes van aquí - TAB 0 a TAB 10]
+# Esto incluye: Portada, Noticias, Negocios, Reflexiones, Crónicas, Multimedia, Denuncias, Opiniones, Personajes, Crimen, Efemérides
 # ============================================
 
 # --- PORTADA (TAB 0) ---
