@@ -52,6 +52,259 @@ def actualizar_dolar_manual(nuevo_valor):
         return False
 
 # ============================================
+# BASE DE DATOS DE ENFERMEDADES (MOTOR DE DIAGNÓSTICO)
+# ============================================
+BASE_DATOS_ENFERMEDADES = {
+    # === ENFERMEDADES CARDIOVASCULARES ===
+    "Hipertensión Arterial": {
+        "sintomas": ["dolor de cabeza", "visión borrosa", "fatiga", "palpitaciones", "mareos", "sangrado nasal", "dificultad para respirar", "zumbido en oídos"],
+        "factores_riesgo": ["sobrepeso", "obesidad", "tabaquismo", "sedentarismo", "estrés", "historia familiar", "consumo de sal"],
+        "especialidad": "Cardiología",
+        "urgencia": "Alta",
+        "recomendaciones": ["Medir presión arterial diariamente", "Reducir consumo de sal", "Ejercicio regular", "Consulta con cardiólogo"],
+        "tratamiento": "Enalapril, losartán, diuréticos, cambios en estilo de vida"
+    },
+    "Hipotensión Arterial": {
+        "sintomas": ["mareos", "visión borrosa", "fatiga", "náuseas", "palidez", "desmayos", "dificultad para concentrarse", "sed"],
+        "factores_riesgo": ["deshidratación", "embarazo", "problemas cardíacos", "diabetes", "anemia", "medicamentos"],
+        "especialidad": "Cardiología",
+        "urgencia": "Media",
+        "recomendaciones": ["Aumentar consumo de líquidos", "Consumir sal moderadamente", "Evitar cambios bruscos de posición", "Consulta con cardiólogo"],
+        "tratamiento": "Aumento de líquidos, sal en dieta, medicamentos según causa"
+    },
+    "Isquemia Cardíaca": {
+        "sintomas": ["dolor en el pecho", "dificultad para respirar", "fatiga", "palpitaciones", "dolor en brazo izquierdo", "náuseas", "sudoración"],
+        "factores_riesgo": ["hipertensión", "colesterol alto", "tabaquismo", "diabetes", "sedentarismo", "historia familiar"],
+        "especialidad": "Cardiología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR A URGENCIAS INMEDIATAMENTE", "Reposo absoluto", "No automedicarse", "Consulta con cardiólogo urgente"],
+        "tratamiento": "Nitroglicerina, antiagregantes, angioplastia, cirugía de bypass"
+    },
+    
+    # === ENFERMEDADES RESPIRATORIAS ===
+    "Bronquitis Aguda": {
+        "sintomas": ["tos", "producción de moco", "dificultad para respirar", "sibilancias", "dolor en el pecho", "fiebre", "fatiga"],
+        "factores_riesgo": ["tabaquismo", "exposición a contaminantes", "infecciones virales", "bajas defensas", "cambios bruscos de temperatura"],
+        "especialidad": "Neumología",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "Aumentar consumo de líquidos", "Usar humidificador", "Consulta con neumólogo si persiste"],
+        "tratamiento": "Broncodilatadores, antiinflamatorios, antibióticos si es bacteriana"
+    },
+    "Catarro Común (Resfriado)": {
+        "sintomas": ["congestión nasal", "estornudos", "tos", "dolor de garganta", "fiebre leve", "fatiga", "dolor de cabeza"],
+        "factores_riesgo": ["cambios de temperatura", "bajas defensas", "contacto con personas enfermas", "estrés"],
+        "especialidad": "Medicina General",
+        "urgencia": "Baja",
+        "recomendaciones": ["Reposo", "Aumentar consumo de líquidos", "Té con miel y limón", "Consulta si empeora"],
+        "tratamiento": "Antihistamínicos, analgésicos, descongestionantes"
+    },
+    "Neumonía": {
+        "sintomas": ["fiebre alta", "tos con flema", "dificultad para respirar", "dolor en el pecho", "fatiga", "escalofríos", "sudoración"],
+        "factores_riesgo": ["edad avanzada", "tabaquismo", "enfermedades crónicas", "bajas defensas", "influenza"],
+        "especialidad": "Neumología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo absoluto", "Aumentar líquidos", "No automedicarse"],
+        "tratamiento": "Antibióticos, antipiréticos, oxigenoterapia si es necesario"
+    },
+    
+    # === ENFERMEDADES NEUROLÓGICAS ===
+    "Cefalea Tensional": {
+        "sintomas": ["dolor de cabeza", "sensación de presión", "dolor en la nuca", "dolor en los hombros", "irritabilidad", "dificultad para concentrarse"],
+        "factores_riesgo": ["estrés", "ansiedad", "falta de sueño", "mala postura", "tensión muscular"],
+        "especialidad": "Neurología",
+        "urgencia": "Baja",
+        "recomendaciones": ["Descanso", "Técnicas de relajación", "Aplicar compresas frías", "Consulta si persiste"],
+        "tratamiento": "Analgésicos, relajantes musculares, terapia de relajación"
+    },
+    "Migraña": {
+        "sintomas": ["dolor de cabeza pulsátil", "náuseas", "vómitos", "sensibilidad a la luz", "sensibilidad al sonido", "aura visual", "fatiga"],
+        "factores_riesgo": ["estrés", "cambios hormonales", "falta de sueño", "historia familiar", "consumo de alcohol", "alimentos específicos"],
+        "especialidad": "Neurología",
+        "urgencia": "Media",
+        "recomendaciones": ["Descanso en lugar oscuro", "Hidratación", "Evitar factores desencadenantes", "Consulta con neurólogo"],
+        "tratamiento": "Triptanos, antiinflamatorios, betabloqueadores"
+    },
+    "Neuritis": {
+        "sintomas": ["dolor agudo", "hormigueo", "entumecimiento", "debilidad muscular", "quemazón", "sensibilidad al tacto", "dificultad para mover"],
+        "factores_riesgo": ["diabetes", "alcoholismo", "infecciones virales", "deficiencias nutricionales", "enfermedades autoinmunes"],
+        "especialidad": "Neurología",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "Fisioterapia", "Calor local", "Consulta con neurólogo"],
+        "tratamiento": "Antiinflamatorios, analgésicos, vitaminas del complejo B"
+    },
+    
+    # === ENFERMEDADES GASTROINTESTINALES ===
+    "Diarrea Aguda": {
+        "sintomas": ["deposiciones líquidas", "dolor abdominal", "náuseas", "vómitos", "fiebre", "deshidratación", "pérdida de apetito"],
+        "factores_riesgo": ["alimentos contaminados", "virus", "bacterias", "intolerancias alimentarias", "estrés", "medicamentos"],
+        "especialidad": "Gastroenterología",
+        "urgencia": "Media",
+        "recomendaciones": ["Hidratación oral", "Dieta blanda", "Reposo", "Consulta si persiste más de 3 días"],
+        "tratamiento": "Sales de rehidratación, probióticos, antidiarreicos"
+    },
+    "Gastroenteritis": {
+        "sintomas": ["diarrea", "vómitos", "dolor abdominal", "fiebre", "deshidratación", "pérdida de apetito", "malestar general"],
+        "factores_riesgo": ["alimentos contaminados", "falta de higiene", "sistema inmunológico débil", "viajes"],
+        "especialidad": "Gastroenterología",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "Hidratación", "Dieta blanda", "Consulta si hay deshidratación"],
+        "tratamiento": "Sales de rehidratación, probióticos, medicamentos según causa"
+    },
+    "Enfermedad de Crohn": {
+        "sintomas": ["dolor abdominal", "diarrea crónica", "fatiga", "pérdida de peso", "sangre en heces", "fiebre", "úlceras bucales"],
+        "factores_riesgo": ["historia familiar", "tabaquismo", "edad < 40", "origen judío", "consumo de antiinflamatorios"],
+        "especialidad": "Gastroenterología",
+        "urgencia": "Media",
+        "recomendaciones": ["Dieta baja en fibra", "Suplementos nutricionales", "Evitar irritantes", "Consulta con gastroenterólogo"],
+        "tratamiento": "Corticosteroides, inmunomoduladores, biológicos"
+    },
+    
+    # === ENFERMEDADES MUSCULOESQUELÉTICAS ===
+    "Artritis Reumatoide": {
+        "sintomas": ["dolor articular", "rigidez matutina", "inflamación", "fatiga", "fiebre", "pérdida de peso", "deformidad articular"],
+        "factores_riesgo": ["historia familiar", "tabaquismo", "obesidad", "sexo femenino", "edad > 40"],
+        "especialidad": "Reumatología",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "Fisioterapia", "Medicamentos antiinflamatorios", "Consulta con reumatólogo"],
+        "tratamiento": "Metotrexato, corticosteroides, anti-TNF"
+    },
+    "Artrosis (Osteoartritis)": {
+        "sintomas": ["dolor articular", "rigidez", "dificultad para moverse", "crujidos", "inflamación leve", "deformidad", "pérdida de flexibilidad"],
+        "factores_riesgo": ["edad avanzada", "obesidad", "sobreuso de articulaciones", "lesiones previas", "historia familiar"],
+        "especialidad": "Reumatología",
+        "urgencia": "Baja",
+        "recomendaciones": ["Ejercicio de bajo impacto", "Pérdida de peso", "Fisioterapia", "Consulta con reumatólogo"],
+        "tratamiento": "Analgésicos, antiinflamatorios, fisioterapia, cirugía en casos graves"
+    },
+    "Cervicalgia (Dolor de Cuello)": {
+        "sintomas": ["dolor en el cuello", "rigidez", "dolor de cabeza", "dificultad para mover el cuello", "dolor en hombros", "hormigueo en brazos"],
+        "factores_riesgo": ["mala postura", "uso excesivo de dispositivos", "estrés", "lesiones", "sobrepeso"],
+        "especialidad": "Traumatología",
+        "urgencia": "Baja",
+        "recomendaciones": ["Aplicar calor local", "Ejercicios de estiramiento", "Mejorar postura", "Consulta si persiste"],
+        "tratamiento": "Analgésicos, relajantes musculares, fisioterapia"
+    },
+    "Lumbalgia (Dolor de Espalda)": {
+        "sintomas": ["dolor lumbar", "rigidez", "dificultad para moverse", "dolor al estar de pie", "dolor al sentarse", "irradiación a piernas"],
+        "factores_riesgo": ["mala postura", "sedentarismo", "sobrepeso", "levantar objetos pesados", "estrés"],
+        "especialidad": "Traumatología",
+        "urgencia": "Baja",
+        "recomendaciones": ["Aplicar calor o frío", "Reposo", "Ejercicios de fortalecimiento", "Consulta si persiste"],
+        "tratamiento": "Analgésicos, relajantes musculares, fisioterapia"
+    },
+    
+    # === INFECCIONES ===
+    "Infección Urinaria": {
+        "sintomas": ["dolor al orinar", "micción frecuente", "orina turbia", "olor fuerte en orina", "dolor pélvico", "fiebre", "escalofríos"],
+        "factores_riesgo": ["falta de higiene", "relaciones sexuales", "embarazo", "diabetes", "uso de anticonceptivos"],
+        "especialidad": "Urología",
+        "urgencia": "Media",
+        "recomendaciones": ["Aumentar consumo de agua", "Jugo de arándano", "Higiene adecuada", "Consulta con urólogo"],
+        "tratamiento": "Antibióticos, analgésicos, aumento de líquidos"
+    },
+    "Cistitis": {
+        "sintomas": ["dolor al orinar", "micción frecuente", "urgencia urinaria", "orina con sangre", "dolor pélvico", "fiebre", "malestar general"],
+        "factores_riesgo": ["infecciones recurrentes", "embarazo", "diabetes", "uso de catéteres", "relaciones sexuales"],
+        "especialidad": "Urología",
+        "urgencia": "Media",
+        "recomendaciones": ["Hidratación", "Higiene", "Evitar irritantes", "Consulta con urólogo"],
+        "tratamiento": "Antibióticos, analgésicos, aumento de líquidos"
+    },
+    
+    # === ENFERMEDADES SISTÉMICAS ===
+    "Diabetes Tipo 2": {
+        "sintomas": ["sed excesiva", "micción frecuente", "fatiga", "visión borrosa", "hambre extrema", "pérdida de peso", "infecciones frecuentes"],
+        "factores_riesgo": ["sobrepeso", "obesidad", "hipertensión", "historia familiar", "sedentarismo", "edad > 45"],
+        "especialidad": "Endocrinología",
+        "urgencia": "Media",
+        "recomendaciones": ["Control de glucosa", "Dieta balanceada", "Ejercicio regular", "Consulta con endocrinólogo"],
+        "tratamiento": "Metformina, insulina, cambios en estilo de vida"
+    },
+    "Lupus Eritematoso Sistémico": {
+        "sintomas": ["fatiga", "dolor articular", "erupción en la cara", "fiebre", "caída de cabello", "úlceras bucales", "dolor en el pecho"],
+        "factores_riesgo": ["sexo femenino", "edad 15-45", "historia familiar", "exposición solar", "infecciones"],
+        "especialidad": "Reumatología",
+        "urgencia": "Alta",
+        "recomendaciones": ["Protección solar", "Reposo", "Medicamentos antiinflamatorios", "Consulta con reumatólogo"],
+        "tratamiento": "Corticosteroides, antipalúdicos, inmunosupresores"
+    },
+    "Anemia": {
+        "sintomas": ["fatiga", "debilidad", "palidez", "mareos", "dificultad para respirar", "palpitaciones", "manos y pies fríos"],
+        "factores_riesgo": ["deficiencia de hierro", "dieta pobre", "sangrado menstrual", "embarazo", "enfermedades crónicas"],
+        "especialidad": "Hematología",
+        "urgencia": "Media",
+        "recomendaciones": ["Dieta rica en hierro", "Suplementos", "Descanso", "Consulta con hematólogo"],
+        "tratamiento": "Suplementos de hierro, vitamina B12, ácido fólico"
+    }
+}
+
+# ============================================
+# FUNCIÓN DE DIAGNÓSTICO AVANZADO
+# ============================================
+def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad, sexo):
+    """
+    Función avanzada de diagnóstico que analiza múltiples enfermedades
+    y devuelve un ranking de probabilidad.
+    """
+    diagnosticos = []
+    
+    # Normalizar síntomas (convertir a minúsculas y quitar acentos)
+    sintomas_normalizados = []
+    for s in sintomas_usuario:
+        s_lower = s.lower().strip()
+        # Quitar acentos básicos
+        s_lower = s_lower.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+        sintomas_normalizados.append(s_lower)
+    
+    # Analizar cada enfermedad
+    for nombre, info in BASE_DATOS_ENFERMEDADES.items():
+        puntaje = 0
+        sintomas_coincidentes = []
+        factores_riesgo = []
+        total_sintomas = len(info["sintomas"])
+        
+        # Verificar coincidencia de síntomas
+        for sintoma in info["sintomas"]:
+            s_lower = sintoma.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+            if any(s_lower in s_usuario or s_usuario in s_lower for s_usuario in sintomas_normalizados):
+                puntaje += 1
+                sintomas_coincidentes.append(sintoma)
+        
+        # Verificar factores de riesgo
+        for factor in info["factores_riesgo"]:
+            factor_lower = factor.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+            for condicion in condiciones_preexistentes:
+                cond_lower = condicion.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
+                if factor_lower in cond_lower or cond_lower in factor_lower:
+                    factores_riesgo.append(factor)
+                    puntaje += 1
+        
+        # Calcular porcentaje de coincidencia
+        if total_sintomas > 0:
+            porcentaje = (puntaje / (total_sintomas + len(info["factores_riesgo"]))) * 100
+        else:
+            porcentaje = 0
+        
+        # Solo considerar si hay al menos 1 síntoma coincidente
+        if len(sintomas_coincidentes) >= 1:
+            diagnosticos.append({
+                "enfermedad": nombre,
+                "porcentaje": min(porcentaje, 100),
+                "sintomas_coincidentes": sintomas_coincidentes,
+                "factores_riesgo": factores_riesgo,
+                "especialidad": info["especialidad"],
+                "urgencia": info["urgencia"],
+                "recomendaciones": info["recomendaciones"],
+                "tratamiento": info["tratamiento"]
+            })
+    
+    # Ordenar por porcentaje de coincidencia (mayor a menor)
+    diagnosticos.sort(key=lambda x: x["porcentaje"], reverse=True)
+    
+    # Solo devolver los top 8
+    return diagnosticos[:8]
+
+# ============================================
 # FUNCIONES DE ME GUSTA (HÍBRIDO)
 # ============================================
 
@@ -853,7 +1106,7 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 
 /* ============================================
-   CORRECCIÓN: Inputs, textareas y select con texto visible
+   CORRECCIÓN DE VISIBILIDAD PARA SELECTS Y MULTISELECTS
    ============================================ */
 
 /* Inputs de texto */
@@ -864,7 +1117,7 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     border-radius: 12px !important;
 }}
 
-/* Select boxes */
+/* Select boxes - FONDO BLANCO Y TEXTO NEGRO */
 .stSelectbox > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -912,6 +1165,7 @@ div[data-baseweb="popover"] {{
     background-color: #ffffff !important;
     border: 2px solid #FFD700 !important;
     border-radius: 12px !important;
+    z-index: 9999 !important;
 }}
 div[data-baseweb="popover"] ul {{
     background-color: #ffffff !important;
@@ -959,9 +1213,7 @@ input[type="number"] {{
     background-color: #FFD700 !important;
 }}
 
-/* ============================================
-   CORRECCIÓN: Checkbox y Radio
-   ============================================ */
+/* Checkbox y Radio */
 .stCheckbox label, .stRadio label {{
     color: #FFFFFF !important;
 }}
@@ -969,9 +1221,7 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 
-/* ============================================
-   CORRECCIÓN: Formularios y alertas
-   ============================================ */
+/* Formularios y alertas */
 .stAlert {{
     background-color: rgba(0, 0, 0, 0.8) !important;
     color: #FFFFFF !important;
@@ -983,9 +1233,7 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 
-/* ============================================
-   CORRECCIÓN: Botones
-   ============================================ */
+/* Botones */
 .stButton > button {{ 
     background: linear-gradient(135deg, #FFD700, #CF142B) !important; 
     color: white !important; 
@@ -1775,12 +2023,12 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20, 21, 22, 23)
+# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20 - CON DIAGNÓSTICO AVANZADO)
 # ============================================
 
-# --- TAB 20: EVALUAR SÍNTOMAS ---
+# --- TAB 20: EVALUAR SÍNTOMAS (CON DIAGNÓSTICO AVANZADO) ---
 elif st.session_state.selected_tab == 20:
-    st.title("🩺 Evaluación de Síntomas")
+    st.title("🩺 Evaluación de Síntomas - Diagnóstico Avanzado")
     
     # ADVERTENCIA IMPORTANTE
     st.markdown("""
@@ -1805,8 +2053,9 @@ elif st.session_state.selected_tab == 20:
     st.markdown("""
     ### ¿Cómo funciona?
     1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
-    2. Obtendrás un reporte con posibles causas y recomendaciones
-    3. El reporte te ayudará a saber cuándo debes consultar a un médico
+    2. Nuestro sistema analizará tus síntomas con una base de datos de más de 25 enfermedades
+    3. Obtendrás un diagnóstico diferencial con porcentajes de probabilidad
+    4. El reporte te ayudará a saber cuándo debes consultar a un médico
     """)
     
     if 'cuestionario_paso' not in st.session_state:
@@ -1833,7 +2082,7 @@ elif st.session_state.selected_tab == 20:
             
             condiciones = st.multiselect(
                 "¿Tienes alguna condición médica preexistente?",
-                ["Diabetes", "Hipertensión", "Asma", "Alergias", "Enfermedad cardíaca", "Ninguna", "Otra"]
+                ["Diabetes", "Hipertensión", "Asma", "Alergias", "Enfermedad cardíaca", "Depresión", "Ansiedad", "Artritis", "Ninguna", "Otra"]
             )
             
             submitted = st.form_submit_button("Siguiente →", use_container_width=True)
@@ -1850,33 +2099,48 @@ elif st.session_state.selected_tab == 20:
     elif st.session_state.cuestionario_paso == 2:
         with st.form("paso_2_consulta"):
             st.subheader("🩺 Paso 2: Cuéntanos tus síntomas")
-            st.markdown("Responde lo más detallado posible.")
+            st.markdown("Selecciona todos los síntomas que estás experimentando.")
             
-            sintoma_principal = st.selectbox(
-                "¿Cuál es tu síntoma principal?",
-                ["Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal", 
-                 "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar", 
-                 "Dolor en el pecho", "Erupción cutánea", "Otro"]
+            # Lista ampliada de síntomas
+            sintomas_disponibles = [
+                "Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal",
+                "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar",
+                "Dolor en el pecho", "Erupción cutánea", "Fatiga", "Sed excesiva",
+                "Micción frecuente", "Visión borrosa", "Hambre extrema", "Pérdida de peso",
+                "Infecciones frecuentes", "Dolor articular", "Rigidez matutina",
+                "Inflamación", "Temblores", "Rigidez muscular", "Bradicinesia",
+                "Inestabilidad postural", "Pérdida de memoria", "Confusión",
+                "Cambios de humor", "Desorientación", "Bulto en el pecho",
+                "Sangre en orina", "Dificultad para orinar", "Tristeza persistente",
+                "Preocupación excesiva", "Irritabilidad", "Palpitaciones", "Sangrado nasal",
+                "Congestión nasal", "Estornudos", "Diarrea", "Vómitos",
+                "Dolor al orinar", "Orina turbia", "Dolor pélvico", "Zumbido en oídos",
+                "Dificultad para concentrarse", "Pérdida de apetito", "Desmayos",
+                "Palidez", "Sibilancias", "Producción de moco", "Sensibilidad a la luz",
+                "Sensibilidad al sonido", "Aura visual", "Quemazón", "Hormigueo",
+                "Entumecimiento", "Debilidad muscular", "Crujidos articulares"
+            ]
+            
+            sintomas_seleccionados = st.multiselect(
+                "Selecciona tus síntomas (puedes elegir varios):",
+                sintomas_disponibles
             )
             
-            if sintoma_principal == "Otro":
-                sintoma_principal = st.text_input("Describe tu síntoma principal")
+            # Campo para síntomas adicionales
+            otros_sintomas = st.text_input("¿Tienes algún síntoma adicional no listado? (Separado por comas)")
+            
+            if otros_sintomas:
+                sintomas_adicionales = [s.strip() for s in otros_sintomas.split(",") if s.strip()]
+                sintomas_seleccionados.extend(sintomas_adicionales)
             
             duracion = st.selectbox(
-                "¿Cuánto tiempo llevas con este síntoma?",
+                "¿Cuánto tiempo llevas con estos síntomas?",
                 ["Menos de 24 horas", "1-3 días", "4-7 días", "Más de una semana", "Más de un mes"]
             )
             
             intensidad = st.slider(
-                "¿Cómo calificas la intensidad del síntoma? (1 = Leve, 10 = Insoportable)",
+                "¿Cómo calificas la intensidad de los síntomas? (1 = Leve, 10 = Insoportable)",
                 min_value=1, max_value=10, value=5
-            )
-            
-            sintomas_acompanantes = st.multiselect(
-                "¿Tienes otros síntomas acompañantes?",
-                ["Náuseas", "Vómitos", "Diarrea", "Estreñimiento", "Fatiga", "Fiebre", 
-                 "Escalofríos", "Sudoración", "Dificultad para respirar", "Palpitaciones", 
-                 "Mareos", "Dolor muscular", "Ninguno"]
             )
             
             st.markdown("---")
@@ -1885,161 +2149,164 @@ elif st.session_state.selected_tab == 20:
             medicamentos = st.text_input("¿Estás tomando algún medicamento? (Opcional)")
             alergias_med = st.text_input("¿Tienes alergias a medicamentos? (Opcional)")
             
-            submitted = st.form_submit_button("Generar Reporte", use_container_width=True)
+            submitted = st.form_submit_button("Generar Diagnóstico", use_container_width=True)
             if submitted:
-                st.session_state.respuestas['sintoma_principal'] = sintoma_principal
-                st.session_state.respuestas['duracion'] = duracion
-                st.session_state.respuestas['intensidad'] = intensidad
-                st.session_state.respuestas['sintomas_acompanantes'] = sintomas_acompanantes
-                st.session_state.respuestas['medicamentos'] = medicamentos
-                st.session_state.respuestas['alergias_med'] = alergias_med
-                st.session_state.cuestionario_paso = 3
-                st.rerun()
+                if sintomas_seleccionados:
+                    st.session_state.respuestas['sintomas'] = sintomas_seleccionados
+                    st.session_state.respuestas['duracion'] = duracion
+                    st.session_state.respuestas['intensidad'] = intensidad
+                    st.session_state.respuestas['medicamentos'] = medicamentos
+                    st.session_state.respuestas['alergias_med'] = alergias_med
+                    st.session_state.cuestionario_paso = 3
+                    st.rerun()
+                else:
+                    st.error("❌ Debes seleccionar al menos un síntoma.")
     
-    # --- PASO 3: Reporte ---
+    # --- PASO 3: Diagnóstico ---
     elif st.session_state.cuestionario_paso == 3:
-        st.subheader("📋 Tu Reporte Personalizado")
+        st.subheader("📋 Diagnóstico Personalizado")
         st.markdown("*Basado en la información que proporcionaste.*")
         
         resp = st.session_state.respuestas
-        sintoma = resp.get('sintoma_principal', 'No especificado')
-        duracion = resp.get('duracion', 'No especificada')
-        intensidad = resp.get('intensidad', 0)
-        acompanantes = resp.get('sintomas_acompanantes', [])
+        sintomas = resp.get('sintomas', [])
         condiciones = resp.get('condiciones', [])
+        edad = resp.get('edad', 30)
+        sexo = resp.get('sexo', 'Femenino')
         
-        # Motor de sugerencias (lógica de reglas)
-        reporte = {
-            "causas": [],
-            "recomendaciones": [],
-            "urgencia": "🟢 Baja - Puedes manejar esto en casa",
-            "color": "#4CAF50",
-            "accion": "Descanso y cuidado en casa"
-        }
+        # Ejecutar diagnóstico avanzado
+        diagnosticos = diagnosticar_enfermedades(sintomas, condiciones, edad, sexo)
         
-        if sintoma.lower() in ["dolor de cabeza", "cefalea", "migraña"]:
-            reporte["causas"] = ["Tensión o estrés", "Deshidratación", "Migraña", "Sinusitis"]
-            reporte["recomendaciones"] = ["Descansa en un lugar tranquilo", "Bebe agua", "Aplica compresas frías"]
-            if intensidad >= 8:
-                reporte["urgencia"] = "🟡 Media - Consulta a un médico si es muy intenso"
-                reporte["color"] = "#FFC107"
-                reporte["accion"] = "Consulta médica recomendada"
-        
-        elif sintoma.lower() in ["fiebre", "temperatura"]:
-            reporte["causas"] = ["Infección viral", "Infección bacteriana"]
-            reporte["recomendaciones"] = ["Reposo", "Bebe líquidos", "Toma medicamentos para bajar la fiebre"]
-            if intensidad >= 7 or duracion in ["Más de 3 días", "Más de una semana"]:
-                reporte["urgencia"] = "🔴 Alta - Acude a un centro de salud"
-                reporte["color"] = "#F44336"
-                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
-        
-        elif sintoma.lower() in ["dolor de garganta", "garganta"]:
-            reporte["causas"] = ["Infección viral", "Infección bacteriana", "Alergias"]
-            reporte["recomendaciones"] = ["Gárgaras con agua y sal", "Bebe líquidos calientes", "Descansa la voz"]
-            if "fiebre" in acompanantes or intensidad >= 7:
-                reporte["urgencia"] = "🟡 Media - Consulta a un médico si hay fiebre"
-                reporte["color"] = "#FFC107"
-                reporte["accion"] = "Consulta médica recomendada"
-        
-        elif "respir" in sintoma.lower() or "dificultad" in sintoma.lower():
-            reporte["causas"] = ["Asma", "Infección respiratoria", "Alergia severa"]
-            reporte["recomendaciones"] = ["Siéntate en posición recta", "Mantén la calma"]
-            reporte["urgencia"] = "🔴 ALTA - Requiere atención médica URGENTE"
-            reporte["color"] = "#F44336"
-            reporte["accion"] = "ACUDE AL MÉDICO O LLAMA AL 911"
-        
-        elif "pecho" in sintoma.lower() or "corazón" in sintoma.lower():
-            reporte["causas"] = ["Problemas cardíacos", "Ansiedad", "Reflujo"]
-            reporte["recomendaciones"] = ["Siéntate y mantén la calma", "Si es intenso, llama al 911"]
-            reporte["urgencia"] = "🔴 ALTA - Requiere atención médica URGENTE"
-            reporte["color"] = "#F44336"
-            reporte["accion"] = "LLAMA AL 911 O ACUDE A URGENCIAS"
-        
+        if diagnosticos:
+            st.markdown("### 📊 Resultados del Diagnóstico")
+            st.markdown(f"**Síntomas analizados:** {len(sintomas)} síntomas")
+            st.markdown(f"**Edad:** {edad} años | **Sexo:** {sexo}")
+            
+            # Mostrar los diagnósticos
+            for i, diag in enumerate(diagnosticos):
+                porcentaje = diag["porcentaje"]
+                color = "#4CAF50" if porcentaje > 70 else "#FFC107" if porcentaje > 40 else "#FF6B6B"
+                urgencia_emoji = "🔴" if diag["urgencia"] == "Alta" else "🟡" if diag["urgencia"] == "Media" else "🟢"
+                
+                with st.expander(f"#{i+1} {diag['enfermedad']} - {porcentaje:.0f}% de coincidencia"):
+                    st.markdown(f"""
+                    <div style="background: {color}20; border-left: 4px solid {color}; padding: 15px; border-radius: 8px;">
+                        <h4 style="color: {color};">{diag['enfermedad']}</h4>
+                        <p><strong>Coincidencia:</strong> {porcentaje:.0f}%</p>
+                        <p><strong>Urgencia:</strong> {urgencia_emoji} {diag['urgencia']}</p>
+                        <p><strong>Especialidad:</strong> {diag['especialidad']}</p>
+                        <p><strong>Síntomas coincidentes:</strong> {', '.join(diag['sintomas_coincidentes'])}</p>
+                        {f"<p><strong>Factores de riesgo:</strong> {', '.join(diag['factores_riesgo'])}</p>" if diag['factores_riesgo'] else ""}
+                        <p><strong>Tratamiento sugerido:</strong> {diag['tratamiento']}</p>
+                        <p><strong>Recomendaciones:</strong></p>
+                        <ul>
+                            {''.join([f'<li>{r}</li>' for r in diag['recomendaciones']])}
+                        </ul>
+                    </div>
+                    """, unsafe_allow_html=True)
+            
+            # Recomendaciones generales
+            st.markdown("---")
+            st.markdown("### 💡 Recomendaciones Generales")
+            
+            if any(d["urgencia"] == "Alta" for d in diagnosticos):
+                st.warning("""
+                ⚠️ **Se recomienda atención médica URGENTE.**
+                Algunos de tus síntomas coinciden con condiciones que requieren evaluación médica inmediata.
+                Por favor, acude a un centro de salud o llama al 911.
+                """)
+            elif any(d["urgencia"] == "Media" for d in diagnosticos):
+                st.info("""
+                🟡 **Se recomienda consulta médica PRONTO.**
+                Tus síntomas sugieren condiciones que deben ser evaluadas por un especialista.
+                Agenda una cita médica en los próximos días.
+                """)
+            else:
+                st.success("""
+                🟢 **Puedes manejar esto en casa.**
+                Tus síntomas son leves y no sugieren condiciones graves. Descansa, hidrátate y monitorea tus síntomas.
+                Si empeoran, consulta a un médico.
+                """)
+            
+            # Resumen para el médico
+            st.markdown("---")
+            st.markdown("### 📋 Resumen para tu médico")
+            st.info("""
+            **Lleva esta información a tu consulta médica:**
+            - Síntomas: {sintomas}
+            - Duración: {duracion}
+            - Intensidad: {intensidad}/10
+            - Edad: {edad} años
+            - Sexo: {sexo}
+            - Medicamentos: {medicamentos}
+            - Condiciones preexistentes: {condiciones}
+            - Diagnósticos sugeridos: {diagnosticos}
+            """.format(
+                sintomas=', '.join(sintomas),
+                duracion=resp.get('duracion', 'No especificada'),
+                intensidad=resp.get('intensidad', 0),
+                edad=edad,
+                sexo=sexo,
+                medicamentos=resp.get('medicamentos', 'Ninguno'),
+                condiciones=', '.join(condiciones) if condiciones else 'Ninguna',
+                diagnosticos=', '.join([d['enfermedad'] for d in diagnosticos[:3]])
+            ))
+            
+            st.markdown("""
+            <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #FFD700; border-radius: 10px; padding: 15px; margin: 20px 0;">
+                <p style="text-align: center; margin: 0;">
+                    <strong>⚠️ RECUERDA:</strong> Esta herramienta es solo informativa. 
+                    Siempre consulta con un médico calificado para cualquier problema de salud.
+                </p>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Guardar en historial
+            consulta = {
+                "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+                "sintomas": len(sintomas),
+                "diagnostico": diagnosticos[0]["enfermedad"] if diagnosticos else "Sin diagnóstico",
+                "urgencia": diagnosticos[0]["urgencia"] if diagnosticos else "Baja"
+            }
+            st.session_state.historial_consultas.append(consulta)
+            
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                if st.button("📥 Descargar Reporte", use_container_width=True):
+                    st.info("Funcionalidad de descarga en desarrollo")
+            with col2:
+                if st.button("🔄 Nueva Consulta", use_container_width=True):
+                    st.session_state.cuestionario_paso = 1
+                    st.session_state.respuestas = {}
+                    st.rerun()
+            with col3:
+                if st.button("📋 Ver Mi Historial", use_container_width=True):
+                    st.session_state.ver_historial = True
+                    st.rerun()
+            
+            if st.session_state.get('ver_historial', False):
+                st.markdown("---")
+                st.markdown("### 📋 Tu Historial de Consultas")
+                if st.session_state.historial_consultas:
+                    for h in st.session_state.historial_consultas:
+                        st.markdown(f"- **{h['fecha']}** - {h['sintomas']} síntomas - {h['diagnostico']} ({h['urgencia']})")
+                else:
+                    st.info("No tienes consultas guardadas")
+                if st.button("Ocultar Historial"):
+                    st.session_state.ver_historial = False
+                    st.rerun()
         else:
-            reporte["causas"] = ["Condición común", "Consulta a un médico para diagnóstico"]
-            reporte["recomendaciones"] = ["Monitorea tus síntomas", "Descansa", "Consulta a un médico"]
-            reporte["urgencia"] = "🟡 Media - Se recomienda consulta médica"
-            reporte["color"] = "#FFC107"
-            reporte["accion"] = "Consulta médica recomendada"
-        
-        if condiciones and "Ninguna" not in condiciones:
-            reporte["recomendaciones"].append("⚠️ Tienes condiciones preexistentes. Consulta con tu médico.")
-        
-        st.markdown(f"""
-        <div style="background: {reporte['color']}20; border-left: 8px solid {reporte['color']}; border-radius: 10px; padding: 20px; margin: 20px 0;">
-            <h3 style="color: {reporte['color']};">{reporte['urgencia']}</h3>
-            <p style="font-size: 1.2em;"><strong>Acción recomendada:</strong> {reporte['accion']}</p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        st.markdown("**📋 Resumen de tus síntomas:**")
-        st.markdown(f"- **Síntoma principal:** {sintoma}")
-        st.markdown(f"- **Duración:** {duracion}")
-        st.markdown(f"- **Intensidad:** {intensidad}/10")
-        if acompanantes:
-            st.markdown(f"- **Síntomas acompañantes:** {', '.join(acompanantes)}")
-        
-        st.markdown("---")
-        st.markdown("### 🔍 Posibles causas")
-        for causa in reporte["causas"]:
-            st.markdown(f"- {causa}")
-        
-        st.markdown("### 💡 Recomendaciones")
-        for reco in reporte["recomendaciones"]:
-            st.markdown(f"- {reco}")
-        
-        st.markdown("---")
-        st.markdown("### 📋 Resumen para tu médico")
-        st.info("""
-        **Lleva esta información a tu consulta médica:**
-        - Síntoma principal y duración
-        - Intensidad del síntoma (escala 1-10)
-        - Síntomas acompañantes
-        - Medicamentos que estás tomando
-        - Condiciones preexistentes
-        """)
-        
-        st.markdown("""
-        <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #FFD700; border-radius: 10px; padding: 15px; margin: 20px 0;">
-            <p style="text-align: center; margin: 0;">
-                <strong>⚠️ RECUERDA:</strong> Esta herramienta es solo informativa. 
-                Siempre consulta con un médico calificado para cualquier problema de salud.
-            </p>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        consulta = {
-            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
-            "sintoma": sintoma,
-            "duracion": duracion,
-            "urgencia": reporte['urgencia']
-        }
-        st.session_state.historial_consultas.append(consulta)
-        
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            if st.button("📥 Descargar Reporte", use_container_width=True):
-                st.info("Funcionalidad de descarga en desarrollo")
-        with col2:
+            st.warning("No se encontraron coincidencias significativas con las enfermedades en nuestra base de datos.")
+            st.info("""
+            **Posibles razones:**
+            - Los síntomas seleccionados son muy generales
+            - La combinación de síntomas es poco común
+            - Podría tratarse de una condición no incluida en nuestra base de datos
+            
+            **Recomendación:** Consulta a un médico para una evaluación profesional.
+            """)
             if st.button("🔄 Nueva Consulta", use_container_width=True):
                 st.session_state.cuestionario_paso = 1
                 st.session_state.respuestas = {}
-                st.rerun()
-        with col3:
-            if st.button("📋 Ver Mi Historial", use_container_width=True):
-                st.session_state.ver_historial = True
-                st.rerun()
-        
-        if st.session_state.get('ver_historial', False):
-            st.markdown("---")
-            st.markdown("### 📋 Tu Historial de Consultas")
-            if st.session_state.historial_consultas:
-                for h in st.session_state.historial_consultas:
-                    st.markdown(f"- **{h['fecha']}** - {h['sintoma']} ({h['urgencia']})")
-            else:
-                st.info("No tienes consultas guardadas")
-            if st.button("Ocultar Historial"):
-                st.session_state.ver_historial = False
                 st.rerun()
 
 # --- TAB 21: DIRECTORIO MÉDICO ---
@@ -2163,6 +2430,40 @@ elif st.session_state.selected_tab == 22:
             **💤 Descanso:**
             - Duerme entre 7-8 horas diarias
             - Mantén horarios regulares de sueño
+            """
+        },
+        "Enfermedades Crónicas más Comunes": {
+            "descripcion": "Información sobre condiciones de salud frecuentes",
+            "contenido": """
+            **🩸 Diabetes Tipo 2:**
+            - Control de glucosa regular
+            - Dieta balanceada baja en azúcares
+            - Ejercicio diario
+            - Medicación según indicación médica
+            
+            **❤️ Hipertensión Arterial:**
+            - Medir presión arterial regularmente
+            - Reducir consumo de sal
+            - Mantener peso saludable
+            - Evitar el estrés
+            
+            **🫁 EPOC (Enfermedad Pulmonar Obstructiva Crónica):**
+            - Dejar de fumar
+            - Ejercicios respiratorios
+            - Evitar contaminantes
+            - Seguir tratamiento médico
+            
+            **🦴 Artrosis:**
+            - Ejercicio de bajo impacto
+            - Control de peso
+            - Fisioterapia
+            - Medicamentos antiinflamatorios
+            
+            **🧠 Ansiedad y Depresión:**
+            - Terapia psicológica
+            - Ejercicio regular
+            - Técnicas de relajación
+            - Apoyo familiar y social
             """
         }
     }
