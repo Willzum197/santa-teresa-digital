@@ -820,7 +820,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON FONDO DE IMAGEN
+# ESTILOS - CON FONDO DE IMAGEN Y EFECTOS HOVER
 # ============================================
 st.markdown(f"""
 <style>
@@ -852,11 +852,54 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] {{ background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important; border-right: 3px solid #FFD700 !important; }}
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 input, textarea {{ background-color: #f0f0f0 !important; color: #000000 !important; border: 2px solid #FFD700 !important; border-radius: 12px !important; }}
-.stButton > button {{ background: linear-gradient(135deg, #FFD700, #CF142B) !important; color: white !important; border-radius: 25px !important; }}
+.stButton > button {{ 
+    background: linear-gradient(135deg, #FFD700, #CF142B) !important; 
+    color: white !important; 
+    border-radius: 25px !important;
+    transition: all 0.3s ease !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+    border: none !important;
+}}
+.stButton > button:hover {{
+    transform: translateY(-3px) !important;
+    box-shadow: 0 8px 20px rgba(255, 215, 0, 0.4) !important;
+    background: linear-gradient(135deg, #FFE44D, #E01830) !important;
+}}
+.stButton > button:active {{
+    transform: translateY(0px) !important;
+    box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2) !important;
+}}
 .bronze-footer {{ background: linear-gradient(145deg, #8c6a31, #5d431a) !important; border: 5px solid #d4af37 !important; padding: 35px 25px !important; border-radius: 20px !important; text-align: center !important; margin-top: 50px !important; }}
 .bronze-footer p {{ color: #ffd700 !important; }}
 .stInfo, .stSuccess, .stWarning, .stError {{ background-color: rgba(0,0,0,0.8) !important; color: white !important; }}
 [data-testid="stMetricValue"] {{ color: #FFD700 !important; font-size: 1.5rem !important; }}
+
+/* Estilos para botones de la sección de salud */
+.health-btn-container {{
+    background: rgba(0, 40, 80, 0.4) !important;
+    border-radius: 15px !important;
+    padding: 12px !important;
+    border: 1px solid rgba(0, 180, 216, 0.2) !important;
+}}
+.health-btn {{
+    background: linear-gradient(135deg, #0a4b6e, #1a7a9e) !important;
+    border: 2px solid #00b4d8 !important;
+    color: white !important;
+    border-radius: 12px !important;
+    padding: 12px 20px !important;
+    font-size: 1.05em !important;
+    font-weight: bold !important;
+    box-shadow: 0 4px 15px rgba(0, 180, 216, 0.2) !important;
+    transition: all 0.3s ease !important;
+    width: 100% !important;
+    text-align: center !important;
+}}
+.health-btn:hover {{
+    background: linear-gradient(135deg, #00b4d8, #0077b6) !important;
+    transform: translateY(-4px) !important;
+    box-shadow: 0 8px 30px rgba(0, 180, 216, 0.5) !important;
+    border-color: #FFD700 !important;
+}}
 </style>
 """, unsafe_allow_html=True)
 
@@ -872,10 +915,10 @@ if logo:
 # ============================================
 st.markdown(f"""
 <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin: 15px 0;">
-    <a href="https://api.whatsapp.com/send?text=Santa Teresa al Dia - {APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #25D366;">📱 WhatsApp</a>
-    <a href="https://www.facebook.com/sharer/sharer.php?u={APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #1877F2;">📘 Facebook</a>
-    <a href="https://www.instagram.com/" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: linear-gradient(45deg, #f09433, #d62976);">📸 Instagram</a>
-    <button id="copyButton" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #3498db; border: none; cursor: pointer;">📋 Copiar</button>
+    <a href="https://api.whatsapp.com/send?text=Santa Teresa al Dia - {APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #25D366; transition: all 0.3s ease;">📱 WhatsApp</a>
+    <a href="https://www.facebook.com/sharer/sharer.php?u={APP_URL}" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #1877F2; transition: all 0.3s ease;">📘 Facebook</a>
+    <a href="https://www.instagram.com/" target="_blank" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: linear-gradient(45deg, #f09433, #d62976); transition: all 0.3s ease;">📸 Instagram</a>
+    <button id="copyButton" style="display: inline-block; padding: 10px 25px; border-radius: 25px; background: #3498db; border: none; cursor: pointer; transition: all 0.3s ease;">📋 Copiar</button>
 </div>
 <script>
 document.getElementById('copyButton').addEventListener('click', function() {{
@@ -1037,15 +1080,39 @@ with col_linea3[2]:
 with col_linea3[3]:
     st.markdown(" ")
 
+# ============================================
+# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES
+# ============================================
+st.markdown("### 🩺 Hablando con tus doctores")
+
+# Contenedor con estilo para los botones
+st.markdown("""
+<div style="background: rgba(0, 40, 80, 0.3); border-radius: 15px; padding: 12px; margin-bottom: 10px; border: 1px solid rgba(0, 180, 216, 0.15);">
+</div>
+""", unsafe_allow_html=True)
+
+col_salud = st.columns(4)
+with col_salud[0]:
+    if st.button("🩺 Evaluar Síntomas", use_container_width=True, key="tab_20"):
+        st.session_state.selected_tab = 20
+with col_salud[1]:
+    if st.button("📍 Directorio Médico", use_container_width=True, key="tab_21"):
+        st.session_state.selected_tab = 21
+with col_salud[2]:
+    if st.button("📚 Guías de Salud", use_container_width=True, key="tab_22"):
+        st.session_state.selected_tab = 22
+with col_salud[3]:
+    if st.button("💬 Pregunta al Doctor", use_container_width=True, key="tab_23"):
+        st.session_state.selected_tab = 23
+
 st.markdown("---")
 
 if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES
+# CONTENIDO DE LAS SECCIONES EXISTENTES
 # ============================================
-
 # --- PORTADA (TAB 0) ---
 if st.session_state.selected_tab == 0:
     col1, col2 = st.columns(2)
@@ -1121,14 +1188,13 @@ elif st.session_state.selected_tab == 1:
             else:
                 st.info(f"No hay noticias de {categoria}")
 
-# --- NEGOCIOS (TAB 2) - ACTUALIZADO CON VIDEOS ---
+# --- NEGOCIOS (TAB 2) ---
 elif st.session_state.selected_tab == 2:
     st.title("📍 Donde ir - Donde comprar")
     negocios = get_negocios()
     if not negocios.empty:
         for idx, n in negocios.iterrows():
             with st.expander(f"🏪 {n['nombre']}"):
-                # Mostrar imágenes
                 if n.get('imagenes_url') and n['imagenes_url']:
                     if isinstance(n['imagenes_url'], list) and len(n['imagenes_url']) > 0:
                         mostrar_imagenes_en_fila(n['imagenes_url'], max_imagenes=3)
@@ -1139,12 +1205,10 @@ elif st.session_state.selected_tab == 2:
                 
                 st.write(f"**Reseña:** {n['resena']}")
                 
-                # Mostrar video de YouTube si existe
                 if n.get('video_url') and n['video_url']:
                     st.markdown("#### 🎥 Video del negocio")
                     mostrar_video_youtube(n['video_url'], width_percent=50)
                 
-                # Mostrar ubicación en Google Maps
                 if n.get('google_maps_url') and n['google_maps_url']:
                     st.markdown(f"📍 [Ver ubicación en Google Maps]({n['google_maps_url']})")
                 
@@ -1573,6 +1637,514 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
+# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES
+# ============================================
+
+# --- TAB 20: EVALUAR SÍNTOMAS ---
+elif st.session_state.selected_tab == 20:
+    st.title("🩺 Evaluación de Síntomas")
+    
+    # ADVERTENCIA IMPORTANTE
+    st.markdown("""
+    <div style="background: rgba(255, 0, 0, 0.15); border: 2px solid #FF6B6B; border-radius: 15px; padding: 20px; margin-bottom: 25px;">
+        <div style="display: flex; align-items: center; gap: 15px;">
+            <span style="font-size: 2.5em;">⚠️</span>
+            <div>
+                <h3 style="color: #FF6B6B; margin: 0;">ADVERTENCIA IMPORTANTE</h3>
+                <p style="margin: 5px 0 0 0; color: #FFFFFF;">
+                    Esta herramienta es <strong>SOLO INFORMATIVA</strong> y NO reemplaza una consulta médica profesional.
+                    Los resultados son una guía preliminar basada en la información proporcionada.
+                    <br><br>
+                    <strong>SI TIENES UNA EMERGENCIA, LLAMA INMEDIATAMENTE AL 911 O ACUDE AL CENTRO DE SALUD MÁS CERCANO.</strong>
+                    <br>
+                    Siempre consulta con un médico calificado para cualquier problema de salud.
+                </p>
+            </div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    st.markdown("""
+    ### ¿Cómo funciona?
+    1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
+    2. Obtendrás un reporte con posibles causas y recomendaciones
+    3. El reporte te ayudará a saber cuándo debes consultar a un médico
+    """)
+    
+    if 'cuestionario_paso' not in st.session_state:
+        st.session_state.cuestionario_paso = 1
+    if 'respuestas' not in st.session_state:
+        st.session_state.respuestas = {}
+    if 'historial_consultas' not in st.session_state:
+        st.session_state.historial_consultas = []
+    
+    # --- PASO 1: Datos Personales ---
+    if st.session_state.cuestionario_paso == 1:
+        with st.form("paso_1_consulta"):
+            st.subheader("📋 Paso 1: Información Personal")
+            st.markdown("Estos datos ayudan a personalizar los resultados.")
+            
+            col1, col2 = st.columns(2)
+            with col1:
+                edad = st.number_input("Edad", min_value=1, max_value=120, value=30, step=1)
+            with col2:
+                sexo = st.selectbox("Sexo biológico", ["Masculino", "Femenino", "Prefiero no decir"])
+            
+            peso = st.number_input("Peso aproximado (kg) - Opcional", min_value=10, max_value=300, value=70, step=1)
+            altura = st.number_input("Altura aproximada (cm) - Opcional", min_value=50, max_value=250, value=170, step=1)
+            
+            condiciones = st.multiselect(
+                "¿Tienes alguna condición médica preexistente?",
+                ["Diabetes", "Hipertensión", "Asma", "Alergias", "Enfermedad cardíaca", "Ninguna", "Otra"]
+            )
+            
+            submitted = st.form_submit_button("Siguiente →", use_container_width=True)
+            if submitted:
+                st.session_state.respuestas['edad'] = edad
+                st.session_state.respuestas['sexo'] = sexo
+                st.session_state.respuestas['peso'] = peso
+                st.session_state.respuestas['altura'] = altura
+                st.session_state.respuestas['condiciones'] = condiciones
+                st.session_state.cuestionario_paso = 2
+                st.rerun()
+    
+    # --- PASO 2: Síntomas ---
+    elif st.session_state.cuestionario_paso == 2:
+        with st.form("paso_2_consulta"):
+            st.subheader("🩺 Paso 2: Cuéntanos tus síntomas")
+            st.markdown("Responde lo más detallado posible.")
+            
+            sintoma_principal = st.selectbox(
+                "¿Cuál es tu síntoma principal?",
+                ["Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal", 
+                 "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar", 
+                 "Dolor en el pecho", "Erupción cutánea", "Otro"]
+            )
+            
+            if sintoma_principal == "Otro":
+                sintoma_principal = st.text_input("Describe tu síntoma principal")
+            
+            duracion = st.selectbox(
+                "¿Cuánto tiempo llevas con este síntoma?",
+                ["Menos de 24 horas", "1-3 días", "4-7 días", "Más de una semana", "Más de un mes"]
+            )
+            
+            intensidad = st.slider(
+                "¿Cómo calificas la intensidad del síntoma? (1 = Leve, 10 = Insoportable)",
+                min_value=1, max_value=10, value=5
+            )
+            
+            sintomas_acompanantes = st.multiselect(
+                "¿Tienes otros síntomas acompañantes?",
+                ["Náuseas", "Vómitos", "Diarrea", "Estreñimiento", "Fatiga", "Fiebre", 
+                 "Escalofríos", "Sudoración", "Dificultad para respirar", "Palpitaciones", 
+                 "Mareos", "Dolor muscular", "Ninguno"]
+            )
+            
+            st.markdown("---")
+            st.markdown("**Información adicional:**")
+            
+            medicamentos = st.text_input("¿Estás tomando algún medicamento? (Opcional)")
+            alergias_med = st.text_input("¿Tienes alergias a medicamentos? (Opcional)")
+            
+            submitted = st.form_submit_button("Generar Reporte", use_container_width=True)
+            if submitted:
+                st.session_state.respuestas['sintoma_principal'] = sintoma_principal
+                st.session_state.respuestas['duracion'] = duracion
+                st.session_state.respuestas['intensidad'] = intensidad
+                st.session_state.respuestas['sintomas_acompanantes'] = sintomas_acompanantes
+                st.session_state.respuestas['medicamentos'] = medicamentos
+                st.session_state.respuestas['alergias_med'] = alergias_med
+                st.session_state.cuestionario_paso = 3
+                st.rerun()
+    
+    # --- PASO 3: Reporte ---
+    elif st.session_state.cuestionario_paso == 3:
+        st.subheader("📋 Tu Reporte Personalizado")
+        st.markdown("*Basado en la información que proporcionaste.*")
+        
+        resp = st.session_state.respuestas
+        sintoma = resp.get('sintoma_principal', 'No especificado')
+        duracion = resp.get('duracion', 'No especificada')
+        intensidad = resp.get('intensidad', 0)
+        acompanantes = resp.get('sintomas_acompanantes', [])
+        condiciones = resp.get('condiciones', [])
+        
+        # Motor de sugerencias (lógica de reglas)
+        reporte = {
+            "causas": [],
+            "recomendaciones": [],
+            "urgencia": "🟢 Baja - Puedes manejar esto en casa",
+            "color": "#4CAF50",
+            "accion": "Descanso y cuidado en casa"
+        }
+        
+        if sintoma.lower() in ["dolor de cabeza", "cefalea", "migraña"]:
+            reporte["causas"] = ["Tensión o estrés", "Deshidratación", "Migraña", "Sinusitis"]
+            reporte["recomendaciones"] = ["Descansa en un lugar tranquilo", "Bebe agua", "Aplica compresas frías"]
+            if intensidad >= 8:
+                reporte["urgencia"] = "🟡 Media - Consulta a un médico si es muy intenso"
+                reporte["color"] = "#FFC107"
+                reporte["accion"] = "Consulta médica recomendada"
+        
+        elif sintoma.lower() in ["fiebre", "temperatura"]:
+            reporte["causas"] = ["Infección viral", "Infección bacteriana"]
+            reporte["recomendaciones"] = ["Reposo", "Bebe líquidos", "Toma medicamentos para bajar la fiebre"]
+            if intensidad >= 7 or duracion in ["Más de 3 días", "Más de una semana"]:
+                reporte["urgencia"] = "🔴 Alta - Acude a un centro de salud"
+                reporte["color"] = "#F44336"
+                reporte["accion"] = "ACUDE AL MÉDICO URGENTEMENTE"
+        
+        elif sintoma.lower() in ["dolor de garganta", "garganta"]:
+            reporte["causas"] = ["Infección viral", "Infección bacteriana", "Alergias"]
+            reporte["recomendaciones"] = ["Gárgaras con agua y sal", "Bebe líquidos calientes", "Descansa la voz"]
+            if "fiebre" in acompanantes or intensidad >= 7:
+                reporte["urgencia"] = "🟡 Media - Consulta a un médico si hay fiebre"
+                reporte["color"] = "#FFC107"
+                reporte["accion"] = "Consulta médica recomendada"
+        
+        elif "respir" in sintoma.lower() or "dificultad" in sintoma.lower():
+            reporte["causas"] = ["Asma", "Infección respiratoria", "Alergia severa"]
+            reporte["recomendaciones"] = ["Siéntate en posición recta", "Mantén la calma"]
+            reporte["urgencia"] = "🔴 ALTA - Requiere atención médica URGENTE"
+            reporte["color"] = "#F44336"
+            reporte["accion"] = "ACUDE AL MÉDICO O LLAMA AL 911"
+        
+        elif "pecho" in sintoma.lower() or "corazón" in sintoma.lower():
+            reporte["causas"] = ["Problemas cardíacos", "Ansiedad", "Reflujo"]
+            reporte["recomendaciones"] = ["Siéntate y mantén la calma", "Si es intenso, llama al 911"]
+            reporte["urgencia"] = "🔴 ALTA - Requiere atención médica URGENTE"
+            reporte["color"] = "#F44336"
+            reporte["accion"] = "LLAMA AL 911 O ACUDE A URGENCIAS"
+        
+        else:
+            reporte["causas"] = ["Condición común", "Consulta a un médico para diagnóstico"]
+            reporte["recomendaciones"] = ["Monitorea tus síntomas", "Descansa", "Consulta a un médico"]
+            reporte["urgencia"] = "🟡 Media - Se recomienda consulta médica"
+            reporte["color"] = "#FFC107"
+            reporte["accion"] = "Consulta médica recomendada"
+        
+        if condiciones and "Ninguna" not in condiciones:
+            reporte["recomendaciones"].append("⚠️ Tienes condiciones preexistentes. Consulta con tu médico.")
+        
+        st.markdown(f"""
+        <div style="background: {reporte['color']}20; border-left: 8px solid {reporte['color']}; border-radius: 10px; padding: 20px; margin: 20px 0;">
+            <h3 style="color: {reporte['color']};">{reporte['urgencia']}</h3>
+            <p style="font-size: 1.2em;"><strong>Acción recomendada:</strong> {reporte['accion']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        st.markdown("**📋 Resumen de tus síntomas:**")
+        st.markdown(f"- **Síntoma principal:** {sintoma}")
+        st.markdown(f"- **Duración:** {duracion}")
+        st.markdown(f"- **Intensidad:** {intensidad}/10")
+        if acompanantes:
+            st.markdown(f"- **Síntomas acompañantes:** {', '.join(acompanantes)}")
+        
+        st.markdown("---")
+        st.markdown("### 🔍 Posibles causas")
+        for causa in reporte["causas"]:
+            st.markdown(f"- {causa}")
+        
+        st.markdown("### 💡 Recomendaciones")
+        for reco in reporte["recomendaciones"]:
+            st.markdown(f"- {reco}")
+        
+        st.markdown("---")
+        st.markdown("### 📋 Resumen para tu médico")
+        st.info("""
+        **Lleva esta información a tu consulta médica:**
+        - Síntoma principal y duración
+        - Intensidad del síntoma (escala 1-10)
+        - Síntomas acompañantes
+        - Medicamentos que estás tomando
+        - Condiciones preexistentes
+        """)
+        
+        st.markdown("""
+        <div style="background: rgba(255, 215, 0, 0.15); border: 2px solid #FFD700; border-radius: 10px; padding: 15px; margin: 20px 0;">
+            <p style="text-align: center; margin: 0;">
+                <strong>⚠️ RECUERDA:</strong> Esta herramienta es solo informativa. 
+                Siempre consulta con un médico calificado para cualquier problema de salud.
+            </p>
+        </div>
+        """, unsafe_allow_html=True)
+        
+        consulta = {
+            "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+            "sintoma": sintoma,
+            "duracion": duracion,
+            "urgencia": reporte['urgencia']
+        }
+        st.session_state.historial_consultas.append(consulta)
+        
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            if st.button("📥 Descargar Reporte", use_container_width=True):
+                st.info("Funcionalidad de descarga en desarrollo")
+        with col2:
+            if st.button("🔄 Nueva Consulta", use_container_width=True):
+                st.session_state.cuestionario_paso = 1
+                st.session_state.respuestas = {}
+                st.rerun()
+        with col3:
+            if st.button("📋 Ver Mi Historial", use_container_width=True):
+                st.session_state.ver_historial = True
+                st.rerun()
+        
+        if st.session_state.get('ver_historial', False):
+            st.markdown("---")
+            st.markdown("### 📋 Tu Historial de Consultas")
+            if st.session_state.historial_consultas:
+                for h in st.session_state.historial_consultas:
+                    st.markdown(f"- **{h['fecha']}** - {h['sintoma']} ({h['urgencia']})")
+            else:
+                st.info("No tienes consultas guardadas")
+            if st.button("Ocultar Historial"):
+                st.session_state.ver_historial = False
+                st.rerun()
+
+# --- TAB 21: DIRECTORIO MÉDICO ---
+elif st.session_state.selected_tab == 21:
+    st.title("📍 Directorio Médico de Santa Teresa del Tuy")
+    st.markdown("### Centros de salud, farmacias y especialistas locales")
+    
+    st.info("""
+    ℹ️ **Información importante:**
+    - Este directorio es colaborativo y se actualiza constantemente
+    - Si conoces un centro de salud que no está listado, ¡puedes sugerirlo!
+    """)
+    
+    centros = [
+        {"nombre": "Hospital General de Santa Teresa", "tipo": "Hospital", 
+         "direccion": "Av. Principal, Santa Teresa", "telefono": "0212-XXX-XXXX", 
+         "servicios": ["Emergencias 24h", "Consulta Externa", "Hospitalización"]},
+        {"nombre": "Ambulatorio Urbano I", "tipo": "Ambulatorio", 
+         "direccion": "Barrio El Centro, Santa Teresa", "telefono": "0212-XXX-XXXX",
+         "servicios": ["Medicina General", "Pediatría", "Odontología"]},
+        {"nombre": "Farmacia Santa Teresa 24h", "tipo": "Farmacia", 
+         "direccion": "Esquina Bolívar, Santa Teresa", "telefono": "0212-XXX-XXXX",
+         "servicios": ["Venta de medicamentos", "Delivery 24h"]},
+        {"nombre": "Clínica San José", "tipo": "Clínica Privada", 
+         "direccion": "Calle 5, Santa Teresa", "telefono": "0212-XXX-XXXX",
+         "servicios": ["Consultas Especializadas", "Laboratorio", "Imagenología"]},
+    ]
+    
+    for centro in centros:
+        with st.expander(f"{centro['tipo']}: {centro['nombre']}"):
+            st.markdown(f"**Dirección:** {centro['direccion']}")
+            st.markdown(f"**Teléfono:** {centro['telefono']}")
+            st.markdown(f"**Servicios:** {', '.join(centro['servicios'])}")
+            col1, col2 = st.columns(2)
+            with col1:
+                st.button("📍 Ver en Mapa", key=f"mapa_{centro['nombre']}")
+            with col2:
+                st.button("📞 Llamar", key=f"llamar_{centro['nombre']}")
+    
+    st.markdown("---")
+    st.markdown("### ➕ Sugerir un centro de salud")
+    with st.form("sugerir_centro"):
+        nombre_sug = st.text_input("Nombre del centro *")
+        tipo_sug = st.selectbox("Tipo", ["Hospital", "Ambulatorio", "Farmacia", "Clínica Privada", "Especialista"])
+        direccion_sug = st.text_area("Dirección *")
+        telefono_sug = st.text_input("Teléfono")
+        servicios_sug = st.text_input("Servicios que ofrece")
+        
+        submitted = st.form_submit_button("Enviar Sugerencia")
+        if submitted:
+            if nombre_sug and direccion_sug:
+                st.success("✅ ¡Gracias! Tu sugerencia será revisada por el administrador.")
+                st.balloons()
+            else:
+                st.error("❌ El nombre y la dirección son obligatorios")
+
+# --- TAB 22: GUÍAS DE SALUD ---
+elif st.session_state.selected_tab == 22:
+    st.title("📚 Guías de Salud")
+    st.markdown("### Información útil para el cuidado de tu salud")
+    
+    st.info("""
+    ℹ️ **Nota importante:** Estas guías son educativas y no reemplazan el consejo médico profesional.
+    """)
+    
+    guias = {
+        "Primeros Auxilios Básicos": {
+            "descripcion": "Qué hacer en situaciones de emergencia comunes",
+            "contenido": """
+            **🩹 Heridas y cortes:**
+            1. Lava el área con agua y jabón
+            2. Aplica presión con una gasa limpia para detener el sangrado
+            3. Cubre con un vendaje limpio
+            
+            **🔥 Quemaduras:**
+            1. Enfría la quemadura con agua fría (no hielo) por 10-15 minutos
+            2. No apliques cremas, manteca o remedios caseros
+            3. Cubre con un paño limpio y húmedo
+            
+            **🦴 Fracturas:**
+            1. Inmoviliza el área afectada
+            2. Aplica hielo envuelto en un paño
+            3. Busca atención médica inmediata
+            """
+        },
+        "Fiebre en Adultos": {
+            "descripcion": "Cómo manejar la fiebre y cuándo preocuparse",
+            "contenido": """
+            **¿Qué es fiebre?**
+            - Temperatura mayor a 38°C (100.4°F)
+            - Es un mecanismo de defensa del cuerpo
+            
+            **Cuándo consultar al médico:**
+            - Fiebre de más de 39.5°C (103°F)
+            - Fiebre que dura más de 3 días
+            - Acompañada de dolor de cabeza intenso, dificultad para respirar o confusión
+            - En niños menores de 3 meses: cualquier fiebre requiere atención médica
+            
+            **Recomendaciones:**
+            - Descansa y mantente hidratado
+            - Toma medicamentos para bajar la fiebre (paracetamol) según indicaciones
+            - No te automediques con antibióticos
+            """
+        },
+        "Prevención de Enfermedades": {
+            "descripcion": "Consejos para mantenerte saludable",
+            "contenido": """
+            **💧 Hidratación:**
+            - Bebe al menos 2 litros de agua al día
+            - Aumenta la ingesta en clima caliente o con actividad física
+            
+            **🍎 Alimentación saludable:**
+            - Come frutas y verduras diariamente
+            - Reduce el consumo de azúcar y grasas saturadas
+            - Incluye proteínas magras en tu dieta
+            
+            **🏃 Actividad física:**
+            - Realiza al menos 30 minutos de ejercicio moderado al día
+            - Camina, trota o práctica deporte regularmente
+            
+            **💤 Descanso:**
+            - Duerme entre 7-8 horas diarias
+            - Mantén horarios regulares de sueño
+            """
+        }
+    }
+    
+    for titulo, info in guias.items():
+        with st.expander(f"📖 {titulo}"):
+            st.markdown(f"**{info['descripcion']}**")
+            st.markdown("---")
+            st.markdown(info['contenido'])
+    
+    st.markdown("---")
+    st.markdown("### 🏥 Recursos de Emergencia")
+    st.markdown("""
+    - **🚑 Emergencias Médicas:** 911
+    - **🚒 Bomberos:** 0800-BOMBEROS (0800-266-2376)
+    - **🚨 Policía:** 911
+    - **Hospital General de Santa Teresa:** 0212-XXX-XXXX
+    """)
+
+# --- TAB 23: PREGUNTA AL DOCTOR ---
+elif st.session_state.selected_tab == 23:
+    st.title("💬 Pregunta al Doctor")
+    st.markdown("### Haz una pregunta sobre tu salud a nuestro equipo de expertos")
+    
+    st.info("""
+    ℹ️ **Nota importante:** Las respuestas son orientativas y no reemplazan una consulta médica presencial.
+    """)
+    
+    # Inicializar estado para preguntas
+    if 'preguntas_doctor' not in st.session_state:
+        st.session_state.preguntas_doctor = []
+    if 'pregunta_actual' not in st.session_state:
+        st.session_state.pregunta_actual = ""
+    
+    st.markdown("---")
+    st.markdown("### 📝 Haz tu pregunta")
+    
+    with st.form("form_pregunta_doctor"):
+        nombre_pregunta = st.text_input("Tu nombre (opcional)")
+        titulo_pregunta = st.text_input("Título de tu pregunta *")
+        pregunta = st.text_area("Describe tu pregunta o inquietud de salud *", height=120)
+        
+        col1, col2 = st.columns(2)
+        with col1:
+            submitted = st.form_submit_button("📤 Enviar Pregunta", use_container_width=True)
+        with col2:
+            st.markdown("")
+        
+        if submitted:
+            if titulo_pregunta and pregunta:
+                nueva_pregunta = {
+                    "id": len(st.session_state.preguntas_doctor) + 1,
+                    "nombre": nombre_pregunta if nombre_pregunta else "Anónimo",
+                    "titulo": titulo_pregunta,
+                    "pregunta": pregunta,
+                    "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+                    "respuesta": None,
+                    "respondida": False
+                }
+                st.session_state.preguntas_doctor.append(nueva_pregunta)
+                st.success("✅ ¡Pregunta enviada! Un especialista la responderá pronto.")
+                st.rerun()
+            else:
+                st.error("❌ El título y la descripción son obligatorios.")
+    
+    st.markdown("---")
+    st.markdown("### 📋 Preguntas y respuestas")
+    
+    # Mostrar preguntas (solo las respondidas para el público general)
+    preguntas_respondidas = [p for p in st.session_state.preguntas_doctor if p['respondida']]
+    preguntas_pendientes = [p for p in st.session_state.preguntas_doctor if not p['respondida']]
+    
+    # Si es admin, mostrar todas las preguntas
+    if es_admin:
+        st.markdown("#### 👨‍⚕️ Panel de Administración - Preguntas Pendientes")
+        if preguntas_pendientes:
+            for p in preguntas_pendientes:
+                with st.container():
+                    st.markdown(f"**ID: {p['id']}** - **{p['titulo']}**")
+                    st.markdown(f"**👤 {p['nombre']}** *{p['fecha']}*")
+                    st.markdown(f"**Pregunta:** {p['pregunta']}")
+                    
+                    with st.form(key=f"responder_pregunta_{p['id']}"):
+                        respuesta = st.text_area("Respuesta del doctor", key=f"respuesta_{p['id']}")
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            if st.form_submit_button("✅ Responder", use_container_width=True):
+                                if respuesta:
+                                    p['respuesta'] = respuesta
+                                    p['respondida'] = True
+                                    st.success("✅ Respuesta publicada")
+                                    st.rerun()
+                                else:
+                                    st.error("❌ Escribe una respuesta")
+                        with col2:
+                            if st.form_submit_button("🗑️ Eliminar", use_container_width=True):
+                                st.session_state.preguntas_doctor.remove(p)
+                                st.success("✅ Pregunta eliminada")
+                                st.rerun()
+                    st.divider()
+        else:
+            st.info("No hay preguntas pendientes")
+        
+        st.markdown("---")
+        st.markdown("#### ✅ Preguntas Respondidas")
+    else:
+        st.markdown("#### ✅ Preguntas Respondidas")
+    
+    if preguntas_respondidas:
+        for p in preguntas_respondidas:
+            with st.expander(f"📝 {p['titulo']}"):
+                st.markdown(f"**👤 {p['nombre']}** *{p['fecha']}*")
+                st.markdown(f"**Pregunta:** {p['pregunta']}")
+                st.markdown(f"**💬 Respuesta del Doctor:**")
+                st.markdown(f"*{p['respuesta']}*")
+                st.divider()
+    else:
+        st.info("No hay preguntas respondidas aún. ¡Sé el primero en preguntar!")
+
+# ============================================
 # PANEL ADMIN (COMPLETO)
 # ============================================
 if st.session_state.get('es_admin', False):
@@ -1715,7 +2287,7 @@ if st.session_state.get('es_admin', False):
                         del st.session_state.edit_noticia
                         st.rerun()
     
-    # --- NEGOCIOS (ADMIN) - ACTUALIZADO CON VIDEOS ---
+    # --- NEGOCIOS (ADMIN) ---
     elif "🏪 Negocios" in admin_opt:
         st.subheader("🏪 Gestionar Negocios")
         
@@ -1726,14 +2298,13 @@ if st.session_state.get('es_admin', False):
                 google_maps_url = st.text_input("Enlace Google Maps (opcional)", placeholder="https://maps.google.com/...")
                 video_url = st.text_input("Enlace YouTube (opcional)", placeholder="https://www.youtube.com/watch?v=XXXXX")
                 
-                # Mostrar vista previa del video si se ingresa una URL
                 if video_url and video_url.strip():
                     video_id = extraer_video_id(video_url)
                     if video_id:
                         st.markdown("#### 📹 Vista previa del video")
                         st.video(f"https://www.youtube.com/embed/{video_id}")
                     else:
-                        st.warning("⚠️ URL de YouTube no válida. Debe ser como: https://www.youtube.com/watch?v=XXXXX")
+                        st.warning("⚠️ URL de YouTube no válida")
                 
                 imagenes = st.file_uploader("Fotos (máximo 3)", type=["jpg", "png", "jpeg"], accept_multiple_files=True)
                 if len(imagenes) > 3:
@@ -1765,7 +2336,6 @@ if st.session_state.get('es_admin', False):
                     
                     st.write(f"**Reseña:** {n['resena']}")
                     
-                    # Mostrar video si existe
                     if n.get('video_url') and n['video_url']:
                         st.markdown("#### 🎥 Video actual")
                         mostrar_video_youtube(n['video_url'], width_percent=30)
@@ -1812,7 +2382,6 @@ if st.session_state.get('es_admin', False):
                 nuevo_google_maps = st.text_input("Enlace Google Maps", value=n.get('google_maps_url', ''))
                 nuevo_video = st.text_input("Enlace YouTube", value=n.get('video_url', ''))
                 
-                # Mostrar vista previa del video si se ingresa una URL
                 if nuevo_video and nuevo_video.strip():
                     video_id = extraer_video_id(nuevo_video)
                     if video_id:
