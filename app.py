@@ -106,6 +106,14 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo absoluto", "Aumentar líquidos", "No automedicarse"],
         "tratamiento": "Antibióticos, antipiréticos, oxigenoterapia si es necesario"
     },
+    "Asma Bronquial": {
+        "sintomas": ["dificultad para respirar", "sibilancias", "tos", "opresión en el pecho", "fatiga", "sensación de ahogo"],
+        "factores_riesgo": ["alergias", "historia familiar", "tabaquismo", "obesidad", "exposición a alérgenos"],
+        "especialidad": "Neumología",
+        "urgencia": "Alta",
+        "recomendaciones": ["Usar inhalador de rescate", "Evitar alérgenos", "Consulta con neumólogo"],
+        "tratamiento": "Broncodilatadores, corticosteroides inhalados"
+    },
     
     # === ENFERMEDADES NEUROLÓGICAS ===
     "Cefalea Tensional": {
@@ -235,6 +243,62 @@ BASE_DATOS_ENFERMEDADES = {
         "urgencia": "Media",
         "recomendaciones": ["Dieta rica en hierro", "Suplementos", "Descanso", "Consulta con hematólogo"],
         "tratamiento": "Suplementos de hierro, vitamina B12, ácido fólico"
+    },
+    "Fiebre Tifoidea": {
+        "sintomas": ["fiebre alta", "dolor de cabeza", "dolor abdominal", "estreñimiento", "diarrea", "erupción cutánea", "fatiga"],
+        "factores_riesgo": ["consumo de agua contaminada", "falta de higiene", "viajes a zonas endémicas", "contacto con infectados"],
+        "especialidad": "Infectología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Hidratación", "Aislamiento"],
+        "tratamiento": "Antibióticos, antipiréticos, hidratación"
+    },
+    "Dengue": {
+        "sintomas": ["fiebre alta", "dolor de cabeza", "dolor muscular", "dolor articular", "erupción cutánea", "sangrado", "fatiga"],
+        "factores_riesgo": ["picaduras de mosquitos", "vivir en zonas tropicales", "temporada de lluvias"],
+        "especialidad": "Infectología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Hidratación", "No tomar aspirina"],
+        "tratamiento": "Antipiréticos, hidratación, vigilancia médica"
+    },
+    "Hepatitis B": {
+        "sintomas": ["fatiga", "dolor abdominal", "orina oscura", "ictericia", "náuseas", "vómitos", "fiebre"],
+        "factores_riesgo": ["contacto sexual sin protección", "compartir agujas", "transfusiones", "transmisión perinatal"],
+        "especialidad": "Gastroenterología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Dieta ligera", "Evitar alcohol"],
+        "tratamiento": "Antivirales, inmunomoduladores, seguimiento médico"
+    },
+    "Gripe (Influenza)": {
+        "sintomas": ["fiebre alta", "tos", "dolor de garganta", "dolor muscular", "dolor de cabeza", "fatiga", "escalofríos"],
+        "factores_riesgo": ["contacto con personas enfermas", "bajas defensas", "cambios de temperatura"],
+        "especialidad": "Medicina General",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "Aumentar líquidos", "Antipiréticos", "Consulta si empeora"],
+        "tratamiento": "Antivirales, antipiréticos, descanso"
+    },
+    "Varicela": {
+        "sintomas": ["fiebre", "erupción con ampollas", "picazón", "dolor de cabeza", "fatiga", "pérdida de apetito"],
+        "factores_riesgo": ["contacto con infectados", "bajas defensas", "no vacunado"],
+        "especialidad": "Dermatología",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "No rascar", "Baños de avena", "Consulta si fiebre alta"],
+        "tratamiento": "Antipiréticos, antihistamínicos, antivirales"
+    },
+    "Sarampión": {
+        "sintomas": ["fiebre alta", "tos", "congestión nasal", "conjuntivitis", "erupción", "dolor de cabeza", "fatiga"],
+        "factores_riesgo": ["no vacunado", "contacto con infectados", "bajas defensas"],
+        "especialidad": "Infectología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Aislamiento", "Hidratación", "Reposo"],
+        "tratamiento": "Sintomático, vitaminas, vigilancia médica"
+    },
+    "Paperas": {
+        "sintomas": ["inflamación de parótidas", "fiebre", "dolor al masticar", "dolor de cabeza", "fatiga", "pérdida de apetito"],
+        "factores_riesgo": ["no vacunado", "contacto con infectados"],
+        "especialidad": "Infectología",
+        "urgencia": "Media",
+        "recomendaciones": ["Reposo", "Aumentar líquidos", "Compresas frías", "Consulta si complicaciones"],
+        "tratamiento": "Analgésicos, antipiréticos, hidratación"
     }
 }
 
@@ -303,6 +367,56 @@ def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad,
     
     # Solo devolver los top 8
     return diagnosticos[:8]
+
+# ============================================
+# FUNCIONES DE ADMINISTRACIÓN DE ENFERMEDADES
+# ============================================
+def guardar_enfermedad_en_supabase(nombre, info):
+    """Guarda una enfermedad en Supabase para persistencia"""
+    try:
+        data = {
+            "nombre": nombre,
+            "sintomas": info["sintomas"],
+            "factores_riesgo": info["factores_riesgo"],
+            "especialidad": info["especialidad"],
+            "urgencia": info["urgencia"],
+            "recomendaciones": info["recomendaciones"],
+            "tratamiento": info["tratamiento"]
+        }
+        # Verificar si ya existe
+        existing = supabase.table("enfermedades").select("*").eq("nombre", nombre).execute()
+        if existing.data:
+            supabase.table("enfermedades").update(data).eq("nombre", nombre).execute()
+        else:
+            supabase.table("enfermedades").insert(data).execute()
+        return True
+    except Exception as e:
+        print(f"Error guardando enfermedad: {e}")
+        return False
+
+def cargar_enfermedades_de_supabase():
+    """Carga las enfermedades desde Supabase y las combina con la base local"""
+    try:
+        response = supabase.table("enfermedades").select("*").execute()
+        if response.data:
+            for item in response.data:
+                nombre = item.pop("nombre")
+                BASE_DATOS_ENFERMEDADES[nombre] = item
+        return True
+    except Exception as e:
+        print(f"Error cargando enfermedades: {e}")
+        return False
+
+def eliminar_enfermedad_de_supabase(nombre):
+    """Elimina una enfermedad de Supabase"""
+    try:
+        supabase.table("enfermedades").delete().eq("nombre", nombre).execute()
+        if nombre in BASE_DATOS_ENFERMEDADES:
+            del BASE_DATOS_ENFERMEDADES[nombre]
+        return True
+    except Exception as e:
+        print(f"Error eliminando enfermedad: {e}")
+        return False
 
 # ============================================
 # FUNCIONES DE ME GUSTA (HÍBRIDO)
@@ -1105,11 +1219,7 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] {{ background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important; border-right: 3px solid #FFD700 !important; }}
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 
-/* ============================================
-   CORRECCIÓN DE VISIBILIDAD PARA SELECTS Y MULTISELECTS
-   ============================================ */
-
-/* Inputs de texto */
+/* CORRECCIÓN DE VISIBILIDAD PARA SELECTS Y MULTISELECTS */
 input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > textarea {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1117,7 +1227,6 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     border-radius: 12px !important;
 }}
 
-/* Select boxes - FONDO BLANCO Y TEXTO NEGRO */
 .stSelectbox > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1129,7 +1238,6 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     color: #FFFFFF !important;
 }}
 
-/* Multiselect */
 .stMultiSelect > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1141,7 +1249,6 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     color: #FFFFFF !important;
 }}
 
-/* Tags del multiselect */
 .stMultiSelect [data-baseweb="tag"] {{
     background-color: #FFD700 !important;
     color: #000000 !important;
@@ -1153,14 +1260,10 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     fill: #000000 !important;
 }}
 
-/* Input del multiselect */
 .stMultiSelect [data-baseweb="select"] input {{
     color: #000000 !important;
 }}
 
-/* ============================================
-   CORRECCIÓN: Opciones de los selects (menú desplegable)
-   ============================================ */
 div[data-baseweb="popover"] {{
     background-color: #ffffff !important;
     border: 2px solid #FFD700 !important;
@@ -1184,7 +1287,6 @@ div[data-baseweb="popover"] li[aria-selected="true"] {{
     color: #000000 !important;
 }}
 
-/* Select normal */
 select {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1194,7 +1296,6 @@ select option {{
     color: #000000 !important;
 }}
 
-/* Number inputs */
 input[type="number"] {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1202,7 +1303,6 @@ input[type="number"] {{
     border-radius: 12px !important;
 }}
 
-/* Slider */
 .stSlider > div > div > div {{
     color: #FFFFFF !important;
 }}
@@ -1213,7 +1313,6 @@ input[type="number"] {{
     background-color: #FFD700 !important;
 }}
 
-/* Checkbox y Radio */
 .stCheckbox label, .stRadio label {{
     color: #FFFFFF !important;
 }}
@@ -1221,7 +1320,6 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 
-/* Formularios y alertas */
 .stAlert {{
     background-color: rgba(0, 0, 0, 0.8) !important;
     color: #FFFFFF !important;
@@ -1233,7 +1331,6 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 
-/* Botones */
 .stButton > button {{ 
     background: linear-gradient(135deg, #FFD700, #CF142B) !important; 
     color: white !important; 
@@ -1252,7 +1349,6 @@ input[type="number"] {{
     box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2) !important;
 }}
 
-/* Botones de salud */
 div[data-testid="column"] .stButton > button {{
     background: linear-gradient(135deg, #0a6b8a, #1a8aaa) !important;
     color: #FFFFFF !important;
@@ -1402,7 +1498,8 @@ with st.sidebar:
             "📰 Noticias", "🏪 Negocios", "💭 Reflexiones", "📜 Crónicas",
             "🎬 Videos", "📱 TikTok", "🎵 Música", "⚠️ Denuncias", 
             "💬 Opiniones", "👥 Personajes", "⚖️ El Crimen No Paga", 
-            "⚙️ Configuración", "💬 GESTIONAR COMENTARIOS"
+            "⚙️ Configuración", "💬 GESTIONAR COMENTARIOS",
+            "🏥 GESTIONAR ENFERMEDADES"
         ])
         st.session_state.admin_opt = admin_opt
         st.session_state.es_admin = True
@@ -2053,7 +2150,7 @@ elif st.session_state.selected_tab == 20:
     st.markdown("""
     ### ¿Cómo funciona?
     1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
-    2. Nuestro sistema analizará tus síntomas con una base de datos de más de 25 enfermedades
+    2. Nuestro sistema analizará tus síntomas con una base de datos de más de 30 enfermedades
     3. Obtendrás un diagnóstico diferencial con porcentajes de probabilidad
     4. El reporte te ayudará a saber cuándo debes consultar a un médico
     """)
@@ -2118,7 +2215,12 @@ elif st.session_state.selected_tab == 20:
                 "Dificultad para concentrarse", "Pérdida de apetito", "Desmayos",
                 "Palidez", "Sibilancias", "Producción de moco", "Sensibilidad a la luz",
                 "Sensibilidad al sonido", "Aura visual", "Quemazón", "Hormigueo",
-                "Entumecimiento", "Debilidad muscular", "Crujidos articulares"
+                "Entumecimiento", "Debilidad muscular", "Crujidos articulares",
+                "Dolor en la nuca", "Dolor en hombros", "Dificultad para mover",
+                "Dolor lumbar", "Irradiación a piernas", "Dolor al estar de pie",
+                "Dolor al sentarse", "Olor fuerte en orina", "Escalofríos", "Ictericia",
+                "Orina oscura", "Inflamación de parótidas", "Dolor al masticar",
+                "Ampollas", "Picazón", "Conjuntivitis", "Dolor muscular"
             ]
             
             sintomas_seleccionados = st.multiselect(
@@ -2584,14 +2686,162 @@ elif st.session_state.selected_tab == 23:
         st.info("No hay preguntas respondidas aún. ¡Sé el primero en preguntar!")
 
 # ============================================
-# PANEL ADMIN (COMPLETO)
+# PANEL ADMIN (COMPLETO) - CON GESTIÓN DE ENFERMEDADES
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
     st.title("🔧 Panel de Administración")
     
+    # --- GESTIONAR ENFERMEDADES ---
+    if "🏥 GESTIONAR ENFERMEDADES" in admin_opt:
+        st.subheader("🏥 Gestión de Enfermedades")
+        st.markdown("### Base de datos de enfermedades para el diagnóstico")
+        st.info("Desde aquí puedes agregar, modificar o eliminar enfermedades de la base de datos.")
+        
+        # Cargar enfermedades desde Supabase
+        cargar_enfermedades_de_supabase()
+        
+        # --- Agregar nueva enfermedad ---
+        with st.expander("➕ AGREGAR NUEVA ENFERMEDAD", expanded=True):
+            with st.form("form_agregar_enfermedad"):
+                st.markdown("#### Información de la enfermedad")
+                
+                nombre_nuevo = st.text_input("Nombre de la enfermedad *")
+                col1, col2 = st.columns(2)
+                with col1:
+                    especialidad_nueva = st.text_input("Especialidad *")
+                    urgencia_nueva = st.selectbox("Urgencia", ["Baja", "Media", "Alta"])
+                with col2:
+                    tratamiento_nuevo = st.text_area("Tratamiento sugerido *")
+                
+                sintomas_nuevos = st.text_area("Síntomas (separados por coma) *", help="Ejemplo: dolor de cabeza, fiebre, tos")
+                factores_riesgo_nuevos = st.text_area("Factores de riesgo (separados por coma)", help="Ejemplo: tabaquismo, obesidad, estrés")
+                recomendaciones_nuevas = st.text_area("Recomendaciones (una por línea)", help="Ejemplo: Descanso, Hidratación, Consulta con médico")
+                
+                if st.form_submit_button("💾 Guardar Enfermedad"):
+                    if nombre_nuevo and especialidad_nueva and tratamiento_nuevo and sintomas_nuevos:
+                        # Procesar datos
+                        sintomas_lista = [s.strip() for s in sintomas_nuevos.split(",") if s.strip()]
+                        factores_lista = [f.strip() for f in factores_riesgo_nuevos.split(",") if f.strip()] if factores_riesgo_nuevos else []
+                        recomendaciones_lista = [r.strip() for r in recomendaciones_nuevas.split("\n") if r.strip()] if recomendaciones_nuevas else []
+                        
+                        nueva_enfermedad = {
+                            "sintomas": sintomas_lista,
+                            "factores_riesgo": factores_lista,
+                            "especialidad": especialidad_nueva,
+                            "urgencia": urgencia_nueva,
+                            "recomendaciones": recomendaciones_lista,
+                            "tratamiento": tratamiento_nuevo
+                        }
+                        
+                        if guardar_enfermedad_en_supabase(nombre_nuevo, nueva_enfermedad):
+                            BASE_DATOS_ENFERMEDADES[nombre_nuevo] = nueva_enfermedad
+                            st.success(f"✅ Enfermedad '{nombre_nuevo}' agregada correctamente")
+                            st.rerun()
+                        else:
+                            st.error("❌ Error al guardar la enfermedad")
+                    else:
+                        st.error("❌ Los campos marcados con * son obligatorios")
+        
+        st.markdown("---")
+        st.markdown("### 📋 Enfermedades registradas")
+        st.markdown(f"**Total de enfermedades:** {len(BASE_DATOS_ENFERMEDADES)}")
+        
+        # Buscador
+        busqueda = st.text_input("🔍 Buscar enfermedad:", placeholder="Escribe el nombre de la enfermedad...")
+        
+        enfermedades_mostrar = BASE_DATOS_ENFERMEDADES
+        if busqueda:
+            enfermedades_mostrar = {k: v for k, v in BASE_DATOS_ENFERMEDADES.items() if busqueda.lower() in k.lower()}
+        
+        if enfermedades_mostrar:
+            for nombre, info in list(enfermedades_mostrar.items())[:20]:  # Mostrar 20 por página
+                with st.expander(f"📋 {nombre}", expanded=False):
+                    col1, col2, col3 = st.columns([3, 1, 1])
+                    with col1:
+                        st.markdown(f"**Especialidad:** {info['especialidad']}")
+                        st.markdown(f"**Urgencia:** {info['urgencia']}")
+                        st.markdown(f"**Síntomas:** {', '.join(info['sintomas'])}")
+                        st.markdown(f"**Factores de riesgo:** {', '.join(info['factores_riesgo']) if info['factores_riesgo'] else 'Ninguno'}")
+                        st.markdown(f"**Tratamiento:** {info['tratamiento']}")
+                        st.markdown(f"**Recomendaciones:**")
+                        for rec in info['recomendaciones']:
+                            st.markdown(f"- {rec}")
+                    with col2:
+                        if st.button(f"✏️ Editar", key=f"edit_enf_{nombre}"):
+                            st.session_state.edit_enfermedad = nombre
+                            st.rerun()
+                    with col3:
+                        if st.button(f"🗑️ Eliminar", key=f"del_enf_{nombre}"):
+                            if eliminar_enfermedad_de_supabase(nombre):
+                                st.success(f"✅ Enfermedad '{nombre}' eliminada")
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al eliminar")
+            
+            if len(enfermedades_mostrar) > 20:
+                st.info(f"Mostrando 20 de {len(enfermedades_mostrar)} enfermedades. Usa el buscador para filtrar.")
+        else:
+            st.info("No se encontraron enfermedades")
+        
+        # --- Editar enfermedad ---
+        if st.session_state.get('edit_enfermedad'):
+            nombre_edit = st.session_state.edit_enfermedad
+            info_edit = BASE_DATOS_ENFERMEDADES.get(nombre_edit)
+            
+            if info_edit:
+                st.markdown("---")
+                st.markdown(f"### ✏️ Editando: {nombre_edit}")
+                with st.form("form_editar_enfermedad"):
+                    nuevo_nombre = st.text_input("Nombre", value=nombre_edit)
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        nueva_especialidad = st.text_input("Especialidad", value=info_edit['especialidad'])
+                        nueva_urgencia = st.selectbox("Urgencia", ["Baja", "Media", "Alta"], index=["Baja", "Media", "Alta"].index(info_edit['urgencia']))
+                    with col2:
+                        nuevo_tratamiento = st.text_area("Tratamiento", value=info_edit['tratamiento'])
+                    
+                    nuevos_sintomas = st.text_area("Síntomas (separados por coma)", value=", ".join(info_edit['sintomas']))
+                    nuevos_factores = st.text_area("Factores de riesgo (separados por coma)", value=", ".join(info_edit['factores_riesgo']) if info_edit['factores_riesgo'] else "")
+                    nuevas_recomendaciones = st.text_area("Recomendaciones (una por línea)", value="\n".join(info_edit['recomendaciones']) if info_edit['recomendaciones'] else "")
+                    
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.form_submit_button("💾 Guardar cambios"):
+                            sintomas_lista = [s.strip() for s in nuevos_sintomas.split(",") if s.strip()]
+                            factores_lista = [f.strip() for f in nuevos_factores.split(",") if f.strip()] if nuevos_factores else []
+                            recomendaciones_lista = [r.strip() for r in nuevas_recomendaciones.split("\n") if r.strip()] if nuevas_recomendaciones else []
+                            
+                            enfermedad_editada = {
+                                "sintomas": sintomas_lista,
+                                "factores_riesgo": factores_lista,
+                                "especialidad": nueva_especialidad,
+                                "urgencia": nueva_urgencia,
+                                "recomendaciones": recomendaciones_lista,
+                                "tratamiento": nuevo_tratamiento
+                            }
+                            
+                            # Eliminar la antigua si cambió el nombre
+                            if nuevo_nombre != nombre_edit:
+                                eliminar_enfermedad_de_supabase(nombre_edit)
+                            
+                            if guardar_enfermedad_en_supabase(nuevo_nombre, enfermedad_editada):
+                                if nuevo_nombre != nombre_edit and nombre_edit in BASE_DATOS_ENFERMEDADES:
+                                    del BASE_DATOS_ENFERMEDADES[nombre_edit]
+                                BASE_DATOS_ENFERMEDADES[nuevo_nombre] = enfermedad_editada
+                                st.success("✅ Enfermedad actualizada correctamente")
+                                del st.session_state.edit_enfermedad
+                                st.rerun()
+                            else:
+                                st.error("❌ Error al guardar los cambios")
+                    with col2:
+                        if st.form_submit_button("❌ Cancelar"):
+                            del st.session_state.edit_enfermedad
+                            st.rerun()
+    
     # --- GESTIONAR COMENTARIOS ---
-    if "💬 GESTIONAR COMENTARIOS" in admin_opt:
+    elif "💬 GESTIONAR COMENTARIOS" in admin_opt:
         st.subheader("💬 Gestión Centralizada de Comentarios")
         st.markdown("### Todos los comentarios de las crónicas")
         st.info("Desde aquí puedes modificar o eliminar cualquier comentario de las crónicas")
