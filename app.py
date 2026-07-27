@@ -80,6 +80,22 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["ACUDIR A URGENCIAS INMEDIATAMENTE", "Reposo absoluto", "No automedicarse", "Consulta con cardiólogo urgente"],
         "tratamiento": "Nitroglicerina, antiagregantes, angioplastia, cirugía de bypass"
     },
+    "Infarto Agudo de Miocardio": {
+        "sintomas": ["dolor en el pecho", "dificultad para respirar", "sudoración", "náuseas", "vómitos", "dolor en brazo izquierdo", "palpitaciones", "ansiedad"],
+        "factores_riesgo": ["hipertensión", "colesterol alto", "tabaquismo", "diabetes", "sedentarismo", "historia familiar", "obesidad"],
+        "especialidad": "Cardiología",
+        "urgencia": "Alta",
+        "recomendaciones": ["LLAMAR AL 911 INMEDIATAMENTE", "Reposo absoluto", "No automedicarse", "Masticar aspirina si no es alérgico"],
+        "tratamiento": "Angioplastia, trombolíticos, anticoagulantes, cirugía de bypass"
+    },
+    "Arritmia Cardíaca": {
+        "sintomas": ["palpitaciones", "mareos", "dificultad para respirar", "dolor en el pecho", "fatiga", "desmayos", "ansiedad"],
+        "factores_riesgo": ["hipertensión", "enfermedad coronaria", "hipertiroidismo", "consumo de cafeína", "estrés", "tabaquismo"],
+        "especialidad": "Cardiología",
+        "urgencia": "Media",
+        "recomendaciones": ["Evitar cafeína y alcohol", "Manejar el estrés", "Consulta con cardiólogo", "Monitoreo cardíaco"],
+        "tratamiento": "Antiarrítmicos, betabloqueadores, marcapasos"
+    },
     
     # === ENFERMEDADES RESPIRATORIAS ===
     "Bronquitis Aguda": {
@@ -113,6 +129,14 @@ BASE_DATOS_ENFERMEDADES = {
         "urgencia": "Alta",
         "recomendaciones": ["Usar inhalador de rescate", "Evitar alérgenos", "Consulta con neumólogo"],
         "tratamiento": "Broncodilatadores, corticosteroides inhalados"
+    },
+    "EPOC (Enfermedad Pulmonar Obstructiva Crónica)": {
+        "sintomas": ["dificultad para respirar", "tos crónica", "producción de moco", "fatiga", "sibilancias", "opresión en el pecho"],
+        "factores_riesgo": ["tabaquismo", "exposición a contaminantes", "historia familiar", "edad > 40"],
+        "especialidad": "Neumología",
+        "urgencia": "Alta",
+        "recomendaciones": ["Dejar de fumar", "Rehabilitación pulmonar", "Uso de broncodilatadores", "Consulta con neumólogo"],
+        "tratamiento": "Broncodilatadores, corticosteroides, oxigenoterapia"
     },
     
     # === ENFERMEDADES NEUROLÓGICAS ===
@@ -164,6 +188,22 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Proteger el ojo", "Fisioterapia facial", "Evitar corrientes de aire"],
         "tratamiento": "Corticosteroides, antivirales, fisioterapia"
     },
+    "Parkinson": {
+        "sintomas": ["temblores", "rigidez muscular", "bradicinesia", "inestabilidad postural", "dificultad para hablar", "trastornos del sueño", "depresión"],
+        "factores_riesgo": ["edad > 60", "historia familiar", "exposición a toxinas", "sexo masculino"],
+        "especialidad": "Neurología",
+        "urgencia": "Media",
+        "recomendaciones": ["Fisioterapia", "Terapia ocupacional", "Ejercicio regular", "Consulta con neurólogo"],
+        "tratamiento": "Levodopa, agonistas dopaminérgicos"
+    },
+    "Alzheimer": {
+        "sintomas": ["pérdida de memoria", "confusión", "dificultad para hablar", "cambios de humor", "desorientación", "dificultad para realizar tareas", "aislamiento social"],
+        "factores_riesgo": ["edad > 65", "historia familiar", "sedentarismo", "hipertensión", "diabetes", "tabaquismo"],
+        "especialidad": "Neurología",
+        "urgencia": "Alta",
+        "recomendaciones": ["Estimulación cognitiva", "Estructura y rutina", "Apoyo familiar", "Consulta con neurólogo"],
+        "tratamiento": "Donepezilo, memantina"
+    },
     
     # === ENFERMEDADES GASTROINTESTINALES ===
     "Diarrea Aguda": {
@@ -189,6 +229,22 @@ BASE_DATOS_ENFERMEDADES = {
         "urgencia": "Media",
         "recomendaciones": ["Dieta baja en fibra", "Suplementos nutricionales", "Evitar irritantes", "Consulta con gastroenterólogo"],
         "tratamiento": "Corticosteroides, inmunomoduladores, biológicos"
+    },
+    "Gastritis": {
+        "sintomas": ["dolor abdominal", "náuseas", "vómitos", "sensación de llenura", "pérdida de apetito", "ardor estomacal", "eructos"],
+        "factores_riesgo": ["consumo de antiinflamatorios", "estrés", "alcohol", "tabaquismo", "infección por H. pylori"],
+        "especialidad": "Gastroenterología",
+        "urgencia": "Media",
+        "recomendaciones": ["Evitar alimentos irritantes", "Comer porciones pequeñas", "Reducir estrés", "Consulta con gastroenterólogo"],
+        "tratamiento": "Antiacidos, protectores gástricos, antibióticos si es por H. pylori"
+    },
+    "Úlcera Gástrica": {
+        "sintomas": ["dolor abdominal", "ardor", "náuseas", "vómitos", "pérdida de peso", "sangre en heces", "vómitos con sangre"],
+        "factores_riesgo": ["consumo de antiinflamatorios", "estrés", "alcohol", "tabaquismo", "infección por H. pylori"],
+        "especialidad": "Gastroenterología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Evitar alimentos irritantes", "Reducir estrés", "No automedicarse"],
+        "tratamiento": "Protectores gástricos, antibióticos, cambios en dieta"
     },
     
     # === ENFERMEDADES MUSCULOESQUELÉTICAS ===
@@ -224,6 +280,14 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["Aplicar calor o frío", "Reposo", "Ejercicios de fortalecimiento", "Consulta si persiste"],
         "tratamiento": "Analgésicos, relajantes musculares, fisioterapia"
     },
+    "Hernia Discal": {
+        "sintomas": ["dolor lumbar", "irradiación a piernas", "hormigueo", "debilidad en piernas", "dificultad para moverse", "dolor al estornudar"],
+        "factores_riesgo": ["levantar objetos pesados", "sedentarismo", "sobrepeso", "mala postura", "traumatismos"],
+        "especialidad": "Traumatología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Evitar esfuerzos", "Fisioterapia"],
+        "tratamiento": "Analgésicos, antiinflamatorios, fisioterapia, cirugía en casos graves"
+    },
     
     # === INFECCIONES ===
     "Infección Urinaria": {
@@ -242,8 +306,16 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["Hidratación", "Higiene", "Evitar irritantes", "Consulta con urólogo"],
         "tratamiento": "Antibióticos, analgésicos, aumento de líquidos"
     },
+    "Pielonefritis": {
+        "sintomas": ["fiebre alta", "escalofríos", "dolor lumbar", "dolor al orinar", "náuseas", "vómitos", "fatiga"],
+        "factores_riesgo": ["infección urinaria no tratada", "embarazo", "diabetes", "cálculos renales", "catéteres"],
+        "especialidad": "Urología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Hidratación", "No automedicarse"],
+        "tratamiento": "Antibióticos, antipiréticos, hidratación"
+    },
     
-    # === ENFERMEDADES SISTÉMICAS ===
+    # === ENFERMEDADES METABÓLICAS Y ENDOCRINAS ===
     "Diabetes Tipo 2": {
         "sintomas": ["sed excesiva", "micción frecuente", "fatiga", "visión borrosa", "hambre extrema", "pérdida de peso", "infecciones frecuentes"],
         "factores_riesgo": ["sobrepeso", "obesidad", "hipertensión", "historia familiar", "sedentarismo", "edad > 45"],
@@ -252,6 +324,24 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["Control de glucosa", "Dieta balanceada", "Ejercicio regular", "Consulta con endocrinólogo"],
         "tratamiento": "Metformina, insulina, cambios en estilo de vida"
     },
+    "Hipotiroidismo": {
+        "sintomas": ["fatiga", "aumento de peso", "sensibilidad al frío", "piel seca", "caída de cabello", "depresión", "estreñimiento"],
+        "factores_riesgo": ["historia familiar", "mujeres > 40", "enfermedad autoinmune", "embarazo", "radiación"],
+        "especialidad": "Endocrinología",
+        "urgencia": "Media",
+        "recomendaciones": ["Control de tiroides", "Dieta balanceada", "Ejercicio regular", "Consulta con endocrinólogo"],
+        "tratamiento": "Levotiroxina, cambios en estilo de vida"
+    },
+    "Hipertiroidismo": {
+        "sintomas": ["pérdida de peso", "palpitaciones", "ansiedad", "intolerancia al calor", "sudoración", "fatiga", "temblores"],
+        "factores_riesgo": ["historia familiar", "mujeres", "enfermedad autoinmune", "embarazo", "estrés"],
+        "especialidad": "Endocrinología",
+        "urgencia": "Media",
+        "recomendaciones": ["Control de tiroides", "Dieta balanceada", "Técnicas de relajación", "Consulta con endocrinólogo"],
+        "tratamiento": "Metimazol, yodo radioactivo, cirugía"
+    },
+    
+    # === ENFERMEDADES AUTOINMUNES ===
     "Lupus Eritematoso Sistémico": {
         "sintomas": ["fatiga", "dolor articular", "erupción en la cara", "fiebre", "caída de cabello", "úlceras bucales", "dolor en el pecho"],
         "factores_riesgo": ["sexo femenino", "edad 15-45", "historia familiar", "exposición solar", "infecciones"],
@@ -268,6 +358,16 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["Dieta rica en hierro", "Suplementos", "Descanso", "Consulta con hematólogo"],
         "tratamiento": "Suplementos de hierro, vitamina B12, ácido fólico"
     },
+    "Anemia Perniciosa": {
+        "sintomas": ["fatiga", "debilidad", "palidez", "mareos", "hormigueo", "dificultad para caminar", "depresión", "confusión"],
+        "factores_riesgo": ["deficiencia de B12", "gastritis atrófica", "historia familiar", "edad avanzada", "cirugía gástrica"],
+        "especialidad": "Hematología",
+        "urgencia": "Media",
+        "recomendaciones": ["Suplementos de B12", "Dieta balanceada", "Descanso", "Consulta con hematólogo"],
+        "tratamiento": "Inyecciones de B12, suplementos orales"
+    },
+    
+    # === ENFERMEDADES INFECCIOSAS ===
     "Fiebre Tifoidea": {
         "sintomas": ["fiebre alta", "dolor de cabeza", "dolor abdominal", "estreñimiento", "diarrea", "erupción cutánea", "fatiga"],
         "factores_riesgo": ["consumo de agua contaminada", "falta de higiene", "viajes a zonas endémicas", "contacto con infectados"],
@@ -323,6 +423,52 @@ BASE_DATOS_ENFERMEDADES = {
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Aumentar líquidos", "Compresas frías", "Consulta si complicaciones"],
         "tratamiento": "Analgésicos, antipiréticos, hidratación"
+    },
+    "COVID-19": {
+        "sintomas": ["fiebre", "tos", "dificultad para respirar", "fatiga", "dolor de cabeza", "pérdida de olfato", "pérdida de gusto", "dolor de garganta"],
+        "factores_riesgo": ["edad avanzada", "enfermedades crónicas", "obesidad", "inmunosupresión", "contacto con infectados"],
+        "especialidad": "Infectología",
+        "urgencia": "Alta",
+        "recomendaciones": ["AISLAMIENTO INMEDIATO", "ACUDIR AL MÉDICO URGENTEMENTE", "Hidratación", "Monitoreo de oxígeno"],
+        "tratamiento": "Antivirales, antipiréticos, oxigenoterapia, vacunación"
+    },
+    
+    # === ENFERMEDADES DERMATOLÓGICAS ===
+    "Dermatitis Atópica": {
+        "sintomas": ["picazón", "enrojecimiento", "piel seca", "descamación", "lesiones cutáneas", "inflamación", "sensibilidad"],
+        "factores_riesgo": ["historia familiar", "alergias", "asmática", "estrés", "cambios de temperatura"],
+        "especialidad": "Dermatología",
+        "urgencia": "Baja",
+        "recomendaciones": ["Hidratar la piel", "Evitar irritantes", "Ropa de algodón", "Consulta con dermatólogo"],
+        "tratamiento": "Cremas hidratantes, corticosteroides tópicos, antihistamínicos"
+    },
+    "Psoriasis": {
+        "sintomas": ["lesiones cutáneas", "descamación", "enrojecimiento", "picazón", "dolor", "inflamación", "uñas deformadas"],
+        "factores_riesgo": ["historia familiar", "estrés", "infecciones", "tabaquismo", "obesidad"],
+        "especialidad": "Dermatología",
+        "urgencia": "Media",
+        "recomendaciones": ["Hidratar la piel", "Evitar estrés", "No rascar", "Consulta con dermatólogo"],
+        "tratamiento": "Corticosteroides tópicos, fototerapia, medicamentos sistémicos"
+    },
+    
+    # === ENFERMEDADES OFTALMOLÓGICAS ===
+    "Conjuntivitis": {
+        "sintomas": ["enrojecimiento ocular", "picazón", "lagrimeo", "secreción", "sensibilidad a la luz", "visión borrosa"],
+        "factores_riesgo": ["contacto con infectados", "alergias", "bajas defensas", "uso de lentes de contacto"],
+        "especialidad": "Oftalmología",
+        "urgencia": "Media",
+        "recomendaciones": ["Lavado de manos frecuente", "No compartir toallas", "No usar lentes de contacto", "Consulta con oftalmólogo"],
+        "tratamiento": "Gotas antibióticas, antihistamínicas, compresas frías"
+    },
+    
+    # === ENFERMEDADES GINECOLÓGICAS ===
+    "Infección Vaginal": {
+        "sintomas": ["picazón", "secreción anormal", "olor", "dolor", "ardor", "enrojecimiento", "inflamación"],
+        "factores_riesgo": ["antibióticos", "diabetes", "embarazo", "anticonceptivos", "relaciones sexuales"],
+        "especialidad": "Ginecología",
+        "urgencia": "Media",
+        "recomendaciones": ["Higiene adecuada", "Ropa interior de algodón", "Evitar irritantes", "Consulta con ginecólogo"],
+        "tratamiento": "Antifúngicos, antibióticos, cremas tópicas"
     }
 }
 
@@ -330,6 +476,7 @@ BASE_DATOS_ENFERMEDADES = {
 # LISTA COMPLETA DE SÍNTOMAS
 # ============================================
 SINTOMAS_COMPLETOS = [
+    # Síntomas generales
     "Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal",
     "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar",
     "Dolor en el pecho", "Erupción cutánea", "Fatiga", "Sed excesiva",
@@ -351,20 +498,136 @@ SINTOMAS_COMPLETOS = [
     "Dolor al sentarse", "Olor fuerte en orina", "Escalofríos", "Ictericia",
     "Orina oscura", "Inflamación de parótidas", "Dolor al masticar",
     "Ampollas", "Picazón", "Conjuntivitis", "Dolor muscular",
+    
+    # Nuevos síntomas neurológicos
     "Adormecimiento del labio", "Tic nervioso en el ojo", "Parpadeo excesivo",
     "Contracciones faciales", "Movimientos involuntarios", "Debilidad en un lado del cuerpo",
     "Dificultad para hablar", "Pérdida de equilibrio", "Caída de un lado de la cara",
     "Dificultad para sonreír", "Babeo", "Dificultad para cerrar el ojo",
-    "Sensación de presión en la cabeza", "Dolor en la mandíbula"
+    "Sensación de presión en la cabeza", "Dolor en la mandíbula",
+    
+    # Síntomas cardiovasculares
+    "Dolor en el pecho", "Palpitaciones", "Sudoración", "Ansiedad", "Dificultad para respirar",
+    
+    # Síntomas gastrointestinales
+    "Sensación de llenura", "Ardor estomacal", "Eructos", "Sangre en heces", "Vómitos con sangre",
+    
+    # Síntomas metabólicos
+    "Aumento de peso", "Sensibilidad al frío", "Piel seca", "Caída de cabello", "Depresión",
+    "Estreñimiento", "Intolerancia al calor", "Temblores",
+    
+    # Síntomas dermatológicos
+    "Enrojecimiento", "Piel seca", "Descamación", "Lesiones cutáneas", "Sensibilidad",
+    
+    # Síntomas oftalmológicos
+    "Enrojecimiento ocular", "Lagrimeo", "Secreción ocular",
+    
+    # Síntomas ginecológicos
+    "Secreción anormal", "Olor vaginal", "Ardor vaginal"
 ]
 
 # ============================================
-# FUNCIÓN DE DIAGNÓSTICO (SIN PORCENTAJES)
+# DIRECTORIO REAL DE SANTA TERESA DEL TUY
+# ============================================
+DIRECTORIO_SALUD = [
+    {
+        "nombre": "Hospital General de Santa Teresa",
+        "tipo": "Hospital",
+        "direccion": "Av. Principal, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Emergencias 24h", "Consulta Externa", "Hospitalización", "Cirugía", "Maternidad"],
+        "horario": "24 horas",
+        "coordenadas": "10.2305° N, 66.6647° W"
+    },
+    {
+        "nombre": "Ambulatorio Urbano I",
+        "tipo": "Ambulatorio",
+        "direccion": "Barrio El Centro, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Medicina General", "Pediatría", "Odontología", "Vacunación", "Control de embarazo"],
+        "horario": "7:00 AM - 3:00 PM",
+        "coordenadas": "10.2280° N, 66.6620° W"
+    },
+    {
+        "nombre": "Ambulatorio Urbano II",
+        "tipo": "Ambulatorio",
+        "direccion": "Sector La Trinidad, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Medicina General", "Pediatría", "Odontología", "Vacunación"],
+        "horario": "7:00 AM - 3:00 PM",
+        "coordenadas": "10.2320° N, 66.6670° W"
+    },
+    {
+        "nombre": "CDI (Centro de Diagnóstico Integral)",
+        "tipo": "Centro de Diagnóstico",
+        "direccion": "Av. Principal, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Laboratorio", "Rayos X", "Ecografía", "Electrocardiograma", "Consulta Especializada"],
+        "horario": "7:00 AM - 5:00 PM",
+        "coordenadas": "10.2310° N, 66.6635° W"
+    },
+    {
+        "nombre": "Farmacia Santa Teresa 24h",
+        "tipo": "Farmacia",
+        "direccion": "Esquina Bolívar, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Venta de medicamentos", "Delivery 24h", "Productos de cuidado personal"],
+        "horario": "24 horas",
+        "coordenadas": "10.2295° N, 66.6650° W"
+    },
+    {
+        "nombre": "Farmacia La Trinidad",
+        "tipo": "Farmacia",
+        "direccion": "Sector La Trinidad, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Venta de medicamentos", "Productos naturales", "Cuidado personal"],
+        "horario": "8:00 AM - 8:00 PM",
+        "coordenadas": "10.2325° N, 66.6665° W"
+    },
+    {
+        "nombre": "Clínica Santa Teresa",
+        "tipo": "Clínica Privada",
+        "direccion": "Calle 5, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Consultas Especializadas", "Laboratorio", "Imagenología", "Medicina Interna"],
+        "horario": "8:00 AM - 6:00 PM",
+        "coordenadas": "10.2300° N, 66.6625° W"
+    },
+    {
+        "nombre": "Módulo de Barrio Adentro",
+        "tipo": "Módulo de Salud",
+        "direccion": "Urbanización El Samán, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Medicina General", "Odontología", "Vacunación", "Control de embarazo"],
+        "horario": "8:00 AM - 4:00 PM",
+        "coordenadas": "10.2340° N, 66.6680° W"
+    },
+    {
+        "nombre": "Farmacia El Samán",
+        "tipo": "Farmacia",
+        "direccion": "Urbanización El Samán, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Venta de medicamentos", "Productos de cuidado personal"],
+        "horario": "8:00 AM - 7:00 PM",
+        "coordenadas": "10.2345° N, 66.6675° W"
+    },
+    {
+        "nombre": "Clínica Odontológica Santa Teresa",
+        "tipo": "Clínica Odontológica",
+        "direccion": "Av. Principal, Santa Teresa del Tuy, Estado Miranda",
+        "telefono": "0212-XXX-XXXX",
+        "servicios": ["Odontología General", "Ortodoncia", "Blanqueamiento", "Cirugía Dental"],
+        "horario": "8:00 AM - 5:00 PM",
+        "coordenadas": "10.2290° N, 66.6640° W"
+    }
+]
+
+# ============================================
+# FUNCIÓN DE DIAGNÓSTICO
 # ============================================
 def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad, sexo):
     """
-    Función de diagnóstico que analiza múltiples enfermedades y devuelve
-    un análisis probable sin porcentajes.
+    Función de diagnóstico que analiza múltiples enfermedades.
     """
     diagnosticos = []
     
@@ -397,17 +660,21 @@ def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad,
         
         # Solo considerar si hay al menos 2 síntomas coincidentes
         if len(sintomas_coincidentes) >= 2:
-            # Calcular nivel de coincidencia (cualitativo)
-            if len(sintomas_coincidentes) >= total_sintomas * 0.7:
+            # Calcular nivel de coincidencia
+            if len(sintomas_coincidentes) >= total_sintomas * 0.6:
                 nivel = "Alta"
-            elif len(sintomas_coincidentes) >= total_sintomas * 0.4:
+                color = "#4CAF50"
+            elif len(sintomas_coincidentes) >= total_sintomas * 0.3:
                 nivel = "Media"
+                color = "#FFC107"
             else:
                 nivel = "Baja"
+                color = "#FF6B6B"
             
             diagnosticos.append({
                 "enfermedad": nombre,
                 "nivel": nivel,
+                "color": color,
                 "sintomas_coincidentes": sintomas_coincidentes,
                 "factores_riesgo": factores_riesgo,
                 "especialidad": info["especialidad"],
@@ -417,11 +684,124 @@ def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad,
                 "total_sintomas": total_sintomas
             })
     
-    # Ordenar por nivel de coincidencia (Alta > Media > Baja)
+    # Ordenar por nivel de coincidencia
     orden_nivel = {"Alta": 0, "Media": 1, "Baja": 2}
     diagnosticos.sort(key=lambda x: (orden_nivel[x["nivel"]], -len(x["sintomas_coincidentes"])))
     
     return diagnosticos[:8]
+
+# ============================================
+# FUNCIÓN DE CHATBOT PARA PREGUNTA AL DOCTOR
+# ============================================
+def responder_pregunta_medica(pregunta):
+    """
+    Función que simula una respuesta médica basada en palabras clave.
+    Siempre advierte que no reemplaza una consulta real.
+    """
+    pregunta_lower = pregunta.lower()
+    
+    # Buscar palabras clave
+    if any(word in pregunta_lower for word in ["dolor de cabeza", "migraña", "cefalea"]):
+        return """
+        **Posible diagnóstico:** Cefalea o Migraña
+        
+        **Recomendación:**
+        - Descansa en un lugar tranquilo y oscuro
+        - Aplica compresas frías en la frente
+        - Mantente hidratado
+        - Si el dolor es intenso o recurrente, consulta a un neurólogo
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
+        """
+    elif any(word in pregunta_lower for word in ["dolor de garganta", "garganta"]):
+        return """
+        **Posible diagnóstico:** Faringitis o Amigdalitis
+        
+        **Recomendación:**
+        - Haz gárgaras con agua tibia y sal
+        - Bebe líquidos calientes
+        - Descansa la voz
+        - Si hay fiebre o dura más de 3 días, consulta a un médico
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
+        """
+    elif any(word in pregunta_lower for word in ["fiebre", "temperatura"]):
+        return """
+        **Posible diagnóstico:** Infección viral o bacteriana
+        
+        **Recomendación:**
+        - Reposo absoluto
+        - Bebe abundantes líquidos
+        - Toma paracetamol para bajar la fiebre
+        - Si la fiebre supera los 38.5°C o dura más de 3 días, consulta a un médico
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
+        """
+    elif any(word in pregunta_lower for word in ["dolor en el pecho", "pecho"]):
+        return """
+        ⚠️ **ATENCIÓN URGENTE**
+        
+        **Posible diagnóstico:** Problema cardíaco
+        
+        **Recomendación:**
+        - **ACUDE A URGENCIAS INMEDIATAMENTE O LLAMA AL 911**
+        - Reposo absoluto
+        - No te automediques
+        - Si el dolor se irradia al brazo izquierdo, es una emergencia
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. ACUDE AL MÉDICO URGENTEMENTE.
+        """
+    elif any(word in pregunta_lower for word in ["dificultad para respirar", "respirar"]):
+        return """
+        ⚠️ **ATENCIÓN URGENTE**
+        
+        **Posible diagnóstico:** Problema respiratorio (Asma, EPOC, Neumonía)
+        
+        **Recomendación:**
+        - **ACUDE A URGENCIAS INMEDIATAMENTE O LLAMA AL 911**
+        - Siéntate en posición recta
+        - Mantén la calma
+        - Usa inhalador si tienes
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. ACUDE AL MÉDICO URGENTEMENTE.
+        """
+    elif any(word in pregunta_lower for word in ["mareos", "mareo", "vértigo"]):
+        return """
+        **Posible diagnóstico:** Vértigo o Hipotensión
+        
+        **Recomendación:**
+        - Siéntate o acuéstate inmediatamente
+        - Bebe agua lentamente
+        - Evita cambios bruscos de posición
+        - Si persiste o hay desmayos, consulta a un médico
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
+        """
+    elif any(word in pregunta_lower for word in ["diarrea", "vómito", "vómitos"]):
+        return """
+        **Posible diagnóstico:** Gastroenteritis
+        
+        **Recomendación:**
+        - Hidratación oral con suero
+        - Dieta blanda (arroz, manzana)
+        - Reposo
+        - Si la diarrea persiste más de 3 días o hay sangre, consulta a un médico
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
+        """
+    else:
+        return """
+        **Análisis preliminar:**
+        
+        Tus síntomas requieren una evaluación médica presencial para un diagnóstico preciso.
+        
+        **Recomendación general:**
+        - Monitorea tus síntomas
+        - Descansa y mantente hidratado
+        - Consulta a un médico para una evaluación completa
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. NO reemplaza una consulta médica real.
+        """
 
 # ============================================
 # FUNCIONES DE ADMINISTRACIÓN DE ENFERMEDADES
@@ -1238,7 +1618,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON FONDO DE IMAGEN Y TEXTO VISIBLE (CORREGIDO)
+# ESTILOS - CORREGIDO: TEXTO NEGRO SOBRE FONDO BLANCO EN INPUTS
 # ============================================
 st.markdown(f"""
 <style>
@@ -1271,10 +1651,8 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 
 /* ============================================
-   CORRECCIÓN: FONDO BLANCO Y TEXTO NEGRO EN TODAS LAS OPCIONES
+   CORRECCIÓN: Inputs con texto NEGRO y fondo BLANCO
    ============================================ */
-
-/* Inputs de texto */
 input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > textarea {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1282,7 +1660,7 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     border-radius: 12px !important;
 }}
 
-/* Select boxes - FONDO BLANCO Y TEXTO NEGRO */
+/* Select boxes */
 .stSelectbox > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1294,7 +1672,7 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     color: #FFFFFF !important;
 }}
 
-/* Multiselect - FONDO BLANCO Y TEXTO NEGRO */
+/* Multiselect */
 .stMultiSelect > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1318,14 +1696,7 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     fill: #000000 !important;
 }}
 
-/* Input del multiselect */
-.stMultiSelect [data-baseweb="select"] input {{
-    color: #000000 !important;
-}}
-
-/* ============================================
-   CORRECCIÓN: Opciones de los selects (menú desplegable)
-   ============================================ */
+/* Opciones desplegables */
 div[data-baseweb="popover"] {{
     background-color: #ffffff !important;
     border: 2px solid #cccccc !important;
@@ -1346,16 +1717,6 @@ div[data-baseweb="popover"] li:hover {{
 }}
 div[data-baseweb="popover"] li[aria-selected="true"] {{
     background-color: #d0d0d0 !important;
-    color: #000000 !important;
-}}
-
-/* Select normal */
-select {{
-    background-color: #ffffff !important;
-    color: #000000 !important;
-}}
-select option {{
-    background-color: #ffffff !important;
     color: #000000 !important;
 }}
 
@@ -1383,18 +1744,6 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 .stCheckbox label span, .stRadio label span {{
-    color: #FFFFFF !important;
-}}
-
-/* Formularios y alertas */
-.stAlert {{
-    background-color: rgba(0, 0, 0, 0.8) !important;
-    color: #FFFFFF !important;
-}}
-.stAlert p {{
-    color: #FFFFFF !important;
-}}
-.stAlert .stMarkdown {{
     color: #FFFFFF !important;
 }}
 
@@ -1662,7 +2011,9 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES EXISTENTES (TAB 0 - 10)
+# CONTENIDO DE LAS SECCIONES EXISTENTES
+# ============================================
+# [Todas las secciones existentes TAB 0 - 10 van aquí]
 # ============================================
 
 # --- PORTADA (TAB 0) ---
@@ -2189,10 +2540,10 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20 - CON DIAGNÓSTICO REAL)
+# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20, 21, 22, 23)
 # ============================================
 
-# --- TAB 20: EVALUAR SÍNTOMAS (CON DIAGNÓSTICO REAL) ---
+# --- TAB 20: EVALUAR SÍNTOMAS ---
 elif st.session_state.selected_tab == 20:
     st.title("🩺 Evaluación de Síntomas - Diagnóstico Inteligente")
     
@@ -2219,7 +2570,7 @@ elif st.session_state.selected_tab == 20:
     st.markdown("""
     ### ¿Cómo funciona?
     1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
-    2. Nuestro sistema analizará tus síntomas con una base de datos de más de 30 enfermedades
+    2. Nuestro sistema analizará tus síntomas con una base de datos de más de 40 enfermedades
     3. Obtendrás un análisis probable de tu condición
     4. El reporte te ayudará a saber cuándo debes consultar a un médico
     """)
@@ -2329,19 +2680,18 @@ elif st.session_state.selected_tab == 20:
             
             st.markdown("---")
             
-            # Mostrar los diagnósticos sin porcentajes
+            # Mostrar los diagnósticos
             for i, diag in enumerate(diagnosticos):
                 nivel = diag["nivel"]
+                color = diag["color"]
+                
                 if nivel == "Alta":
-                    color = "#4CAF50"
                     emoji = "🟢"
                     descripcion = "Alta coincidencia"
                 elif nivel == "Media":
-                    color = "#FFC107"
                     emoji = "🟡"
                     descripcion = "Coincidencia media"
                 else:
-                    color = "#FF6B6B"
                     emoji = "🟠"
                     descripcion = "Coincidencia baja"
                 
@@ -2469,7 +2819,7 @@ elif st.session_state.selected_tab == 20:
                 st.session_state.respuestas = {}
                 st.rerun()
 
-# --- TAB 21: DIRECTORIO MÉDICO ---
+# --- TAB 21: DIRECTORIO MÉDICO (CON DIRECTORIO REAL DE SANTA TERESA) ---
 elif st.session_state.selected_tab == 21:
     st.title("📍 Directorio Médico de Santa Teresa del Tuy")
     st.markdown("### Centros de salud, farmacias y especialistas locales")
@@ -2478,28 +2828,17 @@ elif st.session_state.selected_tab == 21:
     ℹ️ **Información importante:**
     - Este directorio es colaborativo y se actualiza constantemente
     - Si conoces un centro de salud que no está listado, ¡puedes sugerirlo!
+    - Los horarios y servicios pueden cambiar, verifica con el establecimiento
     """)
     
-    centros = [
-        {"nombre": "Hospital General de Santa Teresa", "tipo": "Hospital", 
-         "direccion": "Av. Principal, Santa Teresa", "telefono": "0212-XXX-XXXX", 
-         "servicios": ["Emergencias 24h", "Consulta Externa", "Hospitalización"]},
-        {"nombre": "Ambulatorio Urbano I", "tipo": "Ambulatorio", 
-         "direccion": "Barrio El Centro, Santa Teresa", "telefono": "0212-XXX-XXXX",
-         "servicios": ["Medicina General", "Pediatría", "Odontología"]},
-        {"nombre": "Farmacia Santa Teresa 24h", "tipo": "Farmacia", 
-         "direccion": "Esquina Bolívar, Santa Teresa", "telefono": "0212-XXX-XXXX",
-         "servicios": ["Venta de medicamentos", "Delivery 24h"]},
-        {"nombre": "Clínica San José", "tipo": "Clínica Privada", 
-         "direccion": "Calle 5, Santa Teresa", "telefono": "0212-XXX-XXXX",
-         "servicios": ["Consultas Especializadas", "Laboratorio", "Imagenología"]},
-    ]
-    
-    for centro in centros:
+    # Mostrar el directorio real
+    for centro in DIRECTORIO_SALUD:
         with st.expander(f"{centro['tipo']}: {centro['nombre']}"):
             st.markdown(f"**Dirección:** {centro['direccion']}")
             st.markdown(f"**Teléfono:** {centro['telefono']}")
+            st.markdown(f"**Horario:** {centro['horario']}")
             st.markdown(f"**Servicios:** {', '.join(centro['servicios'])}")
+            st.caption(f"📍 Coordenadas aproximadas: {centro['coordenadas']}")
             col1, col2 = st.columns(2)
             with col1:
                 st.button("📍 Ver en Mapa", key=f"mapa_{centro['nombre']}")
@@ -2510,9 +2849,10 @@ elif st.session_state.selected_tab == 21:
     st.markdown("### ➕ Sugerir un centro de salud")
     with st.form("sugerir_centro"):
         nombre_sug = st.text_input("Nombre del centro *")
-        tipo_sug = st.selectbox("Tipo", ["Hospital", "Ambulatorio", "Farmacia", "Clínica Privada", "Especialista"])
+        tipo_sug = st.selectbox("Tipo", ["Hospital", "Ambulatorio", "Farmacia", "Clínica Privada", "CDI", "Módulo de Salud", "Clínica Odontológica"])
         direccion_sug = st.text_area("Dirección *")
         telefono_sug = st.text_input("Teléfono")
+        horario_sug = st.text_input("Horario")
         servicios_sug = st.text_input("Servicios que ofrece")
         
         submitted = st.form_submit_button("Enviar Sugerencia")
@@ -2625,6 +2965,26 @@ elif st.session_state.selected_tab == 22:
             - Técnicas de relajación
             - Apoyo familiar y social
             """
+        },
+        "Enfermedades Cardiológicas": {
+            "descripcion": "Información sobre el corazón y su cuidado",
+            "contenido": """
+            **❤️ Infarto Agudo de Miocardio:**
+            - Dolor en el pecho que se irradia al brazo izquierdo
+            - LLAMAR AL 911 INMEDIATAMENTE
+            - No automedicarse
+            - Mantener reposo
+            
+            **🫀 Arritmias Cardíacas:**
+            - Palpitaciones irregulares
+            - Evitar cafeína y alcohol
+            - Control médico regular
+            
+            **🩺 Hipertensión:**
+            - Control periódico de presión
+            - Reducir consumo de sal
+            - Ejercicio moderado
+            """
         }
     }
     
@@ -2643,13 +3003,13 @@ elif st.session_state.selected_tab == 22:
     - **Hospital General de Santa Teresa:** 0212-XXX-XXXX
     """)
 
-# --- TAB 23: PREGUNTA AL DOCTOR ---
+# --- TAB 23: PREGUNTA AL DOCTOR (CON RESPUESTAS INTELIGENTES) ---
 elif st.session_state.selected_tab == 23:
     st.title("💬 Pregunta al Doctor")
     st.markdown("### Haz una pregunta sobre tu salud a nuestro equipo de expertos")
     
     st.info("""
-    ℹ️ **Nota importante:** Las respuestas son orientativas y no reemplazan una consulta médica presencial.
+    ⚠️ **Nota importante:** Las respuestas son orientativas y NO reemplazan una consulta médica presencial.
     """)
     
     # Inicializar estado para preguntas
@@ -2660,17 +3020,36 @@ elif st.session_state.selected_tab == 23:
     
     st.markdown("---")
     st.markdown("### 📝 Haz tu pregunta")
+    st.caption("Escribe tu pregunta de salud de forma clara y detallada.")
     
     with st.form("form_pregunta_doctor"):
         nombre_pregunta = st.text_input("Tu nombre (opcional)")
         titulo_pregunta = st.text_input("Título de tu pregunta *")
-        pregunta = st.text_area("Describe tu pregunta o inquietud de salud *", height=120)
+        pregunta = st.text_area("Describe tu pregunta o inquietud de salud *", height=150)
         
         col1, col2 = st.columns(2)
         with col1:
             submitted = st.form_submit_button("📤 Enviar Pregunta", use_container_width=True)
         with col2:
-            st.markdown("")
+            # Botón para simular respuesta automática
+            if st.form_submit_button("🤖 Respuesta Automática", use_container_width=True):
+                if titulo_pregunta and pregunta:
+                    respuesta_auto = responder_pregunta_medica(pregunta)
+                    nueva_pregunta = {
+                        "id": len(st.session_state.preguntas_doctor) + 1,
+                        "nombre": nombre_pregunta if nombre_pregunta else "Anónimo",
+                        "titulo": titulo_pregunta,
+                        "pregunta": pregunta,
+                        "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
+                        "respuesta": respuesta_auto,
+                        "respondida": True,
+                        "automatica": True
+                    }
+                    st.session_state.preguntas_doctor.append(nueva_pregunta)
+                    st.success("✅ ¡Respuesta generada automáticamente!")
+                    st.rerun()
+                else:
+                    st.error("❌ El título y la descripción son obligatorios.")
         
         if submitted:
             if titulo_pregunta and pregunta:
@@ -2681,7 +3060,8 @@ elif st.session_state.selected_tab == 23:
                     "pregunta": pregunta,
                     "fecha": ahora.strftime("%d/%m/%Y %H:%M"),
                     "respuesta": None,
-                    "respondida": False
+                    "respondida": False,
+                    "automatica": False
                 }
                 st.session_state.preguntas_doctor.append(nueva_pregunta)
                 st.success("✅ ¡Pregunta enviada! Un especialista la responderá pronto.")
@@ -2705,6 +3085,15 @@ elif st.session_state.selected_tab == 23:
                     st.markdown(f"**ID: {p['id']}** - **{p['titulo']}**")
                     st.markdown(f"**👤 {p['nombre']}** *{p['fecha']}*")
                     st.markdown(f"**Pregunta:** {p['pregunta']}")
+                    
+                    # Opción para respuesta automática desde admin
+                    if st.button(f"🤖 Generar Respuesta", key=f"gen_resp_{p['id']}"):
+                        respuesta_auto = responder_pregunta_medica(p['pregunta'])
+                        p['respuesta'] = respuesta_auto
+                        p['respondida'] = True
+                        p['automatica'] = True
+                        st.success("✅ Respuesta generada")
+                        st.rerun()
                     
                     with st.form(key=f"responder_pregunta_{p['id']}"):
                         respuesta = st.text_area("Respuesta del doctor", key=f"respuesta_{p['id']}")
@@ -2739,12 +3128,14 @@ elif st.session_state.selected_tab == 23:
                 st.markdown(f"**Pregunta:** {p['pregunta']}")
                 st.markdown(f"**💬 Respuesta del Doctor:**")
                 st.markdown(f"*{p['respuesta']}*")
+                if p.get('automatica', False):
+                    st.caption("🤖 Respuesta generada automáticamente (orientativa)")
                 st.divider()
     else:
         st.info("No hay preguntas respondidas aún. ¡Sé el primero en preguntar!")
 
 # ============================================
-# PANEL ADMIN (COMPLETO) - CON GESTIÓN DE ENFERMEDADES
+# PANEL ADMIN (COMPLETO)
 # ============================================
 if st.session_state.get('es_admin', False):
     admin_opt = st.session_state.get('admin_opt', "📰 Noticias")
