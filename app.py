@@ -62,7 +62,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Cardiología",
         "urgencia": "Alta",
         "recomendaciones": ["Medir presión arterial diariamente", "Reducir consumo de sal", "Ejercicio regular", "Consulta con cardiólogo"],
-        "tratamiento": "Enalapril, losartán, diuréticos, cambios en estilo de vida"
+        "tratamiento": "Enalapril, losartán, diuréticos, cambios en estilo de vida",
+        "solo_mujeres": False
     },
     "Hipotensión Arterial": {
         "sintomas": ["mareos", "visión borrosa", "fatiga", "náuseas", "palidez", "desmayos", "dificultad para concentrarse", "sed"],
@@ -70,7 +71,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Cardiología",
         "urgencia": "Media",
         "recomendaciones": ["Aumentar consumo de líquidos", "Consumir sal moderadamente", "Evitar cambios bruscos de posición", "Consulta con cardiólogo"],
-        "tratamiento": "Aumento de líquidos, sal en dieta, medicamentos según causa"
+        "tratamiento": "Aumento de líquidos, sal en dieta, medicamentos según causa",
+        "solo_mujeres": False
     },
     "Isquemia Cardíaca": {
         "sintomas": ["dolor en el pecho", "dificultad para respirar", "fatiga", "palpitaciones", "dolor en brazo izquierdo", "náuseas", "sudoración"],
@@ -78,7 +80,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Cardiología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR A URGENCIAS INMEDIATAMENTE", "Reposo absoluto", "No automedicarse", "Consulta con cardiólogo urgente"],
-        "tratamiento": "Nitroglicerina, antiagregantes, angioplastia, cirugía de bypass"
+        "tratamiento": "Nitroglicerina, antiagregantes, angioplastia, cirugía de bypass",
+        "solo_mujeres": False
     },
     "Infarto Agudo de Miocardio": {
         "sintomas": ["dolor en el pecho", "dificultad para respirar", "sudoración", "náuseas", "vómitos", "dolor en brazo izquierdo", "palpitaciones", "ansiedad"],
@@ -86,7 +89,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Cardiología",
         "urgencia": "Alta",
         "recomendaciones": ["LLAMAR AL 911 INMEDIATAMENTE", "Reposo absoluto", "No automedicarse", "Masticar aspirina si no es alérgico"],
-        "tratamiento": "Angioplastia, trombolíticos, anticoagulantes, cirugía de bypass"
+        "tratamiento": "Angioplastia, trombolíticos, anticoagulantes, cirugía de bypass",
+        "solo_mujeres": False
     },
     "Arritmia Cardíaca": {
         "sintomas": ["palpitaciones", "mareos", "dificultad para respirar", "dolor en el pecho", "fatiga", "desmayos", "ansiedad"],
@@ -94,7 +98,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Cardiología",
         "urgencia": "Media",
         "recomendaciones": ["Evitar cafeína y alcohol", "Manejar el estrés", "Consulta con cardiólogo", "Monitoreo cardíaco"],
-        "tratamiento": "Antiarrítmicos, betabloqueadores, marcapasos"
+        "tratamiento": "Antiarrítmicos, betabloqueadores, marcapasos",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES RESPIRATORIAS ===
@@ -104,7 +109,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neumología",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Aumentar consumo de líquidos", "Usar humidificador", "Consulta con neumólogo si persiste"],
-        "tratamiento": "Broncodilatadores, antiinflamatorios, antibióticos si es bacteriana"
+        "tratamiento": "Broncodilatadores, antiinflamatorios, antibióticos si es bacteriana",
+        "solo_mujeres": False
     },
     "Catarro Común (Resfriado)": {
         "sintomas": ["congestión nasal", "estornudos", "tos", "dolor de garganta", "fiebre leve", "fatiga", "dolor de cabeza"],
@@ -112,7 +118,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Medicina General",
         "urgencia": "Baja",
         "recomendaciones": ["Reposo", "Aumentar consumo de líquidos", "Té con miel y limón", "Consulta si empeora"],
-        "tratamiento": "Antihistamínicos, analgésicos, descongestionantes"
+        "tratamiento": "Antihistamínicos, analgésicos, descongestionantes",
+        "solo_mujeres": False
     },
     "Neumonía": {
         "sintomas": ["fiebre alta", "tos con flema", "dificultad para respirar", "dolor en el pecho", "fatiga", "escalofríos", "sudoración"],
@@ -120,7 +127,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neumología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo absoluto", "Aumentar líquidos", "No automedicarse"],
-        "tratamiento": "Antibióticos, antipiréticos, oxigenoterapia si es necesario"
+        "tratamiento": "Antibióticos, antipiréticos, oxigenoterapia si es necesario",
+        "solo_mujeres": False
     },
     "Asma Bronquial": {
         "sintomas": ["dificultad para respirar", "sibilancias", "tos", "opresión en el pecho", "fatiga", "sensación de ahogo"],
@@ -128,7 +136,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neumología",
         "urgencia": "Alta",
         "recomendaciones": ["Usar inhalador de rescate", "Evitar alérgenos", "Consulta con neumólogo"],
-        "tratamiento": "Broncodilatadores, corticosteroides inhalados"
+        "tratamiento": "Broncodilatadores, corticosteroides inhalados",
+        "solo_mujeres": False
     },
     "EPOC (Enfermedad Pulmonar Obstructiva Crónica)": {
         "sintomas": ["dificultad para respirar", "tos crónica", "producción de moco", "fatiga", "sibilancias", "opresión en el pecho"],
@@ -136,7 +145,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neumología",
         "urgencia": "Alta",
         "recomendaciones": ["Dejar de fumar", "Rehabilitación pulmonar", "Uso de broncodilatadores", "Consulta con neumólogo"],
-        "tratamiento": "Broncodilatadores, corticosteroides, oxigenoterapia"
+        "tratamiento": "Broncodilatadores, corticosteroides, oxigenoterapia",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES NEUROLÓGICAS ===
@@ -146,7 +156,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Baja",
         "recomendaciones": ["Descanso", "Técnicas de relajación", "Aplicar compresas frías", "Consulta si persiste"],
-        "tratamiento": "Analgésicos, relajantes musculares, terapia de relajación"
+        "tratamiento": "Analgésicos, relajantes musculares, terapia de relajación",
+        "solo_mujeres": False
     },
     "Migraña": {
         "sintomas": ["dolor de cabeza pulsátil", "náuseas", "vómitos", "sensibilidad a la luz", "sensibilidad al sonido", "aura visual", "fatiga"],
@@ -154,7 +165,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Media",
         "recomendaciones": ["Descanso en lugar oscuro", "Hidratación", "Evitar factores desencadenantes", "Consulta con neurólogo"],
-        "tratamiento": "Triptanos, antiinflamatorios, betabloqueadores"
+        "tratamiento": "Triptanos, antiinflamatorios, betabloqueadores",
+        "solo_mujeres": False
     },
     "Neuritis": {
         "sintomas": ["dolor agudo", "hormigueo", "entumecimiento", "debilidad muscular", "quemazón", "sensibilidad al tacto", "dificultad para mover"],
@@ -162,7 +174,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Fisioterapia", "Calor local", "Consulta con neurólogo"],
-        "tratamiento": "Antiinflamatorios, analgésicos, vitaminas del complejo B"
+        "tratamiento": "Antiinflamatorios, analgésicos, vitaminas del complejo B",
+        "solo_mujeres": False
     },
     "Accidente Cerebrovascular (ACV)": {
         "sintomas": ["adormecimiento del labio", "debilidad en un lado del cuerpo", "dificultad para hablar", "visión borrosa", "dolor de cabeza", "mareos", "pérdida de equilibrio"],
@@ -170,7 +183,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR A URGENCIAS INMEDIATAMENTE", "No automedicarse", "Mantener reposo", "LLAMAR AL 911"],
-        "tratamiento": "Trombólisis, anticoagulantes, rehabilitación"
+        "tratamiento": "Trombólisis, anticoagulantes, rehabilitación",
+        "solo_mujeres": False
     },
     "Tic Nervioso": {
         "sintomas": ["tic nervioso en el ojo", "movimientos involuntarios", "parpadeo excesivo", "contracciones faciales", "estrés", "ansiedad"],
@@ -178,7 +192,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Baja",
         "recomendaciones": ["Reducir el estrés", "Técnicas de relajación", "Dormir adecuadamente", "Consulta con neurólogo si persiste"],
-        "tratamiento": "Terapia de relajación, medicamentos en casos severos"
+        "tratamiento": "Terapia de relajación, medicamentos en casos severos",
+        "solo_mujeres": False
     },
     "Parálisis Facial": {
         "sintomas": ["adormecimiento del labio", "debilidad facial", "caída de un lado de la cara", "dificultad para sonreír", "babeo", "dificultad para cerrar el ojo"],
@@ -186,7 +201,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Proteger el ojo", "Fisioterapia facial", "Evitar corrientes de aire"],
-        "tratamiento": "Corticosteroides, antivirales, fisioterapia"
+        "tratamiento": "Corticosteroides, antivirales, fisioterapia",
+        "solo_mujeres": False
     },
     "Parkinson": {
         "sintomas": ["temblores", "rigidez muscular", "bradicinesia", "inestabilidad postural", "dificultad para hablar", "trastornos del sueño", "depresión"],
@@ -194,7 +210,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Media",
         "recomendaciones": ["Fisioterapia", "Terapia ocupacional", "Ejercicio regular", "Consulta con neurólogo"],
-        "tratamiento": "Levodopa, agonistas dopaminérgicos"
+        "tratamiento": "Levodopa, agonistas dopaminérgicos",
+        "solo_mujeres": False
     },
     "Alzheimer": {
         "sintomas": ["pérdida de memoria", "confusión", "dificultad para hablar", "cambios de humor", "desorientación", "dificultad para realizar tareas", "aislamiento social"],
@@ -202,7 +219,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Neurología",
         "urgencia": "Alta",
         "recomendaciones": ["Estimulación cognitiva", "Estructura y rutina", "Apoyo familiar", "Consulta con neurólogo"],
-        "tratamiento": "Donepezilo, memantina"
+        "tratamiento": "Donepezilo, memantina",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES GASTROINTESTINALES ===
@@ -212,7 +230,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Gastroenterología",
         "urgencia": "Media",
         "recomendaciones": ["Hidratación oral", "Dieta blanda", "Reposo", "Consulta si persiste más de 3 días"],
-        "tratamiento": "Sales de rehidratación, probióticos, antidiarreicos"
+        "tratamiento": "Sales de rehidratación, probióticos, antidiarreicos",
+        "solo_mujeres": False
     },
     "Gastroenteritis": {
         "sintomas": ["diarrea", "vómitos", "dolor abdominal", "fiebre", "deshidratación", "pérdida de apetito", "malestar general"],
@@ -220,7 +239,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Gastroenterología",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Hidratación", "Dieta blanda", "Consulta si hay deshidratación"],
-        "tratamiento": "Sales de rehidratación, probióticos, medicamentos según causa"
+        "tratamiento": "Sales de rehidratación, probióticos, medicamentos según causa",
+        "solo_mujeres": False
     },
     "Enfermedad de Crohn": {
         "sintomas": ["dolor abdominal", "diarrea crónica", "fatiga", "pérdida de peso", "sangre en heces", "fiebre", "úlceras bucales"],
@@ -228,7 +248,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Gastroenterología",
         "urgencia": "Media",
         "recomendaciones": ["Dieta baja en fibra", "Suplementos nutricionales", "Evitar irritantes", "Consulta con gastroenterólogo"],
-        "tratamiento": "Corticosteroides, inmunomoduladores, biológicos"
+        "tratamiento": "Corticosteroides, inmunomoduladores, biológicos",
+        "solo_mujeres": False
     },
     "Gastritis": {
         "sintomas": ["dolor abdominal", "náuseas", "vómitos", "sensación de llenura", "pérdida de apetito", "ardor estomacal", "eructos"],
@@ -236,7 +257,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Gastroenterología",
         "urgencia": "Media",
         "recomendaciones": ["Evitar alimentos irritantes", "Comer porciones pequeñas", "Reducir estrés", "Consulta con gastroenterólogo"],
-        "tratamiento": "Antiacidos, protectores gástricos, antibióticos si es por H. pylori"
+        "tratamiento": "Antiacidos, protectores gástricos, antibióticos si es por H. pylori",
+        "solo_mujeres": False
     },
     "Úlcera Gástrica": {
         "sintomas": ["dolor abdominal", "ardor", "náuseas", "vómitos", "pérdida de peso", "sangre en heces", "vómitos con sangre"],
@@ -244,7 +266,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Gastroenterología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Evitar alimentos irritantes", "Reducir estrés", "No automedicarse"],
-        "tratamiento": "Protectores gástricos, antibióticos, cambios en dieta"
+        "tratamiento": "Protectores gástricos, antibióticos, cambios en dieta",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES MUSCULOESQUELÉTICAS ===
@@ -254,7 +277,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Reumatología",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Fisioterapia", "Medicamentos antiinflamatorios", "Consulta con reumatólogo"],
-        "tratamiento": "Metotrexato, corticosteroides, anti-TNF"
+        "tratamiento": "Metotrexato, corticosteroides, anti-TNF",
+        "solo_mujeres": False
     },
     "Artrosis (Osteoartritis)": {
         "sintomas": ["dolor articular", "rigidez", "dificultad para moverse", "crujidos", "inflamación leve", "deformidad", "pérdida de flexibilidad"],
@@ -262,7 +286,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Reumatología",
         "urgencia": "Baja",
         "recomendaciones": ["Ejercicio de bajo impacto", "Pérdida de peso", "Fisioterapia", "Consulta con reumatólogo"],
-        "tratamiento": "Analgésicos, antiinflamatorios, fisioterapia, cirugía en casos graves"
+        "tratamiento": "Analgésicos, antiinflamatorios, fisioterapia, cirugía en casos graves",
+        "solo_mujeres": False
     },
     "Cervicalgia (Dolor de Cuello)": {
         "sintomas": ["dolor en el cuello", "rigidez", "dolor de cabeza", "dificultad para mover el cuello", "dolor en hombros", "hormigueo en brazos"],
@@ -270,7 +295,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Traumatología",
         "urgencia": "Baja",
         "recomendaciones": ["Aplicar calor local", "Ejercicios de estiramiento", "Mejorar postura", "Consulta si persiste"],
-        "tratamiento": "Analgésicos, relajantes musculares, fisioterapia"
+        "tratamiento": "Analgésicos, relajantes musculares, fisioterapia",
+        "solo_mujeres": False
     },
     "Lumbalgia (Dolor de Espalda)": {
         "sintomas": ["dolor lumbar", "rigidez", "dificultad para moverse", "dolor al estar de pie", "dolor al sentarse", "irradiación a piernas"],
@@ -278,7 +304,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Traumatología",
         "urgencia": "Baja",
         "recomendaciones": ["Aplicar calor o frío", "Reposo", "Ejercicios de fortalecimiento", "Consulta si persiste"],
-        "tratamiento": "Analgésicos, relajantes musculares, fisioterapia"
+        "tratamiento": "Analgésicos, relajantes musculares, fisioterapia",
+        "solo_mujeres": False
     },
     "Hernia Discal": {
         "sintomas": ["dolor lumbar", "irradiación a piernas", "hormigueo", "debilidad en piernas", "dificultad para moverse", "dolor al estornudar"],
@@ -286,7 +313,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Traumatología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Evitar esfuerzos", "Fisioterapia"],
-        "tratamiento": "Analgésicos, antiinflamatorios, fisioterapia, cirugía en casos graves"
+        "tratamiento": "Analgésicos, antiinflamatorios, fisioterapia, cirugía en casos graves",
+        "solo_mujeres": False
     },
     
     # === INFECCIONES ===
@@ -296,7 +324,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Urología",
         "urgencia": "Media",
         "recomendaciones": ["Aumentar consumo de agua", "Jugo de arándano", "Higiene adecuada", "Consulta con urólogo"],
-        "tratamiento": "Antibióticos, analgésicos, aumento de líquidos"
+        "tratamiento": "Antibióticos, analgésicos, aumento de líquidos",
+        "solo_mujeres": False
     },
     "Cistitis": {
         "sintomas": ["dolor al orinar", "micción frecuente", "urgencia urinaria", "orina con sangre", "dolor pélvico", "fiebre", "malestar general"],
@@ -304,7 +333,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Urología",
         "urgencia": "Media",
         "recomendaciones": ["Hidratación", "Higiene", "Evitar irritantes", "Consulta con urólogo"],
-        "tratamiento": "Antibióticos, analgésicos, aumento de líquidos"
+        "tratamiento": "Antibióticos, analgésicos, aumento de líquidos",
+        "solo_mujeres": False
     },
     "Pielonefritis": {
         "sintomas": ["fiebre alta", "escalofríos", "dolor lumbar", "dolor al orinar", "náuseas", "vómitos", "fatiga"],
@@ -312,7 +342,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Urología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Hidratación", "No automedicarse"],
-        "tratamiento": "Antibióticos, antipiréticos, hidratación"
+        "tratamiento": "Antibióticos, antipiréticos, hidratación",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES METABÓLICAS Y ENDOCRINAS ===
@@ -322,7 +353,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Endocrinología",
         "urgencia": "Media",
         "recomendaciones": ["Control de glucosa", "Dieta balanceada", "Ejercicio regular", "Consulta con endocrinólogo"],
-        "tratamiento": "Metformina, insulina, cambios en estilo de vida"
+        "tratamiento": "Metformina, insulina, cambios en estilo de vida",
+        "solo_mujeres": False
     },
     "Hipotiroidismo": {
         "sintomas": ["fatiga", "aumento de peso", "sensibilidad al frío", "piel seca", "caída de cabello", "depresión", "estreñimiento"],
@@ -330,7 +362,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Endocrinología",
         "urgencia": "Media",
         "recomendaciones": ["Control de tiroides", "Dieta balanceada", "Ejercicio regular", "Consulta con endocrinólogo"],
-        "tratamiento": "Levotiroxina, cambios en estilo de vida"
+        "tratamiento": "Levotiroxina, cambios en estilo de vida",
+        "solo_mujeres": False
     },
     "Hipertiroidismo": {
         "sintomas": ["pérdida de peso", "palpitaciones", "ansiedad", "intolerancia al calor", "sudoración", "fatiga", "temblores"],
@@ -338,7 +371,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Endocrinología",
         "urgencia": "Media",
         "recomendaciones": ["Control de tiroides", "Dieta balanceada", "Técnicas de relajación", "Consulta con endocrinólogo"],
-        "tratamiento": "Metimazol, yodo radioactivo, cirugía"
+        "tratamiento": "Metimazol, yodo radioactivo, cirugía",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES AUTOINMUNES ===
@@ -348,7 +382,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Reumatología",
         "urgencia": "Alta",
         "recomendaciones": ["Protección solar", "Reposo", "Medicamentos antiinflamatorios", "Consulta con reumatólogo"],
-        "tratamiento": "Corticosteroides, antipalúdicos, inmunosupresores"
+        "tratamiento": "Corticosteroides, antipalúdicos, inmunosupresores",
+        "solo_mujeres": False
     },
     "Anemia": {
         "sintomas": ["fatiga", "debilidad", "palidez", "mareos", "dificultad para respirar", "palpitaciones", "manos y pies fríos"],
@@ -356,7 +391,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Hematología",
         "urgencia": "Media",
         "recomendaciones": ["Dieta rica en hierro", "Suplementos", "Descanso", "Consulta con hematólogo"],
-        "tratamiento": "Suplementos de hierro, vitamina B12, ácido fólico"
+        "tratamiento": "Suplementos de hierro, vitamina B12, ácido fólico",
+        "solo_mujeres": False
     },
     "Anemia Perniciosa": {
         "sintomas": ["fatiga", "debilidad", "palidez", "mareos", "hormigueo", "dificultad para caminar", "depresión", "confusión"],
@@ -364,7 +400,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Hematología",
         "urgencia": "Media",
         "recomendaciones": ["Suplementos de B12", "Dieta balanceada", "Descanso", "Consulta con hematólogo"],
-        "tratamiento": "Inyecciones de B12, suplementos orales"
+        "tratamiento": "Inyecciones de B12, suplementos orales",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES INFECCIOSAS ===
@@ -374,7 +411,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Infectología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Hidratación", "Aislamiento"],
-        "tratamiento": "Antibióticos, antipiréticos, hidratación"
+        "tratamiento": "Antibióticos, antipiréticos, hidratación",
+        "solo_mujeres": False
     },
     "Dengue": {
         "sintomas": ["fiebre alta", "dolor de cabeza", "dolor muscular", "dolor articular", "erupción cutánea", "sangrado", "fatiga"],
@@ -382,7 +420,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Infectología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Hidratación", "No tomar aspirina"],
-        "tratamiento": "Antipiréticos, hidratación, vigilancia médica"
+        "tratamiento": "Antipiréticos, hidratación, vigilancia médica",
+        "solo_mujeres": False
     },
     "Hepatitis B": {
         "sintomas": ["fatiga", "dolor abdominal", "orina oscura", "ictericia", "náuseas", "vómitos", "fiebre"],
@@ -390,7 +429,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Gastroenterología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Reposo", "Dieta ligera", "Evitar alcohol"],
-        "tratamiento": "Antivirales, inmunomoduladores, seguimiento médico"
+        "tratamiento": "Antivirales, inmunomoduladores, seguimiento médico",
+        "solo_mujeres": False
     },
     "Gripe (Influenza)": {
         "sintomas": ["fiebre alta", "tos", "dolor de garganta", "dolor muscular", "dolor de cabeza", "fatiga", "escalofríos"],
@@ -398,7 +438,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Medicina General",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Aumentar líquidos", "Antipiréticos", "Consulta si empeora"],
-        "tratamiento": "Antivirales, antipiréticos, descanso"
+        "tratamiento": "Antivirales, antipiréticos, descanso",
+        "solo_mujeres": False
     },
     "Varicela": {
         "sintomas": ["fiebre", "erupción con ampollas", "picazón", "dolor de cabeza", "fatiga", "pérdida de apetito"],
@@ -406,7 +447,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Dermatología",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "No rascar", "Baños de avena", "Consulta si fiebre alta"],
-        "tratamiento": "Antipiréticos, antihistamínicos, antivirales"
+        "tratamiento": "Antipiréticos, antihistamínicos, antivirales",
+        "solo_mujeres": False
     },
     "Sarampión": {
         "sintomas": ["fiebre alta", "tos", "congestión nasal", "conjuntivitis", "erupción", "dolor de cabeza", "fatiga"],
@@ -414,7 +456,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Infectología",
         "urgencia": "Alta",
         "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Aislamiento", "Hidratación", "Reposo"],
-        "tratamiento": "Sintomático, vitaminas, vigilancia médica"
+        "tratamiento": "Sintomático, vitaminas, vigilancia médica",
+        "solo_mujeres": False
     },
     "Paperas": {
         "sintomas": ["inflamación de parótidas", "fiebre", "dolor al masticar", "dolor de cabeza", "fatiga", "pérdida de apetito"],
@@ -422,7 +465,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Infectología",
         "urgencia": "Media",
         "recomendaciones": ["Reposo", "Aumentar líquidos", "Compresas frías", "Consulta si complicaciones"],
-        "tratamiento": "Analgésicos, antipiréticos, hidratación"
+        "tratamiento": "Analgésicos, antipiréticos, hidratación",
+        "solo_mujeres": False
     },
     "COVID-19": {
         "sintomas": ["fiebre", "tos", "dificultad para respirar", "fatiga", "dolor de cabeza", "pérdida de olfato", "pérdida de gusto", "dolor de garganta"],
@@ -430,7 +474,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Infectología",
         "urgencia": "Alta",
         "recomendaciones": ["AISLAMIENTO INMEDIATO", "ACUDIR AL MÉDICO URGENTEMENTE", "Hidratación", "Monitoreo de oxígeno"],
-        "tratamiento": "Antivirales, antipiréticos, oxigenoterapia, vacunación"
+        "tratamiento": "Antivirales, antipiréticos, oxigenoterapia, vacunación",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES DERMATOLÓGICAS ===
@@ -440,7 +485,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Dermatología",
         "urgencia": "Baja",
         "recomendaciones": ["Hidratar la piel", "Evitar irritantes", "Ropa de algodón", "Consulta con dermatólogo"],
-        "tratamiento": "Cremas hidratantes, corticosteroides tópicos, antihistamínicos"
+        "tratamiento": "Cremas hidratantes, corticosteroides tópicos, antihistamínicos",
+        "solo_mujeres": False
     },
     "Psoriasis": {
         "sintomas": ["lesiones cutáneas", "descamación", "enrojecimiento", "picazón", "dolor", "inflamación", "uñas deformadas"],
@@ -448,7 +494,8 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Dermatología",
         "urgencia": "Media",
         "recomendaciones": ["Hidratar la piel", "Evitar estrés", "No rascar", "Consulta con dermatólogo"],
-        "tratamiento": "Corticosteroides tópicos, fototerapia, medicamentos sistémicos"
+        "tratamiento": "Corticosteroides tópicos, fototerapia, medicamentos sistémicos",
+        "solo_mujeres": False
     },
     
     # === ENFERMEDADES OFTALMOLÓGICAS ===
@@ -458,17 +505,37 @@ BASE_DATOS_ENFERMEDADES = {
         "especialidad": "Oftalmología",
         "urgencia": "Media",
         "recomendaciones": ["Lavado de manos frecuente", "No compartir toallas", "No usar lentes de contacto", "Consulta con oftalmólogo"],
-        "tratamiento": "Gotas antibióticas, antihistamínicas, compresas frías"
+        "tratamiento": "Gotas antibióticas, antihistamínicas, compresas frías",
+        "solo_mujeres": False
     },
     
-    # === ENFERMEDADES GINECOLÓGICAS ===
+    # === ENFERMEDADES GINECOLÓGICAS (SOLO MUJERES) ===
     "Infección Vaginal": {
         "sintomas": ["picazón", "secreción anormal", "olor", "dolor", "ardor", "enrojecimiento", "inflamación"],
         "factores_riesgo": ["antibióticos", "diabetes", "embarazo", "anticonceptivos", "relaciones sexuales"],
         "especialidad": "Ginecología",
         "urgencia": "Media",
         "recomendaciones": ["Higiene adecuada", "Ropa interior de algodón", "Evitar irritantes", "Consulta con ginecólogo"],
-        "tratamiento": "Antifúngicos, antibióticos, cremas tópicas"
+        "tratamiento": "Antifúngicos, antibióticos, cremas tópicas",
+        "solo_mujeres": True
+    },
+    "Vaginosis Bacteriana": {
+        "sintomas": ["secreción grisácea", "olor a pescado", "picazón", "ardor", "dolor", "irritación"],
+        "factores_riesgo": ["relaciones sexuales", "duchas vaginales", "antibióticos", "embarazo", "diabetes"],
+        "especialidad": "Ginecología",
+        "urgencia": "Media",
+        "recomendaciones": ["Higiene adecuada", "Evitar duchas vaginales", "Ropa interior de algodón", "Consulta con ginecólogo"],
+        "tratamiento": "Antibióticos tópicos u orales",
+        "solo_mujeres": True
+    },
+    "Candidiasis Vaginal": {
+        "sintomas": ["picazón intensa", "secreción blanca", "ardor", "enrojecimiento", "inflamación", "dolor al orinar"],
+        "factores_riesgo": ["antibióticos", "diabetes", "embarazo", "anticonceptivos", "sistema inmunológico débil"],
+        "especialidad": "Ginecología",
+        "urgencia": "Media",
+        "recomendaciones": ["Higiene adecuada", "Ropa interior de algodón", "Evitar azúcares", "Consulta con ginecólogo"],
+        "tratamiento": "Antifúngicos tópicos u orales",
+        "solo_mujeres": True
     }
 }
 
@@ -499,7 +566,7 @@ SINTOMAS_COMPLETOS = [
     "Orina oscura", "Inflamación de parótidas", "Dolor al masticar",
     "Ampollas", "Picazón", "Conjuntivitis", "Dolor muscular",
     
-    # Nuevos síntomas neurológicos
+    # Síntomas neurológicos
     "Adormecimiento del labio", "Tic nervioso en el ojo", "Parpadeo excesivo",
     "Contracciones faciales", "Movimientos involuntarios", "Debilidad en un lado del cuerpo",
     "Dificultad para hablar", "Pérdida de equilibrio", "Caída de un lado de la cara",
@@ -507,14 +574,14 @@ SINTOMAS_COMPLETOS = [
     "Sensación de presión en la cabeza", "Dolor en la mandíbula",
     
     # Síntomas cardiovasculares
-    "Dolor en el pecho", "Palpitaciones", "Sudoración", "Ansiedad", "Dificultad para respirar",
+    "Dolor en el pecho", "Palpitaciones", "Sudoración", "Ansiedad",
     
     # Síntomas gastrointestinales
     "Sensación de llenura", "Ardor estomacal", "Eructos", "Sangre en heces", "Vómitos con sangre",
     
     # Síntomas metabólicos
     "Aumento de peso", "Sensibilidad al frío", "Piel seca", "Caída de cabello", "Depresión",
-    "Estreñimiento", "Intolerancia al calor", "Temblores",
+    "Estreñimiento", "Intolerancia al calor",
     
     # Síntomas dermatológicos
     "Enrojecimiento", "Piel seca", "Descamación", "Lesiones cutáneas", "Sensibilidad",
@@ -522,8 +589,9 @@ SINTOMAS_COMPLETOS = [
     # Síntomas oftalmológicos
     "Enrojecimiento ocular", "Lagrimeo", "Secreción ocular",
     
-    # Síntomas ginecológicos
-    "Secreción anormal", "Olor vaginal", "Ardor vaginal"
+    # Síntomas ginecológicos (para mujeres)
+    "Secreción anormal", "Olor vaginal", "Ardor vaginal", "Secreción grisácea",
+    "Secreción blanca"
 ]
 
 # ============================================
@@ -640,6 +708,10 @@ def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad,
     
     # Analizar cada enfermedad
     for nombre, info in BASE_DATOS_ENFERMEDADES.items():
+        # Si la enfermedad es solo para mujeres y el sexo es masculino, saltar
+        if info.get("solo_mujeres", False) and sexo != "Femenino":
+            continue
+        
         sintomas_coincidentes = []
         factores_riesgo = []
         total_sintomas = len(info["sintomas"])
@@ -700,7 +772,6 @@ def responder_pregunta_medica(pregunta):
     """
     pregunta_lower = pregunta.lower()
     
-    # Buscar palabras clave
     if any(word in pregunta_lower for word in ["dolor de cabeza", "migraña", "cefalea"]):
         return """
         **Posible diagnóstico:** Cefalea o Migraña
@@ -789,6 +860,18 @@ def responder_pregunta_medica(pregunta):
         
         ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
         """
+    elif any(word in pregunta_lower for word in ["picazón", "secreción", "vaginal", "ardor vaginal"]):
+        return """
+        **Posible diagnóstico:** Infección Vaginal (Candidiasis o Vaginosis)
+        
+        **Recomendación:**
+        - Mantén una buena higiene
+        - Usa ropa interior de algodón
+        - Evita duchas vaginales y productos irritantes
+        - Consulta con un ginecólogo para un diagnóstico preciso
+        
+        ⚠️ **Recuerda:** Esta es solo una guía informativa. Consulta a un médico para un diagnóstico preciso.
+        """
     else:
         return """
         **Análisis preliminar:**
@@ -815,7 +898,8 @@ def guardar_enfermedad_en_supabase(nombre, info):
             "especialidad": info["especialidad"],
             "urgencia": info["urgencia"],
             "recomendaciones": info["recomendaciones"],
-            "tratamiento": info["tratamiento"]
+            "tratamiento": info["tratamiento"],
+            "solo_mujeres": info.get("solo_mujeres", False)
         }
         existing = supabase.table("enfermedades").select("*").eq("nombre", nombre).execute()
         if existing.data:
@@ -1618,7 +1702,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CORREGIDO: TEXTO NEGRO SOBRE FONDO BLANCO EN INPUTS
+# ESTILOS - CORREGIDO: TEXTO NEGRO SOBRE FONDO BLANCO EN TODOS LOS ELEMENTOS
 # ============================================
 st.markdown(f"""
 <style>
@@ -1651,8 +1735,10 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 
 /* ============================================
-   CORRECCIÓN: Inputs con texto NEGRO y fondo BLANCO
+   CORRECCIÓN: TODOS LOS INPUTS CON TEXTO NEGRO Y FONDO BLANCO
    ============================================ */
+
+/* Inputs de texto */
 input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > textarea {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1795,6 +1881,28 @@ div[data-testid="column"] .stButton > button p {{
     color: #FFFFFF !important;
     font-weight: bold !important;
     margin: 0 !important;
+}}
+
+/* ============================================
+   CORRECCIÓN: TEXTOS EN EXPANDERS Y ALERTAS
+   ============================================ */
+.streamlit-expanderContent {{
+    color: #FFFFFF !important;
+}}
+.streamlit-expanderContent p, .streamlit-expanderContent li, .streamlit-expanderContent div {{
+    color: #FFFFFF !important;
+}}
+
+/* Alertas */
+.stAlert {{
+    background-color: rgba(0, 0, 0, 0.8) !important;
+    color: #FFFFFF !important;
+}}
+.stAlert p {{
+    color: #FFFFFF !important;
+}}
+.stAlert .stMarkdown {{
+    color: #FFFFFF !important;
 }}
 
 .bronze-footer {{ background: linear-gradient(145deg, #8c6a31, #5d431a) !important; border: 5px solid #d4af37 !important; padding: 35px 25px !important; border-radius: 20px !important; text-align: center !important; margin-top: 50px !important; }}
@@ -2011,9 +2119,9 @@ if 'selected_tab' not in st.session_state:
     st.session_state.selected_tab = 0
 
 # ============================================
-# CONTENIDO DE LAS SECCIONES EXISTENTES
+# CONTENIDO DE LAS SECCIONES EXISTENTES (TAB 0 - 10)
 # ============================================
-# [Todas las secciones existentes TAB 0 - 10 van aquí]
+# [Todas tus secciones existentes van aquí - TAB 0 a TAB 10]
 # ============================================
 
 # --- PORTADA (TAB 0) ---
@@ -2819,7 +2927,7 @@ elif st.session_state.selected_tab == 20:
                 st.session_state.respuestas = {}
                 st.rerun()
 
-# --- TAB 21: DIRECTORIO MÉDICO (CON DIRECTORIO REAL DE SANTA TERESA) ---
+# --- TAB 21: DIRECTORIO MÉDICO ---
 elif st.session_state.selected_tab == 21:
     st.title("📍 Directorio Médico de Santa Teresa del Tuy")
     st.markdown("### Centros de salud, farmacias y especialistas locales")
@@ -2831,7 +2939,6 @@ elif st.session_state.selected_tab == 21:
     - Los horarios y servicios pueden cambiar, verifica con el establecimiento
     """)
     
-    # Mostrar el directorio real
     for centro in DIRECTORIO_SALUD:
         with st.expander(f"{centro['tipo']}: {centro['nombre']}"):
             st.markdown(f"**Dirección:** {centro['direccion']}")
@@ -3003,7 +3110,7 @@ elif st.session_state.selected_tab == 22:
     - **Hospital General de Santa Teresa:** 0212-XXX-XXXX
     """)
 
-# --- TAB 23: PREGUNTA AL DOCTOR (CON RESPUESTAS INTELIGENTES) ---
+# --- TAB 23: PREGUNTA AL DOCTOR ---
 elif st.session_state.selected_tab == 23:
     st.title("💬 Pregunta al Doctor")
     st.markdown("### Haz una pregunta sobre tu salud a nuestro equipo de expertos")
@@ -3031,7 +3138,6 @@ elif st.session_state.selected_tab == 23:
         with col1:
             submitted = st.form_submit_button("📤 Enviar Pregunta", use_container_width=True)
         with col2:
-            # Botón para simular respuesta automática
             if st.form_submit_button("🤖 Respuesta Automática", use_container_width=True):
                 if titulo_pregunta and pregunta:
                     respuesta_auto = responder_pregunta_medica(pregunta)
@@ -3072,11 +3178,9 @@ elif st.session_state.selected_tab == 23:
     st.markdown("---")
     st.markdown("### 📋 Preguntas y respuestas")
     
-    # Mostrar preguntas (solo las respondidas para el público general)
     preguntas_respondidas = [p for p in st.session_state.preguntas_doctor if p['respondida']]
     preguntas_pendientes = [p for p in st.session_state.preguntas_doctor if not p['respondida']]
     
-    # Si es admin, mostrar todas las preguntas
     if es_admin:
         st.markdown("#### 👨‍⚕️ Panel de Administración - Preguntas Pendientes")
         if preguntas_pendientes:
@@ -3086,7 +3190,6 @@ elif st.session_state.selected_tab == 23:
                     st.markdown(f"**👤 {p['nombre']}** *{p['fecha']}*")
                     st.markdown(f"**Pregunta:** {p['pregunta']}")
                     
-                    # Opción para respuesta automática desde admin
                     if st.button(f"🤖 Generar Respuesta", key=f"gen_resp_{p['id']}"):
                         respuesta_auto = responder_pregunta_medica(p['pregunta'])
                         p['respuesta'] = respuesta_auto
@@ -3147,10 +3250,8 @@ if st.session_state.get('es_admin', False):
         st.markdown("### Base de datos de enfermedades para el diagnóstico")
         st.info("Desde aquí puedes agregar, modificar o eliminar enfermedades de la base de datos.")
         
-        # Cargar enfermedades desde Supabase
         cargar_enfermedades_de_supabase()
         
-        # --- Agregar nueva enfermedad ---
         with st.expander("➕ AGREGAR NUEVA ENFERMEDAD", expanded=True):
             with st.form("form_agregar_enfermedad"):
                 st.markdown("#### Información de la enfermedad")
@@ -3160,16 +3261,16 @@ if st.session_state.get('es_admin', False):
                 with col1:
                     especialidad_nueva = st.text_input("Especialidad *")
                     urgencia_nueva = st.selectbox("Urgencia", ["Baja", "Media", "Alta"])
+                    solo_mujeres = st.checkbox("¿Solo para mujeres?")
                 with col2:
                     tratamiento_nuevo = st.text_area("Tratamiento sugerido *")
                 
-                sintomas_nuevos = st.text_area("Síntomas (separados por coma) *", help="Ejemplo: dolor de cabeza, fiebre, tos")
-                factores_riesgo_nuevos = st.text_area("Factores de riesgo (separados por coma)", help="Ejemplo: tabaquismo, obesidad, estrés")
-                recomendaciones_nuevas = st.text_area("Recomendaciones (una por línea)", help="Ejemplo: Descanso, Hidratación, Consulta con médico")
+                sintomas_nuevos = st.text_area("Síntomas (separados por coma) *")
+                factores_riesgo_nuevos = st.text_area("Factores de riesgo (separados por coma)")
+                recomendaciones_nuevas = st.text_area("Recomendaciones (una por línea)")
                 
                 if st.form_submit_button("💾 Guardar Enfermedad"):
                     if nombre_nuevo and especialidad_nueva and tratamiento_nuevo and sintomas_nuevos:
-                        # Procesar datos
                         sintomas_lista = [s.strip() for s in sintomas_nuevos.split(",") if s.strip()]
                         factores_lista = [f.strip() for f in factores_riesgo_nuevos.split(",") if f.strip()] if factores_riesgo_nuevos else []
                         recomendaciones_lista = [r.strip() for r in recomendaciones_nuevas.split("\n") if r.strip()] if recomendaciones_nuevas else []
@@ -3180,7 +3281,8 @@ if st.session_state.get('es_admin', False):
                             "especialidad": especialidad_nueva,
                             "urgencia": urgencia_nueva,
                             "recomendaciones": recomendaciones_lista,
-                            "tratamiento": tratamiento_nuevo
+                            "tratamiento": tratamiento_nuevo,
+                            "solo_mujeres": solo_mujeres
                         }
                         
                         if guardar_enfermedad_en_supabase(nombre_nuevo, nueva_enfermedad):
@@ -3196,7 +3298,6 @@ if st.session_state.get('es_admin', False):
         st.markdown("### 📋 Enfermedades registradas")
         st.markdown(f"**Total de enfermedades:** {len(BASE_DATOS_ENFERMEDADES)}")
         
-        # Buscador
         busqueda = st.text_input("🔍 Buscar enfermedad:", placeholder="Escribe el nombre de la enfermedad...")
         
         enfermedades_mostrar = BASE_DATOS_ENFERMEDADES
@@ -3210,6 +3311,7 @@ if st.session_state.get('es_admin', False):
                     with col1:
                         st.markdown(f"**Especialidad:** {info['especialidad']}")
                         st.markdown(f"**Urgencia:** {info['urgencia']}")
+                        st.markdown(f"**Solo mujeres:** {'Sí' if info.get('solo_mujeres', False) else 'No'}")
                         st.markdown(f"**Síntomas:** {', '.join(info['sintomas'])}")
                         st.markdown(f"**Factores de riesgo:** {', '.join(info['factores_riesgo']) if info['factores_riesgo'] else 'Ninguno'}")
                         st.markdown(f"**Tratamiento:** {info['tratamiento']}")
@@ -3233,7 +3335,6 @@ if st.session_state.get('es_admin', False):
         else:
             st.info("No se encontraron enfermedades")
         
-        # --- Editar enfermedad ---
         if st.session_state.get('edit_enfermedad'):
             nombre_edit = st.session_state.edit_enfermedad
             info_edit = BASE_DATOS_ENFERMEDADES.get(nombre_edit)
@@ -3248,6 +3349,7 @@ if st.session_state.get('es_admin', False):
                     with col1:
                         nueva_especialidad = st.text_input("Especialidad", value=info_edit['especialidad'])
                         nueva_urgencia = st.selectbox("Urgencia", ["Baja", "Media", "Alta"], index=["Baja", "Media", "Alta"].index(info_edit['urgencia']))
+                        solo_mujeres = st.checkbox("Solo para mujeres", value=info_edit.get('solo_mujeres', False))
                     with col2:
                         nuevo_tratamiento = st.text_area("Tratamiento", value=info_edit['tratamiento'])
                     
@@ -3268,10 +3370,10 @@ if st.session_state.get('es_admin', False):
                                 "especialidad": nueva_especialidad,
                                 "urgencia": nueva_urgencia,
                                 "recomendaciones": recomendaciones_lista,
-                                "tratamiento": nuevo_tratamiento
+                                "tratamiento": nuevo_tratamiento,
+                                "solo_mujeres": solo_mujeres
                             }
                             
-                            # Eliminar la antigua si cambió el nombre
                             if nuevo_nombre != nombre_edit:
                                 eliminar_enfermedad_de_supabase(nombre_edit)
                             
