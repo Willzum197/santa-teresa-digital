@@ -140,6 +140,30 @@ BASE_DATOS_ENFERMEDADES = {
         "recomendaciones": ["Reposo", "Fisioterapia", "Calor local", "Consulta con neurólogo"],
         "tratamiento": "Antiinflamatorios, analgésicos, vitaminas del complejo B"
     },
+    "Accidente Cerebrovascular (ACV)": {
+        "sintomas": ["adormecimiento del labio", "debilidad en un lado del cuerpo", "dificultad para hablar", "visión borrosa", "dolor de cabeza", "mareos", "pérdida de equilibrio"],
+        "factores_riesgo": ["hipertensión", "diabetes", "tabaquismo", "colesterol alto", "edad avanzada", "historia familiar"],
+        "especialidad": "Neurología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR A URGENCIAS INMEDIATAMENTE", "No automedicarse", "Mantener reposo", "LLAMAR AL 911"],
+        "tratamiento": "Trombólisis, anticoagulantes, rehabilitación"
+    },
+    "Tic Nervioso": {
+        "sintomas": ["tic nervioso en el ojo", "movimientos involuntarios", "parpadeo excesivo", "contracciones faciales", "estrés", "ansiedad"],
+        "factores_riesgo": ["estrés", "ansiedad", "fatiga", "falta de sueño", "consumo de cafeína"],
+        "especialidad": "Neurología",
+        "urgencia": "Baja",
+        "recomendaciones": ["Reducir el estrés", "Técnicas de relajación", "Dormir adecuadamente", "Consulta con neurólogo si persiste"],
+        "tratamiento": "Terapia de relajación, medicamentos en casos severos"
+    },
+    "Parálisis Facial": {
+        "sintomas": ["adormecimiento del labio", "debilidad facial", "caída de un lado de la cara", "dificultad para sonreír", "babeo", "dificultad para cerrar el ojo"],
+        "factores_riesgo": ["infecciones virales", "estrés", "diabetes", "embarazo", "sistema inmunológico débil"],
+        "especialidad": "Neurología",
+        "urgencia": "Alta",
+        "recomendaciones": ["ACUDIR AL MÉDICO URGENTEMENTE", "Proteger el ojo", "Fisioterapia facial", "Evitar corrientes de aire"],
+        "tratamiento": "Corticosteroides, antivirales, fisioterapia"
+    },
     
     # === ENFERMEDADES GASTROINTESTINALES ===
     "Diarrea Aguda": {
@@ -303,26 +327,56 @@ BASE_DATOS_ENFERMEDADES = {
 }
 
 # ============================================
-# FUNCIÓN DE DIAGNÓSTICO AVANZADO
+# LISTA COMPLETA DE SÍNTOMAS
+# ============================================
+SINTOMAS_COMPLETOS = [
+    "Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal",
+    "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar",
+    "Dolor en el pecho", "Erupción cutánea", "Fatiga", "Sed excesiva",
+    "Micción frecuente", "Visión borrosa", "Hambre extrema", "Pérdida de peso",
+    "Infecciones frecuentes", "Dolor articular", "Rigidez matutina",
+    "Inflamación", "Temblores", "Rigidez muscular", "Bradicinesia",
+    "Inestabilidad postural", "Pérdida de memoria", "Confusión",
+    "Cambios de humor", "Desorientación", "Bulto en el pecho",
+    "Sangre en orina", "Dificultad para orinar", "Tristeza persistente",
+    "Preocupación excesiva", "Irritabilidad", "Palpitaciones", "Sangrado nasal",
+    "Congestión nasal", "Estornudos", "Diarrea", "Vómitos",
+    "Dolor al orinar", "Orina turbia", "Dolor pélvico", "Zumbido en oídos",
+    "Dificultad para concentrarse", "Pérdida de apetito", "Desmayos",
+    "Palidez", "Sibilancias", "Producción de moco", "Sensibilidad a la luz",
+    "Sensibilidad al sonido", "Aura visual", "Quemazón", "Hormigueo",
+    "Entumecimiento", "Debilidad muscular", "Crujidos articulares",
+    "Dolor en la nuca", "Dolor en hombros", "Dificultad para mover",
+    "Dolor lumbar", "Irradiación a piernas", "Dolor al estar de pie",
+    "Dolor al sentarse", "Olor fuerte en orina", "Escalofríos", "Ictericia",
+    "Orina oscura", "Inflamación de parótidas", "Dolor al masticar",
+    "Ampollas", "Picazón", "Conjuntivitis", "Dolor muscular",
+    "Adormecimiento del labio", "Tic nervioso en el ojo", "Parpadeo excesivo",
+    "Contracciones faciales", "Movimientos involuntarios", "Debilidad en un lado del cuerpo",
+    "Dificultad para hablar", "Pérdida de equilibrio", "Caída de un lado de la cara",
+    "Dificultad para sonreír", "Babeo", "Dificultad para cerrar el ojo",
+    "Sensación de presión en la cabeza", "Dolor en la mandíbula"
+]
+
+# ============================================
+# FUNCIÓN DE DIAGNÓSTICO (SIN PORCENTAJES)
 # ============================================
 def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad, sexo):
     """
-    Función avanzada de diagnóstico que analiza múltiples enfermedades
-    y devuelve un ranking de probabilidad.
+    Función de diagnóstico que analiza múltiples enfermedades y devuelve
+    un análisis probable sin porcentajes.
     """
     diagnosticos = []
     
-    # Normalizar síntomas (convertir a minúsculas y quitar acentos)
+    # Normalizar síntomas
     sintomas_normalizados = []
     for s in sintomas_usuario:
         s_lower = s.lower().strip()
-        # Quitar acentos básicos
         s_lower = s_lower.replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
         sintomas_normalizados.append(s_lower)
     
     # Analizar cada enfermedad
     for nombre, info in BASE_DATOS_ENFERMEDADES.items():
-        puntaje = 0
         sintomas_coincidentes = []
         factores_riesgo = []
         total_sintomas = len(info["sintomas"])
@@ -331,7 +385,6 @@ def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad,
         for sintoma in info["sintomas"]:
             s_lower = sintoma.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
             if any(s_lower in s_usuario or s_usuario in s_lower for s_usuario in sintomas_normalizados):
-                puntaje += 1
                 sintomas_coincidentes.append(sintoma)
         
         # Verificar factores de riesgo
@@ -341,38 +394,39 @@ def diagnosticar_enfermedades(sintomas_usuario, condiciones_preexistentes, edad,
                 cond_lower = condicion.lower().replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u')
                 if factor_lower in cond_lower or cond_lower in factor_lower:
                     factores_riesgo.append(factor)
-                    puntaje += 1
         
-        # Calcular porcentaje de coincidencia
-        if total_sintomas > 0:
-            porcentaje = (puntaje / (total_sintomas + len(info["factores_riesgo"]))) * 100
-        else:
-            porcentaje = 0
-        
-        # Solo considerar si hay al menos 1 síntoma coincidente
-        if len(sintomas_coincidentes) >= 1:
+        # Solo considerar si hay al menos 2 síntomas coincidentes
+        if len(sintomas_coincidentes) >= 2:
+            # Calcular nivel de coincidencia (cualitativo)
+            if len(sintomas_coincidentes) >= total_sintomas * 0.7:
+                nivel = "Alta"
+            elif len(sintomas_coincidentes) >= total_sintomas * 0.4:
+                nivel = "Media"
+            else:
+                nivel = "Baja"
+            
             diagnosticos.append({
                 "enfermedad": nombre,
-                "porcentaje": min(porcentaje, 100),
+                "nivel": nivel,
                 "sintomas_coincidentes": sintomas_coincidentes,
                 "factores_riesgo": factores_riesgo,
                 "especialidad": info["especialidad"],
                 "urgencia": info["urgencia"],
                 "recomendaciones": info["recomendaciones"],
-                "tratamiento": info["tratamiento"]
+                "tratamiento": info["tratamiento"],
+                "total_sintomas": total_sintomas
             })
     
-    # Ordenar por porcentaje de coincidencia (mayor a menor)
-    diagnosticos.sort(key=lambda x: x["porcentaje"], reverse=True)
+    # Ordenar por nivel de coincidencia (Alta > Media > Baja)
+    orden_nivel = {"Alta": 0, "Media": 1, "Baja": 2}
+    diagnosticos.sort(key=lambda x: (orden_nivel[x["nivel"]], -len(x["sintomas_coincidentes"])))
     
-    # Solo devolver los top 8
     return diagnosticos[:8]
 
 # ============================================
 # FUNCIONES DE ADMINISTRACIÓN DE ENFERMEDADES
 # ============================================
 def guardar_enfermedad_en_supabase(nombre, info):
-    """Guarda una enfermedad en Supabase para persistencia"""
     try:
         data = {
             "nombre": nombre,
@@ -383,7 +437,6 @@ def guardar_enfermedad_en_supabase(nombre, info):
             "recomendaciones": info["recomendaciones"],
             "tratamiento": info["tratamiento"]
         }
-        # Verificar si ya existe
         existing = supabase.table("enfermedades").select("*").eq("nombre", nombre).execute()
         if existing.data:
             supabase.table("enfermedades").update(data).eq("nombre", nombre).execute()
@@ -395,7 +448,6 @@ def guardar_enfermedad_en_supabase(nombre, info):
         return False
 
 def cargar_enfermedades_de_supabase():
-    """Carga las enfermedades desde Supabase y las combina con la base local"""
     try:
         response = supabase.table("enfermedades").select("*").execute()
         if response.data:
@@ -408,7 +460,6 @@ def cargar_enfermedades_de_supabase():
         return False
 
 def eliminar_enfermedad_de_supabase(nombre):
-    """Elimina una enfermedad de Supabase"""
     try:
         supabase.table("enfermedades").delete().eq("nombre", nombre).execute()
         if nombre in BASE_DATOS_ENFERMEDADES:
@@ -1187,7 +1238,7 @@ if 'visitante_contado' not in st.session_state:
     st.session_state.visitante_contado = True
 
 # ============================================
-# ESTILOS - CON FONDO DE IMAGEN Y TEXTO VISIBLE
+# ESTILOS - CON FONDO DE IMAGEN Y TEXTO VISIBLE (CORREGIDO)
 # ============================================
 st.markdown(f"""
 <style>
@@ -1219,14 +1270,19 @@ div[data-testid="stTabs"] button:hover {{ background-color: #FFD700 !important; 
 [data-testid="stSidebar"] {{ background: linear-gradient(180deg, #87CEEB 0%, #4682B4 100%) !important; border-right: 3px solid #FFD700 !important; }}
 [data-testid="stSidebar"] * {{ color: #1a1a2e !important; }}
 
-/* CORRECCIÓN DE VISIBILIDAD PARA SELECTS Y MULTISELECTS */
+/* ============================================
+   CORRECCIÓN: FONDO BLANCO Y TEXTO NEGRO EN TODAS LAS OPCIONES
+   ============================================ */
+
+/* Inputs de texto */
 input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > textarea {{
     background-color: #ffffff !important;
     color: #000000 !important;
-    border: 2px solid #FFD700 !important;
+    border: 2px solid #cccccc !important;
     border-radius: 12px !important;
 }}
 
+/* Select boxes - FONDO BLANCO Y TEXTO NEGRO */
 .stSelectbox > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1238,6 +1294,7 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     color: #FFFFFF !important;
 }}
 
+/* Multiselect - FONDO BLANCO Y TEXTO NEGRO */
 .stMultiSelect > div > div {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1249,8 +1306,9 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     color: #FFFFFF !important;
 }}
 
+/* Tags del multiselect */
 .stMultiSelect [data-baseweb="tag"] {{
-    background-color: #FFD700 !important;
+    background-color: #e0e0e0 !important;
     color: #000000 !important;
 }}
 .stMultiSelect [data-baseweb="tag"] span {{
@@ -1260,13 +1318,17 @@ input, textarea, .stTextInput > div > div > input, .stTextArea > div > div > tex
     fill: #000000 !important;
 }}
 
+/* Input del multiselect */
 .stMultiSelect [data-baseweb="select"] input {{
     color: #000000 !important;
 }}
 
+/* ============================================
+   CORRECCIÓN: Opciones de los selects (menú desplegable)
+   ============================================ */
 div[data-baseweb="popover"] {{
     background-color: #ffffff !important;
-    border: 2px solid #FFD700 !important;
+    border: 2px solid #cccccc !important;
     border-radius: 12px !important;
     z-index: 9999 !important;
 }}
@@ -1279,14 +1341,15 @@ div[data-baseweb="popover"] li {{
     padding: 8px 12px !important;
 }}
 div[data-baseweb="popover"] li:hover {{
-    background-color: #FFD700 !important;
+    background-color: #e0e0e0 !important;
     color: #000000 !important;
 }}
 div[data-baseweb="popover"] li[aria-selected="true"] {{
-    background-color: #FFD700 !important;
+    background-color: #d0d0d0 !important;
     color: #000000 !important;
 }}
 
+/* Select normal */
 select {{
     background-color: #ffffff !important;
     color: #000000 !important;
@@ -1296,13 +1359,15 @@ select option {{
     color: #000000 !important;
 }}
 
+/* Number inputs */
 input[type="number"] {{
     background-color: #ffffff !important;
     color: #000000 !important;
-    border: 2px solid #FFD700 !important;
+    border: 2px solid #cccccc !important;
     border-radius: 12px !important;
 }}
 
+/* Slider */
 .stSlider > div > div > div {{
     color: #FFFFFF !important;
 }}
@@ -1313,6 +1378,7 @@ input[type="number"] {{
     background-color: #FFD700 !important;
 }}
 
+/* Checkbox y Radio */
 .stCheckbox label, .stRadio label {{
     color: #FFFFFF !important;
 }}
@@ -1320,6 +1386,7 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 
+/* Formularios y alertas */
 .stAlert {{
     background-color: rgba(0, 0, 0, 0.8) !important;
     color: #FFFFFF !important;
@@ -1331,6 +1398,7 @@ input[type="number"] {{
     color: #FFFFFF !important;
 }}
 
+/* Botones */
 .stButton > button {{ 
     background: linear-gradient(135deg, #FFD700, #CF142B) !important; 
     color: white !important; 
@@ -1349,6 +1417,7 @@ input[type="number"] {{
     box-shadow: 0 2px 10px rgba(255, 215, 0, 0.2) !important;
 }}
 
+/* Botones de salud */
 div[data-testid="column"] .stButton > button {{
     background: linear-gradient(135deg, #0a6b8a, #1a8aaa) !important;
     color: #FFFFFF !important;
@@ -2120,12 +2189,12 @@ elif st.session_state.selected_tab == 10:
             st.markdown(f"- **{fecha}:** {texto}")
 
 # ============================================
-# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20 - CON DIAGNÓSTICO AVANZADO)
+# NUEVA SECCIÓN: HABLANDO CON TUS DOCTORES (TAB 20 - CON DIAGNÓSTICO REAL)
 # ============================================
 
-# --- TAB 20: EVALUAR SÍNTOMAS (CON DIAGNÓSTICO AVANZADO) ---
+# --- TAB 20: EVALUAR SÍNTOMAS (CON DIAGNÓSTICO REAL) ---
 elif st.session_state.selected_tab == 20:
-    st.title("🩺 Evaluación de Síntomas - Diagnóstico Avanzado")
+    st.title("🩺 Evaluación de Síntomas - Diagnóstico Inteligente")
     
     # ADVERTENCIA IMPORTANTE
     st.markdown("""
@@ -2151,7 +2220,7 @@ elif st.session_state.selected_tab == 20:
     ### ¿Cómo funciona?
     1. Responde unas preguntas sobre tus síntomas (solo toma 3 minutos)
     2. Nuestro sistema analizará tus síntomas con una base de datos de más de 30 enfermedades
-    3. Obtendrás un diagnóstico diferencial con porcentajes de probabilidad
+    3. Obtendrás un análisis probable de tu condición
     4. El reporte te ayudará a saber cuándo debes consultar a un médico
     """)
     
@@ -2198,34 +2267,9 @@ elif st.session_state.selected_tab == 20:
             st.subheader("🩺 Paso 2: Cuéntanos tus síntomas")
             st.markdown("Selecciona todos los síntomas que estás experimentando.")
             
-            # Lista ampliada de síntomas
-            sintomas_disponibles = [
-                "Dolor de cabeza", "Dolor de garganta", "Fiebre", "Tos", "Dolor abdominal",
-                "Dolor de espalda", "Náuseas", "Mareos", "Dificultad para respirar",
-                "Dolor en el pecho", "Erupción cutánea", "Fatiga", "Sed excesiva",
-                "Micción frecuente", "Visión borrosa", "Hambre extrema", "Pérdida de peso",
-                "Infecciones frecuentes", "Dolor articular", "Rigidez matutina",
-                "Inflamación", "Temblores", "Rigidez muscular", "Bradicinesia",
-                "Inestabilidad postural", "Pérdida de memoria", "Confusión",
-                "Cambios de humor", "Desorientación", "Bulto en el pecho",
-                "Sangre en orina", "Dificultad para orinar", "Tristeza persistente",
-                "Preocupación excesiva", "Irritabilidad", "Palpitaciones", "Sangrado nasal",
-                "Congestión nasal", "Estornudos", "Diarrea", "Vómitos",
-                "Dolor al orinar", "Orina turbia", "Dolor pélvico", "Zumbido en oídos",
-                "Dificultad para concentrarse", "Pérdida de apetito", "Desmayos",
-                "Palidez", "Sibilancias", "Producción de moco", "Sensibilidad a la luz",
-                "Sensibilidad al sonido", "Aura visual", "Quemazón", "Hormigueo",
-                "Entumecimiento", "Debilidad muscular", "Crujidos articulares",
-                "Dolor en la nuca", "Dolor en hombros", "Dificultad para mover",
-                "Dolor lumbar", "Irradiación a piernas", "Dolor al estar de pie",
-                "Dolor al sentarse", "Olor fuerte en orina", "Escalofríos", "Ictericia",
-                "Orina oscura", "Inflamación de parótidas", "Dolor al masticar",
-                "Ampollas", "Picazón", "Conjuntivitis", "Dolor muscular"
-            ]
-            
             sintomas_seleccionados = st.multiselect(
                 "Selecciona tus síntomas (puedes elegir varios):",
-                sintomas_disponibles
+                SINTOMAS_COMPLETOS
             )
             
             # Campo para síntomas adicionales
@@ -2266,7 +2310,7 @@ elif st.session_state.selected_tab == 20:
     
     # --- PASO 3: Diagnóstico ---
     elif st.session_state.cuestionario_paso == 3:
-        st.subheader("📋 Diagnóstico Personalizado")
+        st.subheader("📋 Análisis de Diagnóstico")
         st.markdown("*Basado en la información que proporcionaste.*")
         
         resp = st.session_state.respuestas
@@ -2275,27 +2319,41 @@ elif st.session_state.selected_tab == 20:
         edad = resp.get('edad', 30)
         sexo = resp.get('sexo', 'Femenino')
         
-        # Ejecutar diagnóstico avanzado
+        # Ejecutar diagnóstico
         diagnosticos = diagnosticar_enfermedades(sintomas, condiciones, edad, sexo)
         
         if diagnosticos:
-            st.markdown("### 📊 Resultados del Diagnóstico")
+            st.markdown("### 📊 Análisis Probable")
             st.markdown(f"**Síntomas analizados:** {len(sintomas)} síntomas")
             st.markdown(f"**Edad:** {edad} años | **Sexo:** {sexo}")
             
-            # Mostrar los diagnósticos
+            st.markdown("---")
+            
+            # Mostrar los diagnósticos sin porcentajes
             for i, diag in enumerate(diagnosticos):
-                porcentaje = diag["porcentaje"]
-                color = "#4CAF50" if porcentaje > 70 else "#FFC107" if porcentaje > 40 else "#FF6B6B"
+                nivel = diag["nivel"]
+                if nivel == "Alta":
+                    color = "#4CAF50"
+                    emoji = "🟢"
+                    descripcion = "Alta coincidencia"
+                elif nivel == "Media":
+                    color = "#FFC107"
+                    emoji = "🟡"
+                    descripcion = "Coincidencia media"
+                else:
+                    color = "#FF6B6B"
+                    emoji = "🟠"
+                    descripcion = "Coincidencia baja"
+                
                 urgencia_emoji = "🔴" if diag["urgencia"] == "Alta" else "🟡" if diag["urgencia"] == "Media" else "🟢"
                 
-                with st.expander(f"#{i+1} {diag['enfermedad']} - {porcentaje:.0f}% de coincidencia"):
+                with st.expander(f"#{i+1} Posible: {diag['enfermedad']} ({descripcion})"):
                     st.markdown(f"""
                     <div style="background: {color}20; border-left: 4px solid {color}; padding: 15px; border-radius: 8px;">
-                        <h4 style="color: {color};">{diag['enfermedad']}</h4>
-                        <p><strong>Coincidencia:</strong> {porcentaje:.0f}%</p>
-                        <p><strong>Urgencia:</strong> {urgencia_emoji} {diag['urgencia']}</p>
-                        <p><strong>Especialidad:</strong> {diag['especialidad']}</p>
+                        <h4 style="color: {color};">🔍 Posible {diag['enfermedad']}</h4>
+                        <p><strong>Nivel de coincidencia:</strong> {emoji} {descripcion}</p>
+                        <p><strong>Urgencia sugerida:</strong> {urgencia_emoji} {diag['urgencia']}</p>
+                        <p><strong>Especialidad sugerida:</strong> {diag['especialidad']}</p>
                         <p><strong>Síntomas coincidentes:</strong> {', '.join(diag['sintomas_coincidentes'])}</p>
                         {f"<p><strong>Factores de riesgo:</strong> {', '.join(diag['factores_riesgo'])}</p>" if diag['factores_riesgo'] else ""}
                         <p><strong>Tratamiento sugerido:</strong> {diag['tratamiento']}</p>
@@ -2755,7 +2813,7 @@ if st.session_state.get('es_admin', False):
             enfermedades_mostrar = {k: v for k, v in BASE_DATOS_ENFERMEDADES.items() if busqueda.lower() in k.lower()}
         
         if enfermedades_mostrar:
-            for nombre, info in list(enfermedades_mostrar.items())[:20]:  # Mostrar 20 por página
+            for nombre, info in list(enfermedades_mostrar.items())[:20]:
                 with st.expander(f"📋 {nombre}", expanded=False):
                     col1, col2, col3 = st.columns([3, 1, 1])
                     with col1:
